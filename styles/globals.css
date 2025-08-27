@@ -1,0 +1,43 @@
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f7f7f7;
+}
+main {
+  max-width: 600px;
+  margin: 2rem auto;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+h1, h2 {
+  color: #1a202c;
+}
+a {
+  color: #3182ce;
+  text-decoration: none;
+}
+nav {
+  margin-bottom: 2rem;
+}
+footer {
+  text-align: center;
+  margin-top: 4rem;
+  color: #888;
+}
+button {
+  background: #3182ce;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  margin-left: 1rem;
+}
+input {
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+}
