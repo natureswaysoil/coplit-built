@@ -1,27 +1,37 @@
-import { supabase } from '../lib/supabaseClient'
-import { useState } from 'react'
+import { useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export default function Auth() {
-  const [email, setEmail] = useState('')
-  const [message, setMessage] = useState('')
+  const [email, setEmail] = useState('');
+  const [msg, setMsg] = useState('');
 
-  const signIn = async () => {
-    const { error } = await supabase.auth.signInWithOtp({ email })
-    if (error) setMessage(error.message)
-    else setMessage('Check your email for the login link!')
-  }
+  const handleSignIn = async (e) => {
+    e.preventDefault();
+    const { error } = await supabase.auth.signInWithOtp({ email });
+    setMsg(error ? error.message : 'Check your email for the login link!');
+  };
 
   return (
-    <div>
+    <main>
       <h1>Sign In</h1>
-      <input
-        type="email"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-        placeholder="Your email"
-      />
-      <button onClick={signIn}>Send Login Link</button>
-      <p>{message}</p>
-    </div>
-  )
+      <form onSubmit={handleSignIn} style={{ marginBottom: 16 }}>
+        <label>
+          Email:
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            required
+          />
+        </label>
+        <button type="submit">Sign In</button>
+      </form>
+      <p>{msg}</p>
+    </main>
+  );
 }
