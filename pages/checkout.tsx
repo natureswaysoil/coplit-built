@@ -43,12 +43,12 @@ export default function Checkout() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-  if (!items.length) return;
+    if (!items.length) return;
     setSubmitting(true);
     try {
       // ensure customer exists or create
       let customerId: string | null = null;
-  const { data: existing, error: selErr } = await supabase
+      const { data: existing, error: selErr } = await supabase
         .from('customers')
         .select('id')
         .eq('email', email)
@@ -104,9 +104,9 @@ export default function Checkout() {
             email,
             name,
             items: items.map(it => ({ title: it.title, size: it.size, qty: it.qty, price: it.price, sku: it.sku })),
-      subtotal,
-      tax,
-      total,
+            subtotal,
+            tax,
+            total,
             shipping: {
               address1, address2, city, state, zip, county, phone
             }
