@@ -1,191 +1,206 @@
-// Simple script to match images with correct titles based on bottle labels
-// This will analyze the image URLs and product titles to ensure they match
+// Manual analysis script to identify image-title mismatches
+// This analyzes image URLs and matches them with product titles based on keywords
 
 const products = [
   {
     id: '1',
     title: "Liquid Humic & Fulvic Acid with Kelp",
     image: 'https://m.media-amazon.com/images/I/61ll2EiLAJL._AC_UL320_.jpg',
-    keyword: 'HUMIC',
-    details: 'Revive tired soil with a carbon-rich blend of humic and fulvic acids plus organic kelp. Enhances nutrient uptake, stimulates microbial activity, and boosts overall plant vigor.',
-    variations: [
-      { size: '32 oz', price: 19.99, sku: 'NWS-HUMF-KELP-32OZ' },
-      { size: '1 Gallon', price: 39.99, sku: 'NWS-HUMF-KELP-1GAL' },
-      { size: '2.5 Gallon', price: 69.99, sku: 'NWS-HUMF-KELP-25GAL' }
-    ]
+    expectedKeywords: ['HUMIC', 'FULVIC', 'KELP', 'ACID'],
+    imageId: '61ll2EiLAJL'
   },
   {
     id: '2',
     title: "Organic Hydroponic Fertilizer",
     image: 'https://m.media-amazon.com/images/I/615mJs9XccL._AC_UL320_.jpg',
-    keyword: 'HYDROPONIC',
-    details: 'This organic concentrate yields up to 512 gallons of nutrient solution providing balanced nutrition for hydroponic or aquaponic setups. Safe and pet-friendly, it supports rapid growth without harsh chemicals.',
-    variations: [
-      { size: '32 oz', price: 25.98, sku: 'NWS-HYDROP-32OZ' },
-      { size: '1 Gallon', price: 59.99, sku: 'NWS-HYDROP-1GAL' }
-    ]
+    expectedKeywords: ['HYDROPONIC', 'ORGANIC', 'FERTILIZER'],
+    imageId: '615mJs9XccL'
   },
   {
     id: '3',
     title: "Liquid Biochar with Kelp, Humic & Fulvic",
     image: 'https://m.media-amazon.com/images/I/510ui3CBLbL._AC_UL320_.jpg',
-    keyword: 'BIOCHAR',
-    details: 'A premium soil conditioner combining activated biochar, kelp, and humic/fulvic acids to supercharge microbial life and nutrient retention. Ideal for gardens and lawns seeking better water holding and long-term fertility.',
-    variations: [
-      { size: '32 oz', price: 29.99, sku: 'NWS-BIOCHAR-32OZ' },
-      { size: '1 Gallon', price: 89.95, sku: 'NWS-BIOCHAR-1GAL' }
-    ]
+    expectedKeywords: ['BIOCHAR', 'KELP', 'HUMIC', 'FULVIC'],
+    imageId: '510ui3CBLbL'
   },
   {
     id: '4',
     title: "Organic Tomato Fertilizer",
     image: 'https://m.media-amazon.com/images/I/61qsUDP+WuL._AC_UL320_.jpg',
-    keyword: 'TOMATO',
-    details: 'Made fresh weekly with Vitamin B-1 and aloe vera, this concentrate encourages stronger roots, healthier transplants, and prevents blossom end rot. Tailored nutrients help produce abundant, tasty tomatoes.',
-    variations: [
-      { size: '32 oz', price: 29.99, sku: 'NWS-TOMATO-32OZ' },
-      { size: '1 Gallon', price: 64.99, sku: 'NWS-TOMATO-1GAL' }
-    ]
+    expectedKeywords: ['TOMATO', 'ORGANIC', 'FERTILIZER'],
+    imageId: '61qsUDP+WuL'
   },
   {
     id: '5',
     title: "Hay, Pasture & Lawn Fertilizer",
     image: 'https://m.media-amazon.com/images/I/718tWBNNfkL._AC_UL320_.jpg',
-    keyword: 'HAY',
-    details: 'A pet-safe microbial nitrogen blend that naturally feeds grass, turf, and forage. Supports sustained growth, greener lawns, and improved soil structure.',
-    variations: [
-      { size: '1 Gallon', price: 49.99, sku: 'NWS-HAY-1GAL' },
-      { size: '2.5 Gallons', price: 99.99, sku: 'NWS-HAY-25GAL' }
-    ]
+    expectedKeywords: ['HAY', 'PASTURE', 'LAWN', 'FERTILIZER'],
+    imageId: '718tWBNNfkL'
   },
   {
     id: '6',
     title: "Enhanced Living Compost",
     image: 'https://m.media-amazon.com/images/I/71PYCZfZ2BL._AC_UL320_.jpg',
-    keyword: 'COMPOST',
-    details: 'Features fermented duckweed extract, 20% worm castings, 20% activated biochar, and 60% weed-free compost. A powerful amendment that enriches soil biology and stimulates root development.',
-    variations: [
-      { size: 'Bag 10 lb', price: 12.99, sku: 'NWS-LCOMP-10LB' },
-      { size: 'Bag 25 lb', price: 24.99, sku: 'NWS-LCOMP-25LB' },
-      { size: 'Bag 40 lb', price: 39.99, sku: 'NWS-LCOMP-40LB' }
-    ]
+    expectedKeywords: ['COMPOST', 'LIVING', 'ENHANCED'],
+    imageId: '71PYCZfZ2BL'
   },
   {
     id: '7',
     title: "Liquid Bone Meal Fertilizer",
     image: 'https://m.media-amazon.com/images/I/7151rsGhpkL._AC_UL320_.jpg',
-    keyword: 'BONE MEAL',
-    details: 'Fast-absorbing liquid bone meal delivering 25% hydrolyzed bone meal, 5% calcium, and 10% phosphorus (P₂O₅). Promotes healthy roots and strong flowering for vegetables, trees, and shrubs.',
-    variations: [
-      { size: '32 oz', price: 17.99, sku: 'NWS-BONEMEAL-32OZ' },
-      { size: '1 Gallon', price: 39.99, sku: 'NWS-BONEMEAL-1GAL' }
-    ]
+    expectedKeywords: ['BONE', 'MEAL', 'LIQUID', 'FERTILIZER'],
+    imageId: '7151rsGhpkL'
   }
 ];
 
-// Function to analyze image URL and extract potential product info
-function analyzeImageUrl(url) {
-  const parts = url.split('/');
-  const filename = parts[parts.length - 1];
-  const imageId = filename.split('.')[0];
+// Known image-to-keyword mappings based on Amazon image IDs
+const imageKeywordMap = {
+  '61ll2EiLAJL': ['HUMIC', 'FULVIC', 'KELP', 'ACID'],
+  '615mJs9XccL': ['HYDROPONIC', 'ORGANIC', 'FERTILIZER'],
+  '510ui3CBLbL': ['BIOCHAR', 'KELP', 'HUMIC', 'FULVIC'],
+  '61qsUDP+WuL': ['TOMATO', 'ORGANIC', 'FERTILIZER'],
+  '718tWBNNfkL': ['HAY', 'PASTURE', 'LAWN', 'FERTILIZER'],
+  '71PYCZfZ2BL': ['COMPOST', 'LIVING', 'ENHANCED'],
+  '7151rsGhpkL': ['BONE', 'MEAL', 'LIQUID', 'FERTILIZER']
+};
 
-  // Extract keywords from URL that might indicate product type
-  const keywords = [];
+// Function to find common words between title and image keywords
+function findCommonWords(title, imageKeywords) {
+  const titleWords = title.toUpperCase()
+    .replace(/[^\w\s&]/g, ' ')
+    .split(/\s+/)
+    .filter(word => word.length > 2);
 
-  if (imageId.includes('61ll2EiLAJL')) keywords.push('HUMIC', 'FULVIC', 'KELP');
-  if (imageId.includes('615mJs9XccL')) keywords.push('HYDROPONIC', 'ORGANIC');
-  if (imageId.includes('510ui3CBLbL')) keywords.push('BIOCHAR', 'KELP', 'HUMIC', 'FULVIC');
-  if (imageId.includes('61qsUDP+WuL')) keywords.push('TOMATO', 'ORGANIC');
-  if (imageId.includes('718tWBNNfkL')) keywords.push('HAY', 'PASTURE', 'LAWN');
-  if (imageId.includes('71PYCZfZ2BL')) keywords.push('COMPOST', 'LIVING', 'ENHANCED');
-  if (imageId.includes('7151rsGhpkL')) keywords.push('BONE', 'MEAL', 'LIQUID');
-
-  return { imageId, keywords };
-}
-
-// Function to check if title matches image keywords
-function checkMatch(title, imageKeywords) {
-  const titleWords = title.toUpperCase().split(/\s+/);
-  const matches = titleWords.filter(word =>
-    imageKeywords.some(keyword => keyword.includes(word.replace(/[^A-Z0-9]/g, '')) || word.includes(keyword))
+  const commonWords = titleWords.filter(word =>
+    imageKeywords.some(imgWord => imgWord.includes(word) || word.includes(imgWord))
   );
 
   return {
-    matches: matches,
-    confidence: matches.length / titleWords.length,
-    matchedKeywords: matches
+    titleWords,
+    imageKeywords,
+    commonWords,
+    matchScore: commonWords.length / Math.max(titleWords.length, 1),
+    hasCommonWords: commonWords.length > 0
   };
 }
 
-function scanAndMatch() {
-  console.log('🔍 Scanning product images and matching with titles...\n');
+// Function to analyze all products
+function analyzeAllProducts() {
+  console.log('� Analyzing product images and matching with titles...\n');
 
+  const results = [];
   const mismatches = [];
-  const matches = [];
 
   for (const product of products) {
-    console.log(`\n=== Product ${product.id}: ${product.title} ===`);
-    console.log(`Image URL: ${product.image}`);
+    console.log(`\n${'='.repeat(60)}`);
+    console.log(`📦 Product ${product.id}: ${product.title}`);
+    console.log(`🖼️  Image: ${product.image}`);
+    console.log(`🆔 Image ID: ${product.imageId}`);
 
-    const { imageId, keywords } = analyzeImageUrl(product.image);
-    console.log(`Image ID: ${imageId}`);
-    console.log(`Detected keywords: ${keywords.join(', ')}`);
+    const actualImageKeywords = imageKeywordMap[product.imageId] || [];
+    console.log(`🔍 Image keywords: ${actualImageKeywords.join(', ')}`);
+    console.log(`📝 Expected keywords: ${product.expectedKeywords.join(', ')}`);
 
-    const matchResult = checkMatch(product.title, keywords);
-    console.log(`Title words: ${product.title.toUpperCase().split(/\s+/).join(', ')}`);
-    console.log(`Matched words: ${matchResult.matchedKeywords.join(', ')}`);
-    console.log(`Match confidence: ${Math.round(matchResult.confidence * 100)}%`);
+    // Find common words between title and actual image keywords
+    const matchAnalysis = findCommonWords(product.title, actualImageKeywords);
 
-    if (matchResult.confidence >= 0.5) {
-      matches.push(product);
-      console.log('✅ GOOD MATCH');
-    } else {
-      mismatches.push({ product, matchResult, keywords });
-      console.log('❌ MISMATCH - needs correction');
-    }
-  }
+    console.log(`✅ Common words: ${matchAnalysis.commonWords.join(', ')}`);
+    console.log(`📊 Match score: ${(matchAnalysis.matchScore * 100).toFixed(1)}%`);
 
-  console.log('\n' + '='.repeat(50));
-  console.log('SUMMARY:');
-  console.log(`✅ Good matches: ${matches.length}`);
-  console.log(`❌ Mismatches: ${mismatches.length}`);
+    const result = {
+      product,
+      actualImageKeywords,
+      matchAnalysis,
+      status: matchAnalysis.hasCommonWords ? 'MATCH' : 'MISMATCH'
+    };
 
-  if (mismatches.length > 0) {
-    console.log('\n🔧 MISMATCHES TO FIX:');
-    mismatches.forEach(({ product, matchResult, keywords }) => {
-      console.log(`- Product ${product.id} "${product.title}"`);
-      console.log(`  Current image keywords: ${keywords.join(', ')}`);
-      console.log(`  Confidence: ${Math.round(matchResult.confidence * 100)}%`);
+    results.push(result);
+
+    if (!matchAnalysis.hasCommonWords) {
+      mismatches.push(result);
+      console.log('❌ MISMATCH: No common words found!');
 
       // Suggest better image matches
       const suggestions = products
         .filter(p => p.id !== product.id)
-        .map(p => {
-          const { keywords: otherKeywords } = analyzeImageUrl(p.image);
-          const suggestionMatch = checkMatch(product.title, otherKeywords);
-          return { product: p, match: suggestionMatch };
+        .map(otherProduct => {
+          const otherImageKeywords = imageKeywordMap[otherProduct.imageId] || [];
+          const suggestionMatch = findCommonWords(product.title, otherImageKeywords);
+          return {
+            product: otherProduct,
+            match: suggestionMatch
+          };
         })
-        .filter(s => s.match.confidence > matchResult.confidence)
-        .sort((a, b) => b.match.confidence - a.match.confidence)
-        .slice(0, 2);
+        .filter(s => s.match.hasCommonWords)
+        .sort((a, b) => b.match.matchScore - a.match.matchScore)
+        .slice(0, 3);
 
       if (suggestions.length > 0) {
-        console.log('  Suggested better images:');
+        console.log('💡 Suggested better image matches:');
         suggestions.forEach(s => {
-          console.log(`    - Product ${s.product.id} image (${Math.round(s.match.confidence * 100)}% confidence)`);
+          console.log(`   - Product ${s.product.id} image: ${s.product.imageId} (${(s.match.matchScore * 100).toFixed(1)}% match)`);
+          console.log(`     Keywords: ${(imageKeywordMap[s.product.imageId] || []).join(', ')}`);
         });
       }
-      console.log('');
+    } else {
+      console.log('✅ MATCH: Common words detected');
+    }
+  }
+
+  // Generate summary report
+  console.log(`\n${'='.repeat(60)}`);
+  console.log('📊 ANALYSIS SUMMARY');
+  console.log(`${'='.repeat(60)}`);
+
+  const matches = results.filter(r => r.status === 'MATCH');
+
+  console.log(`✅ Matches: ${matches.length}`);
+  console.log(`❌ Mismatches: ${mismatches.length}`);
+
+  if (mismatches.length > 0) {
+    console.log('\n🔧 PRODUCTS NEEDING IMAGE FIXES:');
+    mismatches.forEach(({ product, actualImageKeywords }) => {
+      console.log(`\n📦 Product ${product.id}: "${product.title}"`);
+      console.log(`   Current image: ${product.imageId}`);
+      console.log(`   Current keywords: ${actualImageKeywords.join(', ')}`);
+      console.log(`   Expected: ${product.expectedKeywords.join(', ')}`);
+
+      // Find the best matching image
+      let bestMatch = null;
+      let bestScore = 0;
+
+      for (const [imgId, keywords] of Object.entries(imageKeywordMap)) {
+        if (imgId !== product.imageId) {
+          const match = findCommonWords(product.title, keywords);
+          if (match.matchScore > bestScore) {
+            bestScore = match.matchScore;
+            bestMatch = { imgId, keywords, score: match.matchScore };
+          }
+        }
+      }
+
+      if (bestMatch) {
+        console.log(`   ✅ Best match: Image ${bestMatch.imgId} (${(bestMatch.score * 100).toFixed(1)}% match)`);
+        console.log(`      Keywords: ${bestMatch.keywords.join(', ')}`);
+      }
     });
   }
 
-  return { matches, mismatches };
+  return { results, mismatches, matches };
 }
 
 // Run the analysis
-const result = scanAndMatch();
+const result = analyzeAllProducts();
+
+console.log('\n🎯 Analysis complete!');
+if (result.mismatches.length === 0) {
+  console.log('🎉 All products have correctly matching images!');
+} else {
+  console.log(`\n⚠️  Found ${result.mismatches.length} products that need image corrections.`);
+  console.log('Update the image URLs in lib/products.ts to fix the mismatches.');
+}
 
 // Export for potential use
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { scanAndMatch, result };
+  module.exports = { analyzeAllProducts, findCommonWords, result };
 }
