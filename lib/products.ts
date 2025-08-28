@@ -16,7 +16,7 @@ export const products: Product[] = [
   {
     id: '1',
   title: "Liquid Humic & Fulvic Acid with Kelp",
-  image: 'https://m.media-amazon.com/images/I/61ll2EiLAJL._AC_UL320_.jpg',
+  image: '/screenshots/Screenshot 2025-08-21 102112  humic details.png',
     details: 'Revive tired soil with a carbon-rich blend of humic and fulvic acids plus organic kelp. Enhances nutrient uptake, stimulates microbial activity, and boosts overall plant vigor.',
     variations: [
   { size: '32 oz', price: 19.99, sku: 'NWS-HUMF-KELP-32OZ' },
@@ -27,7 +27,7 @@ export const products: Product[] = [
   {
     id: '2',
   title: "Organic Hydroponic Fertilizer",
-  image: 'https://m.media-amazon.com/images/I/615mJs9XccL._AC_UL320_.jpg',
+  image: '/screenshots/Screenshot 2025-08-21 102258 hydrophonic.png',
     details: 'This organic concentrate yields up to 512 gallons of nutrient solution providing balanced nutrition for hydroponic or aquaponic setups. Safe and pet-friendly, it supports rapid growth without harsh chemicals.',
     variations: [
       { size: '32 oz', price: 25.98, sku: 'NWS-HYDROP-32OZ' },
@@ -57,7 +57,7 @@ export const products: Product[] = [
   {
     id: '5',
   title: "Hay, Pasture & Lawn Fertilizer",
-  image: 'https://m.media-amazon.com/images/I/718tWBNNfkL._AC_UL320_.jpg',
+  image: '/screenshots/Screenshot 2025-08-21 102710  hay details.png',
     details: 'A pet-safe microbial nitrogen blend that naturally feeds grass, turf, and forage. Supports sustained growth, greener lawns, and improved soil structure.',
     variations: [
       { size: '1 Gallon', price: 49.99, sku: 'NWS-HAY-1GAL' },
@@ -67,7 +67,7 @@ export const products: Product[] = [
   {
     id: '6',
   title: "Enhanced Living Compost",
-  image: 'https://m.media-amazon.com/images/I/71PYCZfZ2BL._AC_UL320_.jpg',
+  image: '/screenshots/Screenshot 2025-08-21 102853 compost details.png',
     details: 'Features fermented duckweed extract, 20% worm castings, 20% activated biochar, and 60% weed-free compost. A powerful amendment that enriches soil biology and stimulates root development.',
     variations: [
       { size: 'Bag 10 lb', price: 12.99, sku: 'NWS-LCOMP-10LB' },
@@ -78,7 +78,7 @@ export const products: Product[] = [
   {
     id: '7',
   title: "Liquid Bone Meal Fertilizer",
-  image: 'https://m.media-amazon.com/images/I/7151rsGhpkL._AC_UL320_.jpg',
+  image: '/screenshots/Screenshot 2025-08-21 103208  bone meal details.png',
     details: 'Fast-absorbing liquid bone meal delivering 25% hydrolyzed bone meal, 5% calcium, and 10% phosphorus (P₂O₅). Promotes healthy roots and strong flowering for vegetables, trees, and shrubs.',
     variations: [
       { size: '32 oz', price: 17.99, sku: 'NWS-BONEMEAL-32OZ' },
