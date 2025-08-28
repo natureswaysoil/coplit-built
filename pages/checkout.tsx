@@ -49,9 +49,15 @@ export default function Checkout() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!items.length) return;
+    console.log('Form submitted, items:', items.length);
+    if (!items.length) {
+      console.log('No items in cart');
+      return;
+    }
+    console.log('Setting submitting to true');
     setSubmitting(true);
     try {
+      console.log('Creating customer...');
       // ensure customer exists or create
       let customerId: string | null = null;
       const { data: existing, error: selErr } = await supabase
@@ -59,19 +65,29 @@ export default function Checkout() {
         .select('id')
         .eq('email', email)
         .maybeSingle();
-      if (selErr) throw selErr;
+      if (selErr) {
+        console.error('Customer lookup error:', selErr);
+        throw selErr;
+      }
       if (existing) {
         customerId = existing.id;
+        console.log('Found existing customer:', customerId);
       } else {
+        console.log('Creating new customer...');
         const { data: created, error: insErr } = await supabase
           .from('customers')
           .insert({ name, email })
           .select('id')
           .single();
-        if (insErr) throw insErr;
+        if (insErr) {
+          console.error('Customer creation error:', insErr);
+          throw insErr;
+        }
         customerId = created.id;
+        console.log('Created new customer:', customerId);
       }
 
+      console.log('Creating order via API...');
       // create order and order_items
       // Create order server-side (service role) to bypass RLS
       const orderCreateResp = await fetch('/api/order-create', {
@@ -86,9 +102,16 @@ export default function Checkout() {
           shipping: { address1, address2, city, state, zip, county, phone }
         })
       })
-      if (!orderCreateResp.ok) throw new Error('Failed to create order');
+      console.log('Order create response status:', orderCreateResp.status);
+      if (!orderCreateResp.ok) {
+        const errorText = await orderCreateResp.text();
+        console.error('Order create failed:', errorText);
+        throw new Error(`Failed to create order: ${errorText}`);
+      }
       const { orderId: orderIdLocal } = await orderCreateResp.json();
+      console.log('Order created with ID:', orderIdLocal);
 
+      console.log('Creating order items...');
       const itemsPayload = items.map(it => ({
         order_id: orderIdLocal!,
         sku: it.sku,
@@ -98,10 +121,15 @@ export default function Checkout() {
       const { error: itemsErr } = await supabase
         .from('order_items')
         .insert(itemsPayload);
-      if (itemsErr) throw itemsErr;
+      if (itemsErr) {
+        console.error('Order items creation error:', itemsErr);
+        throw itemsErr;
+      }
+      console.log('Order items created successfully');
 
       // send order confirmation email (best-effort; ignore errors)
       try {
+        console.log('Sending confirmation email...');
         await fetch('/api/order-confirmation', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -118,14 +146,20 @@ export default function Checkout() {
             }
           })
         })
-      } catch {}
+        console.log('Confirmation email sent');
+      } catch (emailErr) {
+        console.error('Email sending failed:', emailErr);
+      }
 
+      console.log('Clearing cart and setting order ID');
       clearCart();
       setOrderId(orderIdLocal);
+      console.log('Order process completed successfully');
     } catch (err) {
-      console.error(err);
-      alert('Failed to place order. Please try again.');
+      console.error('Order submission error:', err);
+      alert(`Failed to place order: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
+      console.log('Setting submitting to false');
       setSubmitting(false);
     }
   }
