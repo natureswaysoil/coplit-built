@@ -1,16 +1,55 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import AutoCroppedImage from '../components/AutoCroppedImage';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { products } from '../lib/products';
 import { useCart } from '../lib/cartContext';
+import { ocrImageToTokens, scoreTitleAgainstTokens } from '../lib/ocrMatcher';
 
 // products are imported from ../lib/products
 
 export default function Home() {
   const { addItem } = useCart();
   const [selected, setSelected] = useState<Record<string, string>>({});
-  const items = Array.isArray(products) ? products : [];
+  const [items, setItems] = useState(Array.isArray(products) ? products : []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const tokensCache = new Map<string, string[]>();
+        async function getTokens(url: string) {
+          if (tokensCache.has(url)) return tokensCache.get(url)!;
+          const tokens = await ocrImageToTokens(url);
+          tokensCache.set(url, tokens);
+          return tokens;
+        }
+        const updated = await Promise.all(products.map(async (p) => {
+          try {
+            const tokens = await getTokens(p.image);
+            const selfScore = scoreTitleAgainstTokens(p.title, tokens).score;
+            if (selfScore >= 0.34) return p;
+            let best = { score: selfScore, image: p.image };
+            for (const candidate of products) {
+              const ct = await getTokens(candidate.image);
+              const s = scoreTitleAgainstTokens(p.title, ct).score;
+              if (s > best.score) best = { score: s, image: candidate.image };
+            }
+            if (best.image !== p.image && best.score > selfScore && best.score >= 0.34) {
+              return { ...p, image: best.image };
+            }
+            return p;
+          } catch {
+            return p;
+          }
+        }));
+        if (!cancelled) setItems(updated);
+      } catch {
+        // ignore
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   return (
     <div style={{ background: '#174F2E', color: 'white', padding: '1rem 0' }}>
