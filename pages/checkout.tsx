@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useCart } from '../lib/cartContext';
 import { supabase } from '../lib/supabaseClient';
-import { NC_COUNTIES, NC_CITY_TO_COUNTY } from '../lib/nc_data';
+import { NC_COUNTIES, NC_CITY_TO_COUNTY, NC_ZIP_TO_COUNTY } from '../lib/nc_data';
 
 export default function Checkout() {
   const { items, clearCart } = useCart();
@@ -34,12 +34,18 @@ export default function Checkout() {
   const tax = mounted && state === 'NC' ? subtotal * (ncRate + countyRate) : 0;
   const total = subtotal + tax;
 
-  // Autofill county based on city for NC
+  // Autofill county based on ZIP code for NC (primary method)
   useEffect(() => {
     if (state !== 'NC') return;
-    const guess = NC_CITY_TO_COUNTY[norm(city)];
-    if (guess && !county) setCounty(guess);
-  }, [city, state]);
+    const zipGuess = NC_ZIP_TO_COUNTY[zip];
+    if (zipGuess && !county) {
+      setCounty(zipGuess);
+      return;
+    }
+    // Fallback to city-based lookup if ZIP not found
+    const cityGuess = NC_CITY_TO_COUNTY[norm(city)];
+    if (cityGuess && !county) setCounty(cityGuess);
+  }, [zip, city, state]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -171,14 +177,14 @@ export default function Checkout() {
             </div>
             <div>
               <label>County (NC only)</label>
-              <input list="nc-counties" value={county} onChange={(e) => setCounty(e.target.value)} style={{ width: '100%', padding: 8 }} placeholder="e.g., Wake" disabled={state !== 'NC'} />
+              <input list="nc-counties" value={county} onChange={(e) => setCounty(e.target.value)} style={{ width: '100%', padding: 8 }} placeholder="Auto-fills from ZIP code" disabled={state !== 'NC'} />
               <datalist id="nc-counties">
                 {NC_COUNTIES.map(c => (<option key={c} value={c} />))}
               </datalist>
             </div>
           </div>
           <div style={{ fontSize: 12, color: '#555' }}>
-            If an NC county is provided and configured, county tax will be added on top of the state rate.
+            County auto-fills from ZIP code. If an NC county is provided and configured, county tax will be added on top of the state rate.
           </div>
           {mounted && (
             <div>
