@@ -18,7 +18,14 @@ export default function ProductDetail({ product }: Props) {
     <main style={{ maxWidth: 900, margin: '0 auto', padding: '2rem' }}>
       <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div style={{ flex: '0 1 320px', background: 'white', borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.07)', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <AutoCroppedImage src={product.image} alt={product.title} width={280} height={280} />
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <AutoCroppedImage src={product.image} alt={product.title} width={280} height={280} />
+            {product.keyword && (
+              <span style={{ position: 'absolute', top: 6, left: 6, background: '#174F2E', color: 'white', fontSize: 12, padding: '2px 6px', borderRadius: 6, letterSpacing: 0.5 }}>
+                {product.keyword}
+              </span>
+            )}
+          </div>
         </div>
         <div style={{ flex: '1 1 360px' }}>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 'bold', marginBottom: '0.75rem' }}>{product.title}</h1>

@@ -20,7 +20,14 @@ export default function Products() {
         )}
         {items.map(p => (
           <div key={p.id} style={{ background: 'white', borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.07)', padding: '1.5rem', minWidth: 220, maxWidth: 320, textAlign: 'center' }}>
-            <AutoCroppedImage src={p.image} alt={p.title} width={180} height={180} />
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <AutoCroppedImage src={p.image} alt={p.title} width={180} height={180} />
+              {p.keyword && (
+                <span style={{ position: 'absolute', top: 6, left: 6, background: '#174F2E', color: 'white', fontSize: 12, padding: '2px 6px', borderRadius: 6, letterSpacing: 0.5 }}>
+                  {p.keyword}
+                </span>
+              )}
+            </div>
             <h3 style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>{p.title}</h3>
             <p style={{ fontSize: '1rem', marginBottom: '1rem' }}>{p.details}</p>
             <div style={{ marginBottom: '0.75rem' }}>

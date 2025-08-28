@@ -18,3 +18,7 @@ A full-stack store demo built with Next.js, Supabase, Stripe, and Markdown for l
 ## Legal Pages
 - [Privacy Policy](pages/privacy-policy.md)
 - [Refund Policy](pages/refund-policy.md)
+
+## Deployment
+- GitHub Actions workflow `.github/workflows/deploy-vercel.yml` deploys to Vercel on push to `main`.
+- Last trigger: 2025-08-28.
