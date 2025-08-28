@@ -22,16 +22,23 @@ type PagesPageConfig = {
   }
 }
 
-
-
-
-
-
-// Validate ../../pages/_app.tsx
-{
-  const handler = {} as typeof import("../../pages/_app.js")
-  handler satisfies PagesPageConfig
+type ApiRouteConfig = {
+  default: (req: any, res: any) => Promise<Response | void> | Response | void
+  config?: {
+    api?: {
+      bodyParser?: boolean | { sizeLimit?: string }
+      responseLimit?: string | number | boolean
+      externalResolver?: boolean
+    }
+    runtime?: 'edge' | 'experimental-edge' | 'nodejs' | string // necessary unless config is exported as const
+    maxDuration?: number
+  }
 }
+
+
+
+
+
 
 // Validate ../../pages/about.tsx
 {
@@ -51,6 +58,12 @@ type PagesPageConfig = {
   handler satisfies PagesPageConfig
 }
 
+// Validate ../../pages/checkout.tsx
+{
+  const handler = {} as typeof import("../../pages/checkout.js")
+  handler satisfies PagesPageConfig
+}
+
 // Validate ../../pages/contact.tsx
 {
   const handler = {} as typeof import("../../pages/contact.js")
@@ -60,6 +73,12 @@ type PagesPageConfig = {
 // Validate ../../pages/index.tsx
 {
   const handler = {} as typeof import("../../pages/index.js")
+  handler satisfies PagesPageConfig
+}
+
+// Validate ../../pages/privacy-policy.tsx
+{
+  const handler = {} as typeof import("../../pages/privacy-policy.js")
   handler satisfies PagesPageConfig
 }
 
@@ -75,6 +94,34 @@ type PagesPageConfig = {
   handler satisfies PagesPageConfig
 }
 
+// Validate ../../pages/refund-policy.tsx
+{
+  const handler = {} as typeof import("../../pages/refund-policy.js")
+  handler satisfies PagesPageConfig
+}
 
+// Validate ../../pages/sales.tsx
+{
+  const handler = {} as typeof import("../../pages/sales.js")
+  handler satisfies PagesPageConfig
+}
+
+// Validate ../../pages/api/contact.ts
+{
+  const handler = {} as typeof import("../../pages/api/contact.js")
+  handler satisfies ApiRouteConfig
+}
+
+// Validate ../../pages/api/order-confirmation.ts
+{
+  const handler = {} as typeof import("../../pages/api/order-confirmation.js")
+  handler satisfies ApiRouteConfig
+}
+
+// Validate ../../pages/api/order-create.ts
+{
+  const handler = {} as typeof import("../../pages/api/order-create.js")
+  handler satisfies ApiRouteConfig
+}
 
 
