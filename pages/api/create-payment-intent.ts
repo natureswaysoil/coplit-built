@@ -8,16 +8,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!secret) return res.status(500).json({ error: 'Missing STRIPE_SECRET_KEY' })
 
   try {
-    // ❌ remove apiVersion option; let the SDK use its pinned version
+    // ❌ remove the apiVersion option completely
     const stripe = new Stripe(secret)
 
-    const { amount, currency = 'usd', email, name, items, shipping, billingSame, billing, isCents = false } =
-      (req.body || {}) as any
-
+    const { amount, currency = 'usd', email, name, items, shipping, billingSame, billing, isCents = false } = (req.body || {}) as any
     const amt = isCents ? Math.floor(amount) : Math.round(Number(amount) * 100)
     if (!Number.isFinite(amt) || amt < 50) return res.status(400).json({ error: 'Invalid amount (min 50¢)' })
 
-    // Keep on-site checkout (Link + card)
     const pi = await stripe.paymentIntents.create({
       amount: amt,
       currency,
@@ -28,7 +25,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         order_email: (email ?? '').toString().slice(0, 120),
         billing_same: String(!!billingSame),
         items: items ? JSON.stringify(items).slice(0, 450) : '',
-        // (optional: mirror flattened shipping/billing keys here if you added that earlier)
       },
       shipping: shipping?.address1
         ? {
