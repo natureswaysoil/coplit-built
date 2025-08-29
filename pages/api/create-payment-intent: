@@ -61,4 +61,20 @@ if (paymentIntent && paymentIntent.status === 'succeeded') {
   await finalizeOrder(paymentIntent.id)     // <-- pass PI id
   window.location.href = '/success'
 }
+const finalizeOrder = async (piId?: string) => {
+  const resp = await fetch('/api/order-create', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      customerId: null,                 // or your looked-up customer id
+      name, email,
+      subtotal, tax, total,             // dollars
+      items: items.map(it => ({ sku: it.sku, qty: it.qty, price: it.price, title: it.title, size: it.size })),
+      shipping: { address1, address2, city, state, zip, county, phone },
+      // billing: { ... }                // optional: if you collect a separate billing form
+      stripePaymentIntentId: piId || null, // enriches billing from Stripe billing_details
+    })
+  })
+  if (!resp.ok) throw new Error(await resp.text())
+}
 
