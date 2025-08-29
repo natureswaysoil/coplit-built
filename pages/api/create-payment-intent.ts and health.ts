@@ -9,10 +9,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!secret) return res.status(500).json({ error: 'Missing STRIPE_SECRET_KEY' })
 
   try {
-    // ✅ do NOT hard-code apiVersion; let the SDK’s pinned version match its types
-    const stripe = new Stripe(secret)
+    const stripe = new Stripe(secret) // ✅ no apiVersion hard-code
 
-    // pass dollars (default) or cents with isCents=true
     const { amount, currency = 'usd', isCents = false } =
       (req.body || {}) as { amount: number; currency?: string; isCents?: boolean }
 
@@ -30,3 +28,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: err?.message || 'Stripe error' })
   }
 }
+
