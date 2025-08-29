@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import { useEffect, useMemo, useState } from 'react'
 import { Elements, PaymentElement, LinkAuthenticationElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
@@ -8,11 +7,12 @@ import { NC_COUNTIES, NC_CITY_TO_COUNTY, NC_ZIP_TO_COUNTY } from '../lib/nc_data
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string)
 
 function PaymentForm({
-  email,
-  setEmail,
+  email, setEmail, finalizeOrder, clientSecret,
 }: {
   email: string
   setEmail: (v: string) => void
+  clientSecret: string
+  finalizeOrder: () => Promise<void>
 }) {
   const stripe = useStripe()
   const elements = useElements()
@@ -24,28 +24,44 @@ function PaymentForm({
     if (!stripe || !elements) return
     setLoading(true)
     setError(null)
-    const { error: submitError } = await stripe.confirmPayment({
+
+    // Stay on-site: avoid redirect unless required by the method
+    const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
-      // You can also set receipt_email on the server when creating the PI
-      confirmParams: {
-        return_url: window.location.origin + '/success',
-      },
+      redirect: 'if_required',
+      confirmParams: { return_url: window.location.origin + '/success' }, // fallback if a redirect is needed
     })
-    if (submitError) setError(submitError.message || 'Payment failed')
+
+    if (error) {
+      setError(error.message || 'Payment failed')
+      setLoading(false)
+      return
+    }
+
+    // If no redirect was needed and we have a confirmed PaymentIntent:
+    if (paymentIntent && paymentIntent.status === 'succeeded') {
+      try {
+        await finalizeOrder()
+        window.location.href = '/success'
+      } catch (e: any) {
+        setError('Payment succeeded, but we could not finalize the order automatically. We will email you shortly.')
+      }
+      setLoading(false)
+      return
+    }
+
+    // If Stripe decided a redirect was required, the return_url will handle it.
     setLoading(false)
   }
 
   return (
-    <form onSubmit={onSubmit} style={{ display: 'grid', gap: 12, maxWidth: 420, marginTop: 12 }}>
-      {/* This enables the "Stripe Link" login/verification UI */}
+    <form onSubmit={onSubmit} style={{ display: 'grid', gap: 12, maxWidth: 420, marginTop: 16 }}>
       <LinkAuthenticationElement
-        onChange={(e) => {
-          if (e?.value?.email) setEmail(e.value.email)
-        }}
         options={{ defaultValues: { email } }}
+        onChange={(e) => e?.value?.email && setEmail(e.value.email)}
       />
       <PaymentElement options={{ layout: 'tabs' }} />
-      <button disabled={!stripe || loading} style={{ padding: '10px 16px', fontWeight: 700 }}>
+      <button disabled={!stripe || !clientSecret || loading} style={{ padding: '10px 16px', fontWeight: 700 }}>
         {loading ? 'Processing…' : 'Pay with Link / Card'}
       </button>
       {error && <p style={{ color: 'crimson' }}>{error}</p>}
@@ -56,7 +72,7 @@ function PaymentForm({
 export default function Checkout() {
   const { items, clearCart } = useCart()
 
-  // Customer/contact fields
+  // Customer + address
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
@@ -70,12 +86,11 @@ export default function Checkout() {
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
 
-  // Totals
-  const subtotal = mounted ? items.reduce((sum, it) => sum + it.price * it.qty, 0) : 0
+  const subtotal = mounted ? items.reduce((s, it) => s + it.price * it.qty, 0) : 0
   const ncRate = useMemo(() => {
     const env = process.env.NEXT_PUBLIC_NC_TAX_RATE
     const parsed = env ? Number(env) : NaN
-    return Number.isFinite(parsed) ? parsed : 0.0475 // default 4.75%
+    return Number.isFinite(parsed) ? parsed : 0.0475
   }, [])
   const countyRatesMap = useMemo(() => {
     const raw = process.env.NEXT_PUBLIC_NC_COUNTY_RATES
@@ -87,43 +102,85 @@ export default function Checkout() {
   const tax = mounted && state === 'NC' ? subtotal * (ncRate + countyRate) : 0
   const total = subtotal + tax
 
-  // Autofill county from ZIP / city
+  // Autofill county based on ZIP/city
   useEffect(() => {
     if (state !== 'NC') return
-    const zipGuess = NC_ZIP_TO_COUNTY[zip]
+    const zipGuess = (NC_ZIP_TO_COUNTY as any)[zip]
     if (zipGuess && !county) { setCounty(zipGuess); return }
-    const cityGuess = NC_CITY_TO_COUNTY[norm(city)]
+    const cityGuess = (NC_CITY_TO_COUNTY as any)[norm(city)]
     if (cityGuess && !county) setCounty(cityGuess)
   }, [zip, city, state]) // eslint-disable-line
 
-  // Stripe PaymentIntent
+  // Stripe PI + finalize order
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [creatingPI, setCreatingPI] = useState(false)
 
   async function beginPayment() {
     if (!items.length) return alert('Your cart is empty.')
-    if (total < 0.5) return alert('Total must be at least $0.50 to pay.')
-    if (!email) return alert('Please enter your email to continue to payment.')
+    if (!email) return alert('Please enter your email.')
+    if (total < 0.5) return alert('Total must be at least $0.50.')
+
     setCreatingPI(true)
     try {
       const r = await fetch('/api/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: Number(total.toFixed(2)), // dollars; server converts to cents
+          amount: Number(total.toFixed(2)),
           currency: 'usd',
-          email, // let server set receipt_email
+          email,
+          name,
+          items: items.map(it => ({ title: it.title, size: it.size, qty: it.qty, price: it.price, sku: it.sku })),
+          shipping: { address1, address2, city, state, zip, county, phone },
         }),
       })
       const j = await r.json()
       if (!r.ok || !j?.clientSecret) throw new Error(j?.error || 'Failed to create payment')
       setClientSecret(j.clientSecret)
-      // Do NOT clear the cart yet — let webhook finalize & then you clear after success
     } catch (e: any) {
       alert(e.message || 'Could not start payment')
     } finally {
       setCreatingPI(false)
     }
+  }
+
+  // Your existing order creation + email call, executed after payment succeeds
+  const finalizeOrder = async () => {
+    // Create order via server (service role)
+    const orderCreateResp = await fetch('/api/order-create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customerId: null, // or look up/create as you did before
+        subtotal,
+        tax,
+        total,
+        items: items.map(it => ({ sku: it.sku, qty: it.qty, price: it.price })),
+        shipping: { address1, address2, city, state, zip, county, phone },
+        name,
+        email,
+      }),
+    })
+    if (!orderCreateResp.ok) throw new Error(await orderCreateResp.text())
+    const { orderId } = await orderCreateResp.json()
+
+    // Send confirmation email (best-effort)
+    await fetch('/api/order-confirmation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        orderId,
+        email,
+        name,
+        items: items.map(it => ({ title: it.title, size: it.size, qty: it.qty, price: it.price, sku: it.sku })),
+        subtotal,
+        tax,
+        total,
+        shipping: { address1, address2, city, state, zip, county, phone },
+      }),
+    })
+
+    clearCart()
   }
 
   return (
@@ -136,7 +193,7 @@ export default function Checkout() {
         <p>Your cart is empty. <a href="/products" style={{ color: '#174F2E', fontWeight: 'bold' }}>Browse products</a></p>
       ) : (
         <>
-          {/* Customer & address form (your original fields) */}
+          {/* Customer + Address */}
           <section style={{ display: 'grid', gap: 12, marginBottom: 16 }}>
             <div>
               <label>Name</label>
@@ -184,7 +241,7 @@ export default function Checkout() {
             </div>
           </section>
 
-          {/* Items & totals */}
+          {/* Items + totals */}
           <section>
             <h3>Items</h3>
             <ul style={{ margin: 0, paddingLeft: 18 }}>
@@ -199,7 +256,7 @@ export default function Checkout() {
             </div>
           </section>
 
-          {/* Step 1: Create PI + open Payment Element */}
+          {/* Step 1: create PI */}
           {!clientSecret ? (
             <button
               onClick={beginPayment}
@@ -209,9 +266,9 @@ export default function Checkout() {
               {creatingPI ? 'Preparing payment…' : 'Continue to Payment (Link / Card)'}
             </button>
           ) : (
-            // Step 2: Render Payment Element (with Link) and confirm
+            // Step 2: render Payment Element and confirm on-page
             <Elements stripe={stripePromise} options={{ clientSecret }}>
-              <PaymentForm email={email} setEmail={setEmail} />
+              <PaymentForm email={email} setEmail={setEmail} clientSecret={clientSecret} finalizeOrder={finalizeOrder} />
             </Elements>
           )}
         </>
@@ -219,3 +276,4 @@ export default function Checkout() {
     </main>
   )
 }
+
