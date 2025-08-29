@@ -56,4 +56,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: err?.message || 'Stripe error' })
   }
 }
+// inside PaymentForm after confirmPayment succeeds without redirect
+if (paymentIntent && paymentIntent.status === 'succeeded') {
+  await finalizeOrder(paymentIntent.id)     // <-- pass PI id
+  window.location.href = '/success'
+}
 
