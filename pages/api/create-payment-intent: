@@ -78,3 +78,88 @@ const finalizeOrder = async (piId?: string) => {
   if (!resp.ok) throw new Error(await resp.text())
 }
 
+// pages/api/create-payment-intent.ts
+import type { NextApiRequest, NextApiResponse } from 'next'
+import Stripe from 'stripe'
+
+type Addr = {
+  address1: string; address2?: string; city: string; state: string; zip: string; county?: string; phone?: string
+}
+
+function trim(s?: string) { return (s ?? '').toString().trim().slice(0, 120) }
+function metaFrom(prefix: string, a?: Partial<Addr>) {
+  if (!a) return {}
+  return {
+    [`${prefix}_line1`]: trim(a.address1),
+    [`${prefix}_line2`]: trim(a.address2),
+    [`${prefix}_city`]: trim(a.city),
+    [`${prefix}_state`]: trim(a.state),
+    [`${prefix}_zip`]: trim(a.zip),
+    [`${prefix}_county`]: trim(a.county),
+    [`${prefix}_phone`]: trim(a.phone),
+  }
+}
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  const secret = process.env.STRIPE_SECRET_KEY
+  if (!secret) return res.status(500).json({ error: 'Missing STRIPE_SECRET_KEY' })
+
+  try {
+    const stripe = new Stripe(secret)
+
+    const {
+      amount,               // dollars
+      currency = 'usd',
+      email,
+      name,
+      items,                // optional summary array
+      shipping,             // { address1,address2,city,state,zip,county,phone }
+      billingSame,          // boolean
+      billing,              // optional separate billing (if billingSame=false)
+    } = (req.body || {}) as {
+      amount: number; currency?: string; email?: string; name?: string;
+      items?: any[]; shipping?: Addr; billingSame?: boolean; billing?: Partial<Addr>;
+    }
+
+    const amt = Math.round(Number(amount) * 100)
+    if (!Number.isFinite(amt) || amt < 50) return res.status(400).json({ error: 'Invalid amount (min $0.50)' })
+
+    const itemsJson = items ? JSON.stringify(items).slice(0, 450) : undefined
+
+    const metadata = {
+      order_name: trim(name),
+      order_email: trim(email),
+      billing_same: String(!!billingSame),
+      ...(metaFrom('ship', shipping)),
+      ...(metaFrom('bill', billingSame ? shipping : billing)),
+      items: itemsJson,
+    }
+
+    const pi = await stripe.paymentIntents.create({
+      amount: amt,
+      currency,
+      payment_method_types: ['card', 'link'],      // keep on-site
+      receipt_email: email || undefined,
+      metadata,                                    // 👈 mirror here
+      shipping: shipping?.address1
+        ? {
+            name: name || email || 'Customer',
+            phone: shipping.phone || undefined,
+            address: {
+              line1: shipping.address1,
+              line2: shipping.address2 || undefined,
+              city: shipping.city,
+              state: shipping.state,
+              postal_code: shipping.zip,
+              country: 'US',
+            },
+          }
+        : undefined,
+    })
+
+    return res.status(200).json({ clientSecret: pi.client_secret })
+  } catch (err: any) {
+    return res.status(500).json({ error: err?.message || 'Stripe error' })
+  }
+}
