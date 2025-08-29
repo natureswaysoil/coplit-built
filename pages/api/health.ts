@@ -7,5 +7,3 @@ export default function handler(_req: NextApiRequest, res: NextApiResponse) {
     hasPublishable: !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
   })
 }
-
-
