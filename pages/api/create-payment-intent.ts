@@ -47,3 +47,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: err?.message || 'Stripe error' })
   }
 }
+# rename the file with spaces to the correct filename
+git mv "pages/api/create-payment-intent.ts and health.ts" pages/api/create-payment-intent.ts 2>/dev/null || \
+mv "pages/api/create-payment-intent.ts and health.ts" pages/api/create-payment-intent.ts
+
+# create a clean, Stripe-free health route
+cat > pages/api/health.ts <<'TS'
+import type { NextApiRequest, NextApiResponse } from 'next'
+
+export default function handler(_req: NextApiRequest, res: NextApiResponse) {
+  res.status(200).json({
+    ok: !!process.env.STRIPE_SECRET_KEY && !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+    hasSecret: !!process.env.STRIPE_SECRET_KEY,
+    hasPublishable: !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+  })
+}
+TS
+
