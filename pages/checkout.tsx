@@ -261,3 +261,55 @@ async function handleStripeCheckout(items) {
 <button onClick={handleStripeCheckout.bind(null, cartItems)}>
   Pay with Card
 </button>
+import { useMemo, useState } from 'react'
+import { useCart } from '../lib/cartContext'
+
+export default function Checkout() {
+  const { items } = useCart()
+  const [submitting, setSubmitting] = useState(false)
+
+  // Map your cart to the payload the API expects
+  const itemsForStripe = useMemo(
+    () =>
+      items.map(it => ({
+        title: `${it.title}${it.size ? ` – ${it.size}` : ''}`,
+        sku: it.sku,
+        qty: it.qty,
+        price: it.price, // dollars
+      })),
+    [items]
+  )
+
+  async function handleStripeCheckout() {
+    if (!itemsForStripe.length) return
+    setSubmitting(true)
+    try {
+      const res = await fetch('/api/checkout_sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: itemsForStripe }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data?.url) throw new Error(data?.error || 'Failed to create checkout')
+      window.location.href = data.url // redirect to Stripe Checkout
+    } catch (e: any) {
+      console.error(e)
+      alert(e.message || 'Checkout failed')
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <main style={{ maxWidth: 900, margin: '0 auto', padding: '2rem' }}>
+      <h1>Checkout</h1>
+      {/* ...show your order summary here... */}
+      <button
+        onClick={handleStripeCheckout}
+        disabled={submitting || itemsForStripe.length === 0}
+        style={{ padding: '0.6rem 1.2rem', fontWeight: 700 }}
+      >
+        {submitting ? 'Redirecting…' : 'Pay with Card'}
+      </button>
+    </main>
+  )
+}
