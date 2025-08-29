@@ -163,3 +163,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: err?.message || 'Stripe error' })
   }
 }
+body: JSON.stringify({
+  amount: Number(total.toFixed(2)),
+  currency: 'usd',
+  email,
+  name,
+  items: items.map(it => ({ title: it.title, size: it.size, qty: it.qty, price: it.price, sku: it.sku })),
+  shipping: { address1, address2, city, state, zip, county, phone },
+  billingSame,
+  billing: billingSame ? null : {
+    address1: bAddress1, address2: bAddress2, city: bCity, state: bState, zip: bZip, phone: bPhone,
+  },
+}),
+// pages/api/order-create.ts (add inside the success path, after you have orderId)
+import Stripe from 'stripe'
+
+// ... after inserting order + order_items:
+if (stripePaymentIntentId) {
+  try {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
+    await stripe.paymentIntents.update(stripePaymentIntentId, {
+      metadata: {
+        order_id: String(orderId),
+        order_status: 'paid',
+        // Optional: re-stamp final addresses in case they changed
+        // ...(metaFrom('ship', shipping)),
+        // ...(metaFrom('bill', resolvedBilling)),
+      },
+    })
+  } catch (e: any) {
+    console.warn('Could not update PI metadata with orderId:', e?.message)
+  }
+}
