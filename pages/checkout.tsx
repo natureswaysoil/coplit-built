@@ -244,3 +244,20 @@ export default function Checkout() {
     </main>
   );
 }
+
+import { loadStripe } from '@stripe/stripe-js'
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string)
+
+async function handleStripeCheckout(items) {
+  const resp = await fetch('/api/checkout_sessions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items }), // [{ title, sku, qty, price }, ...]
+  })
+  const data = await resp.json()
+  if (!resp.ok || !data?.url) throw new Error(data?.error || 'Failed to create checkout')
+  window.location.href = data.url
+}
+<button onClick={handleStripeCheckout.bind(null, cartItems)}>
+  Pay with Card
+</button>
