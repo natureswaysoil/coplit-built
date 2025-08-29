@@ -7,12 +7,12 @@ import { NC_COUNTIES, NC_CITY_TO_COUNTY, NC_ZIP_TO_COUNTY } from '../lib/nc_data
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string)
 
 function PaymentForm({
-  email, setEmail, finalizeOrder, clientSecret,
+  email, setEmail, clientSecret, finalizeOrder,
 }: {
   email: string
   setEmail: (v: string) => void
   clientSecret: string
-  finalizeOrder: () => Promise<void>
+  finalizeOrder: (piId?: string) => Promise<void>
 }) {
   const stripe = useStripe()
   const elements = useElements()
@@ -25,11 +25,10 @@ function PaymentForm({
     setLoading(true)
     setError(null)
 
-    // Stay on-site: avoid redirect unless required by the method
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
-      redirect: 'if_required',
-      confirmParams: { return_url: window.location.origin + '/success' }, // fallback if a redirect is needed
+      redirect: 'if_required',                       // stay on your site unless required
+      confirmParams: { return_url: window.location.origin + '/success' }, // fallback
     })
 
     if (error) {
@@ -38,19 +37,17 @@ function PaymentForm({
       return
     }
 
-    // If no redirect was needed and we have a confirmed PaymentIntent:
-    if (paymentIntent && paymentIntent.status === 'succeeded') {
+    if (paymentIntent?.status === 'succeeded') {
       try {
-        await finalizeOrder()
+        await finalizeOrder(paymentIntent.id)
         window.location.href = '/success'
       } catch (e: any) {
-        setError('Payment succeeded, but we could not finalize the order automatically. We will email you shortly.')
+        setError('Payment succeeded, but we could not finalize your order automatically. We’ll email you shortly.')
       }
       setLoading(false)
       return
     }
 
-    // If Stripe decided a redirect was required, the return_url will handle it.
     setLoading(false)
   }
 
@@ -72,7 +69,7 @@ function PaymentForm({
 export default function Checkout() {
   const { items, clearCart } = useCart()
 
-  // Customer + address
+  // Customer + shipping
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
@@ -83,9 +80,20 @@ export default function Checkout() {
   const [zip, setZip] = useState('')
   const [county, setCounty] = useState('')
 
+  // Billing
+  const [billingSame, setBillingSame] = useState(true)
+  const [bName, setBName] = useState('')
+  const [bAddress1, setBAddress1] = useState('')
+  const [bAddress2, setBAddress2] = useState('')
+  const [bCity, setBCity] = useState('')
+  const [bState, setBState] = useState<'NC' | 'Other'>('NC')
+  const [bZip, setBZip] = useState('')
+  const [bPhone, setBPhone] = useState('')
+
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
 
+  // Totals
   const subtotal = mounted ? items.reduce((s, it) => s + it.price * it.qty, 0) : 0
   const ncRate = useMemo(() => {
     const env = process.env.NEXT_PUBLIC_NC_TAX_RATE
@@ -102,7 +110,7 @@ export default function Checkout() {
   const tax = mounted && state === 'NC' ? subtotal * (ncRate + countyRate) : 0
   const total = subtotal + tax
 
-  // Autofill county based on ZIP/city
+  // Autofill county from ZIP/city for shipping
   useEffect(() => {
     if (state !== 'NC') return
     const zipGuess = (NC_ZIP_TO_COUNTY as any)[zip]
@@ -111,7 +119,7 @@ export default function Checkout() {
     if (cityGuess && !county) setCounty(cityGuess)
   }, [zip, city, state]) // eslint-disable-line
 
-  // Stripe PI + finalize order
+  // PI creation + Payment Element
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [creatingPI, setCreatingPI] = useState(false)
 
@@ -119,6 +127,13 @@ export default function Checkout() {
     if (!items.length) return alert('Your cart is empty.')
     if (!email) return alert('Please enter your email.')
     if (total < 0.5) return alert('Total must be at least $0.50.')
+
+    // if using separate billing, validate basic fields
+    if (!billingSame) {
+      if (!bName || !bAddress1 || !bCity || !bZip) {
+        return alert('Please complete your billing address.')
+      }
+    }
 
     setCreatingPI(true)
     try {
@@ -132,6 +147,8 @@ export default function Checkout() {
           name,
           items: items.map(it => ({ title: it.title, size: it.size, qty: it.qty, price: it.price, sku: it.sku })),
           shipping: { address1, address2, city, state, zip, county, phone },
+          // PaymentIntent doesn’t have a top-level "billing" field; billing is collected by the element.
+          // We’ll store billing in our DB after confirmation (see finalizeOrder).
         }),
       })
       const j = await r.json()
@@ -144,41 +161,47 @@ export default function Checkout() {
     }
   }
 
-  // Your existing order creation + email call, executed after payment succeeds
-  const finalizeOrder = async () => {
-    // Create order via server (service role)
-    const orderCreateResp = await fetch('/api/order-create', {
+  // Finalize order after payment succeeds (store ship/bill + items)
+  const finalizeOrder = async (piId?: string) => {
+    const billingPayload = billingSame
+      ? null
+      : {
+          name: bName,
+          address1: bAddress1,
+          address2: bAddress2,
+          city: bCity,
+          state: bState,
+          zip: bZip,
+          phone: bPhone,
+        }
+
+    const resp = await fetch('/api/order-create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        customerId: null, // or look up/create as you did before
-        subtotal,
-        tax,
-        total,
-        items: items.map(it => ({ sku: it.sku, qty: it.qty, price: it.price })),
+        customerId: null, // or look up/create
+        name, email,
+        subtotal, tax, total,
+        items: items.map(it => ({ sku: it.sku, qty: it.qty, price: it.price, title: it.title, size: it.size })),
         shipping: { address1, address2, city, state, zip, county, phone },
-        name,
-        email,
+        billing: billingPayload,            // null = use Stripe PI enrich / fallback to shipping
+        stripePaymentIntentId: piId || null,
       }),
     })
-    if (!orderCreateResp.ok) throw new Error(await orderCreateResp.text())
-    const { orderId } = await orderCreateResp.json()
+    if (!resp.ok) throw new Error(await resp.text())
 
     // Send confirmation email (best-effort)
-    await fetch('/api/order-confirmation', {
+    fetch('/api/order-confirmation', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        orderId,
-        email,
-        name,
+        orderId: (await resp.json()).orderId,
+        email, name,
         items: items.map(it => ({ title: it.title, size: it.size, qty: it.qty, price: it.price, sku: it.sku })),
-        subtotal,
-        tax,
-        total,
+        subtotal, tax, total,
         shipping: { address1, address2, city, state, zip, county, phone },
       }),
-    })
+    }).catch(() => {})
 
     clearCart()
   }
@@ -193,7 +216,7 @@ export default function Checkout() {
         <p>Your cart is empty. <a href="/products" style={{ color: '#174F2E', fontWeight: 'bold' }}>Browse products</a></p>
       ) : (
         <>
-          {/* Customer + Address */}
+          {/* Shipping */}
           <section style={{ display: 'grid', gap: 12, marginBottom: 16 }}>
             <div>
               <label>Name</label>
@@ -208,7 +231,7 @@ export default function Checkout() {
               <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required style={{ width: '100%', padding: 8 }} placeholder="(555) 555-5555" />
             </div>
             <div>
-              <label>Address</label>
+              <label>Shipping Address</label>
               <input value={address1} onChange={(e) => setAddress1(e.target.value)} required style={{ width: '100%', padding: 8, marginBottom: 6 }} placeholder="Street Address" />
               <input value={address2} onChange={(e) => setAddress2(e.target.value)} style={{ width: '100%', padding: 8 }} placeholder="Apt, Suite (optional)" />
             </div>
@@ -219,61 +242,4 @@ export default function Checkout() {
               </div>
               <div>
                 <label>State</label>
-                <select value={state} onChange={(e) => setState(e.target.value as any)} style={{ width: '100%', padding: 8 }}>
-                  <option value="NC">NC</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-              <div>
-                <label>ZIP</label>
-                <input value={zip} onChange={(e) => setZip(e.target.value)} required style={{ width: '100%', padding: 8 }} />
-              </div>
-              <div>
-                <label>County (NC only)</label>
-                <input list="nc-counties" value={county} onChange={(e) => setCounty(e.target.value)} style={{ width: '100%', padding: 8 }} placeholder="Auto-fills from ZIP code" disabled={state !== 'NC'} />
-                <datalist id="nc-counties">
-                  {NC_COUNTIES.map(c => (<option key={c} value={c} />))}
-                </datalist>
-              </div>
-            </div>
-            <div style={{ fontSize: 12, color: '#555' }}>
-              County auto-fills from ZIP code. If an NC county is provided and configured, county tax will be added on top of the state rate.
-            </div>
-          </section>
-
-          {/* Items + totals */}
-          <section>
-            <h3>Items</h3>
-            <ul style={{ margin: 0, paddingLeft: 18 }}>
-              {items.map(it => (
-                <li key={it.sku}>{it.title} – {it.size} – {it.qty} × ${it.price.toFixed(2)} (SKU: {it.sku})</li>
-              ))}
-            </ul>
-            <div style={{ textAlign: 'right', marginTop: 8 }}>
-              <div>Subtotal: <span suppressHydrationWarning>${subtotal.toFixed(2)}</span></div>
-              <div>Sales Tax{state==='NC' ? ` (${((ncRate + countyRate) * 100).toFixed(2)}%)` : ''}: <span suppressHydrationWarning>${tax.toFixed(2)}</span></div>
-              <div style={{ fontWeight: 'bold' }}>Total: <span suppressHydrationWarning>${total.toFixed(2)}</span></div>
-            </div>
-          </section>
-
-          {/* Step 1: create PI */}
-          {!clientSecret ? (
-            <button
-              onClick={beginPayment}
-              disabled={creatingPI}
-              style={{ background: '#174F2E', color: 'white', border: 'none', borderRadius: 6, padding: '0.6rem 1.2rem', fontWeight: 'bold', cursor: 'pointer', marginTop: 16 }}
-            >
-              {creatingPI ? 'Preparing payment…' : 'Continue to Payment (Link / Card)'}
-            </button>
-          ) : (
-            // Step 2: render Payment Element and confirm on-page
-            <Elements stripe={stripePromise} options={{ clientSecret }}>
-              <PaymentForm email={email} setEmail={setEmail} clientSecret={clientSecret} finalizeOrder={finalizeOrder} />
-            </Elements>
-          )}
-        </>
-      )}
-    </main>
-  )
-}
-
+                <sele
