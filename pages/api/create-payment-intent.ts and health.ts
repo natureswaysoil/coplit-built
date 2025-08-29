@@ -1,3 +1,4 @@
+// pages/api/create-payment-intent.ts
 import type { NextApiRequest, NextApiResponse } from 'next'
 import Stripe from 'stripe'
 
@@ -8,14 +9,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!secret) return res.status(500).json({ error: 'Missing STRIPE_SECRET_KEY' })
 
   try {
-    // ❌ remove apiVersion to avoid TS “basil” mismatch errors
+    // ✅ do NOT hard-code apiVersion; let the SDK’s pinned version match its types
     const stripe = new Stripe(secret)
 
-    // Accept either dollars or cents. If you already pass dollars, keep that; if you pass cents, set isCents=true.
+    // pass dollars (default) or cents with isCents=true
     const { amount, currency = 'usd', isCents = false } =
       (req.body || {}) as { amount: number; currency?: string; isCents?: boolean }
 
-    const amt = isCents ? Math.floor(amount) : Math.round(amount * 100) // Stripe needs cents (>= 50)
+    const amt = isCents ? Math.floor(amount) : Math.round(amount * 100)
     if (!Number.isFinite(amt) || amt < 50) return res.status(400).json({ error: 'Invalid amount (min 50¢)' })
 
     const intent = await stripe.paymentIntents.create({
