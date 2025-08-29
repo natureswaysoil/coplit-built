@@ -12,6 +12,7 @@ export default function ProductDetail({ product }: Props) {
   const { addItem } = useCart();
   const [sku, setSku] = useState<string>(product.variations?.[0]?.sku || '');
   const hasVariants = !!(product.variations && product.variations.length);
+  const [added, setAdded] = useState(false);
   const variant = hasVariants ? (product.variations.find(v => v.sku === sku) || product.variations[0]!) : undefined;
 
   return (
@@ -59,21 +60,28 @@ export default function ProductDetail({ product }: Props) {
           <button
             onClick={() => {
               if (!variant) return;
-              addItem({
-                id: product.id,
-                title: product.title,
-                image: product.image,
-                sku: variant.sku,
-                size: variant.size,
-                price: variant.price,
-                qty: 1,
-              });
+              try {
+                addItem({
+                  id: product.id,
+                  title: product.title,
+                  image: product.image,
+                  sku: variant.sku,
+                  size: variant.size,
+                  price: variant.price,
+                  qty: 1,
+                });
+                setAdded(true);
+                setTimeout(() => setAdded(false), 1500);
+              } catch (e) {
+                console.error('Failed to add to cart', e);
+              }
             }}
             disabled={!variant}
             style={{ background: '#174F2E', color: 'white', border: 'none', borderRadius: 6, padding: '0.6rem 1.2rem', fontWeight: 'bold', cursor: variant ? 'pointer' : 'not-allowed', opacity: variant ? 1 : 0.6 }}
           >
             {variant ? 'Add to Cart' : 'Unavailable'}
           </button>
+          {added && <div style={{ color: '#174F2E', fontSize: 12, marginTop: 6 }}>Added!</div>}
         </div>
       </div>
     </main>

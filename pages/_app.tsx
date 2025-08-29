@@ -23,7 +23,7 @@ function TopNav() {
         <Link href="/auth" style={{ color: '#fff', marginRight: 16 }}>Account</Link>
         <Link href="/about" style={{ color: '#fff', marginRight: 16 }}>About</Link>
         <Link href="/contact" style={{ color: '#fff', marginRight: 16 }}>Contact</Link>
-  <Link href="/sales" style={{ color: '#fff', marginRight: 16 }}>Sales</Link>
+          <Link href="/debug" style={{ color: '#fff', marginRight: 16 }}>Debug</Link>
   <Link href="/privacy-policy" style={{ color: '#fff', marginRight: 16 }}>Privacy</Link>
   <Link href="/refund-policy" style={{ color: '#fff', marginRight: 16 }}>Refunds</Link>
       </div>
