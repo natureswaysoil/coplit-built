@@ -51,3 +51,15 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     </CartProvider>
   );
 }
+
+import "../styles.css";
+import type { AppProps } from "next/app";
+import { CartProvider } from "../cart/CartContext";
+
+export default function MyApp({ Component, pageProps }: AppProps) {
+  return (
+    <CartProvider>
+      <Component {...pageProps} />
+    </CartProvider>
+  );
+}
