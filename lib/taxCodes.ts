@@ -1,21 +1,32 @@
-./lib/supabaseAdmin.ts
-./lib/taxCodes.ts
+// lib/taxCodes.ts
+import { supabaseAdmin } from "./supabaseAdmin";
 
-./pages/api/promo/validate.ts
-./pages/api/promo/suggest.ts
-./pages/api/create-payment-intent-with-tax.ts
-./pages/api/webhooks/stripe.ts
+const DEFAULT_TAX_CODE = "txcd_99999999"; // generic tangible goods (replace if needed)
 
-./components/PromoField.tsx
-./components/CheckoutForm_Tax.tsx
+let cache: Record<string, string> | null = null;
+let cacheAt = 0;
+const TTL_MS = 5 * 60 * 1000; // 5 minutes
 
-./cart/CartContext.tsx   (only if you don’t already have your own)
+export async function loadSkuTaxCodeMap(): Promise<Record<string, string>> {
+  const now = Date.now();
+  if (cache && (now - cacheAt) < TTL_MS) return cache;
+  const table = process.env.SUPABASE_TAXCODE_TABLE || "product_tax_codes";
+  const { data, error } = await supabaseAdmin.from(table).select("sku, tax_code");
+  if (error) {
+    console.warn("Supabase tax-code map fetch failed", error);
+    cache = {};
+  } else {
+    cache = {};
+    for (const row of (data || []) as any[]) {
+      if ((row as any).sku && (row as any).tax_code) cache[(row as any).sku] = (row as any).tax_code;
+    }
+  }
+  cacheAt = now;
+  return cache || {};
+}
 
-./pages/_app.tsx         (merge with yours if it exists)
-./pages/checkout.tsx
-
-./styles.css
-
-./.env.local             (create from .env.local.example)
-
-./migrations/2025_08_31_add_product_tax_codes.sql  (run this in Supabase — not needed in repo)
+export async function codeForSKU(sku?: string): Promise<string> {
+  const map = await loadSkuTaxCodeMap();
+  if (!sku) return DEFAULT_TAX_CODE;
+  return map[sku] || DEFAULT_TAX_CODE;
+}
