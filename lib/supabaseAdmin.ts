@@ -1,21 +1,9 @@
-./lib/supabaseAdmin.ts
-./lib/taxCodes.ts
+// lib/supabaseAdmin.ts
+import { createClient } from "@supabase/supabase-js";
 
-./pages/api/promo/validate.ts
-./pages/api/promo/suggest.ts
-./pages/api/create-payment-intent-with-tax.ts
-./pages/api/webhooks/stripe.ts
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY as string;
 
-./components/PromoField.tsx
-./components/CheckoutForm_Tax.tsx
-
-./cart/CartContext.tsx   (only if you don’t already have your own)
-
-./pages/_app.tsx         (merge with yours if it exists)
-./pages/checkout.tsx
-
-./styles.css
-
-./.env.local             (create from .env.local.example)
-
-./migrations/2025_08_31_add_product_tax_codes.sql  (run this in Supabase — not needed in repo)
+export const supabaseAdmin = createClient(url, serviceKey, {
+  auth: { persistSession: false, autoRefreshToken: false },
+});
