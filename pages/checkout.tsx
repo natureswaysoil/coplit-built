@@ -243,3 +243,25 @@ export default function Checkout() {
               <div>
                 <label>State</label>
                 <sele
+
+                  // pages/checkout.tsx
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import CheckoutForm from "../components/CheckoutForm_Tax";
+import { useCart } from "../cart/CartContext";
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string);
+
+export default function CheckoutPage() {
+  const { items } = useCart();
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Checkout</h1>
+      <Elements options={{ locale: "en" }} stripe={stripePromise}>
+        <CheckoutForm />
+      </Elements>
+      <h3 className="mt-6 font-semibold">Cart (debug)</h3>
+      <pre className="text-xs bg-gray-100 p-2 mt-2 rounded">{JSON.stringify(items, null, 2)}</pre>
+    </div>
+  );
+}
