@@ -12,8 +12,11 @@ export default async function handler(req, res) {
 
     const { currency = 'usd', email, name, items = [], shipping } = req.body || {}
 
-    const subtotal = Array.isArray(items)
-      ? items.reduce((s, it) => s + Number(it.price || 0) * Number(it.qty || 0), 0)
+      ? items.reduce((s, it) => {
+          const price = Number(it.price);
+          const qty = Number(it.qty);
+          return s + (Number.isFinite(price) && Number.isFinite(qty) ? price * qty : 0);
+        }, 0)
       : 0
     const baseRate = Number(process.env.NEXT_PUBLIC_NC_TAX_RATE || 0.0475)
     let countyRates: Record<string, number> = {}
