@@ -149,3 +149,7 @@ export default function Home() {
 export default function Home() {
   return <div>hello 🌱</div>;
 }
+export default function Home() {
+  return <main style={{ padding: 24 }}>home ok</main>;
+}
+
