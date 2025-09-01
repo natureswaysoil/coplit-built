@@ -26,8 +26,7 @@ export default async function handler(req, res) {
       } catch {}
     }
     const norm = (s: string) => s.trim().toLowerCase()
-    const countyRate =
-      shipping?.state === 'NC' && shipping?.county
+      shipping?.state === 'NC' && typeof shipping?.county === 'string' && shipping.county.trim() !== ''
         ? countyRates[norm(shipping.county)] || 0
         : 0
     const tax = shipping?.state === 'NC' ? subtotal * (baseRate + countyRate) : 0
