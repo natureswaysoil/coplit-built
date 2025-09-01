@@ -1,5 +1,15 @@
-import { useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import dynamic from 'next/dynamic';
+const AuthScreen = dynamic(() => Promise.resolve(() =>
+  <main style={{ padding: 24 }}>
+    <h1>/auth</h1>
+    <p>Pages Router page loaded.</p>
+  </main>
+), { ssr: false });
+
+export default function Page() {
+  return <AuthScreen />;
+}
+
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
