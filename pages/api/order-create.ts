@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const supabase = createClient(url, key, { auth: { persistSession: false } })
 
   const { customerId, subtotal, tax, total, items, shipping } = req.body || {}
-  if (!customerId || !Array.isArray(items) || typeof total !== 'number') {
+  if (!Array.isArray(items) || typeof total !== 'number') {
     return res.status(400).json({ error: 'Missing required fields' })
   }
 
@@ -19,9 +19,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { data: order, error: orderErr } = await supabase
       .from('orders')
       .insert({
-        customer_id: customerId,
+        customer_id: customerId || null,
         total,
-        tax: tax ?? 0,
+        tax: typeof tax === 'number' ? tax : 0,
         shipping_state: shipping?.state ?? null,
         shipping_county: shipping?.county ?? null,
         shipping_zip: shipping?.zip ?? null,

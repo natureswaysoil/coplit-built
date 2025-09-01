@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Elements, PaymentElement, LinkAuthenticationElement, useStripe, useElements } from '@stripe/react-stripe-js'
+import { Elements, PaymentElement, LinkAuthenticationElement, useStripe, useElements } from '../lib/stripe-mock'
 import { loadStripe } from '@stripe/stripe-js'
 import { useCart } from '../lib/cartContext'
 import { NC_COUNTIES, NC_CITY_TO_COUNTY, NC_ZIP_TO_COUNTY } from '../lib/nc_data'
@@ -122,6 +122,7 @@ export default function Checkout() {
   // PI creation + Payment Element
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [creatingPI, setCreatingPI] = useState(false)
+  const [serverTotals, setServerTotals] = useState<{ subtotal: number; tax: number; total: number } | null>(null)
 
   async function beginPayment() {
     if (!items.length) return alert('Your cart is empty.')
@@ -141,19 +142,17 @@ export default function Checkout() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: Number(total.toFixed(2)),
           currency: 'usd',
           email,
           name,
           items: items.map(it => ({ title: it.title, size: it.size, qty: it.qty, price: it.price, sku: it.sku })),
           shipping: { address1, address2, city, state, zip, county, phone },
-          // PaymentIntent doesn’t have a top-level "billing" field; billing is collected by the element.
-          // We’ll store billing in our DB after confirmation (see finalizeOrder).
         }),
       })
       const j = await r.json()
       if (!r.ok || !j?.clientSecret) throw new Error(j?.error || 'Failed to create payment')
       setClientSecret(j.clientSecret)
+      setServerTotals({ subtotal: j.subtotal, tax: j.tax, total: j.total })
     } catch (e: any) {
       alert(e.message || 'Could not start payment')
     } finally {
@@ -175,13 +174,16 @@ export default function Checkout() {
           phone: bPhone,
         }
 
+    const amounts = serverTotals || { subtotal, tax, total }
     const resp = await fetch('/api/order-create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         customerId: null, // or look up/create
         name, email,
-        subtotal, tax, total,
+        subtotal: amounts.subtotal,
+        tax: amounts.tax,
+        total: amounts.total,
         items: items.map(it => ({ sku: it.sku, qty: it.qty, price: it.price, title: it.title, size: it.size })),
         shipping: { address1, address2, city, state, zip, county, phone },
         billing: billingPayload,            // null = use Stripe PI enrich / fallback to shipping
@@ -198,7 +200,9 @@ export default function Checkout() {
         orderId: (await resp.json()).orderId,
         email, name,
         items: items.map(it => ({ title: it.title, size: it.size, qty: it.qty, price: it.price, sku: it.sku })),
-        subtotal, tax, total,
+        subtotal: amounts.subtotal,
+        tax: amounts.tax,
+        total: amounts.total,
         shipping: { address1, address2, city, state, zip, county, phone },
       }),
     }).catch(() => {})
@@ -242,4 +246,68 @@ export default function Checkout() {
               </div>
               <div>
                 <label>State</label>
-                <sele
+                <select value={state} onChange={(e) => setState(e.target.value as 'NC' | 'Other')} required style={{ width: '100%', padding: 8 }}>
+                  <option value="NC">NC</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label>Zip</label>
+                <input value={zip} onChange={(e) => setZip(e.target.value)} required style={{ width: '100%', padding: 8 }} />
+              </div>
+              <div>
+                <label>County (NC)</label>
+                <select value={county} onChange={(e) => setCounty(e.target.value)} style={{ width: '100%', padding: 8 }}>
+                  <option value="">Select</option>
+                  {NC_COUNTIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+            </div>
+          </section>
+
+          {/* Billing */}
+          <section style={{ display: 'grid', gap: 12, marginBottom: 16 }}>
+            <label>
+              <input type="checkbox" checked={billingSame} onChange={(e) => setBillingSame(e.target.checked)} /> Billing same as shipping
+            </label>
+            {!billingSame && (
+              <div style={{ display: 'grid', gap: 12 }}>
+                <input value={bName} onChange={(e) => setBName(e.target.value)} placeholder="Billing Name" style={{ width: '100%', padding: 8 }} />
+                <input value={bAddress1} onChange={(e) => setBAddress1(e.target.value)} placeholder="Billing Address" style={{ width: '100%', padding: 8 }} />
+                <input value={bAddress2} onChange={(e) => setBAddress2(e.target.value)} placeholder="Billing Address 2" style={{ width: '100%', padding: 8 }} />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 120px 120px', gap: 12 }}>
+                  <input value={bCity} onChange={(e) => setBCity(e.target.value)} placeholder="City" style={{ width: '100%', padding: 8 }} />
+                  <select value={bState} onChange={(e) => setBState(e.target.value as 'NC' | 'Other')} style={{ width: '100%', padding: 8 }}>
+                    <option value="NC">NC</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  <input value={bZip} onChange={(e) => setBZip(e.target.value)} placeholder="Zip" style={{ width: '100%', padding: 8 }} />
+                </div>
+                <input value={bPhone} onChange={(e) => setBPhone(e.target.value)} placeholder="Phone" style={{ width: '100%', padding: 8 }} />
+              </div>
+            )}
+          </section>
+
+          {/* Totals */}
+          <section style={{ marginBottom: 16 }}>
+            <p>Subtotal: ${(subtotal/100).toFixed(2)}</p>
+            <p>Tax: ${(tax/100).toFixed(2)}</p>
+            <p>Total: ${(total/100).toFixed(2)}</p>
+            {!clientSecret && (
+              <button onClick={beginPayment} disabled={creatingPI} style={{ padding: '10px 16px', fontWeight: 700 }}>
+                {creatingPI ? 'Calculating…' : 'Enter payment details'}
+              </button>
+            )}
+          </section>
+
+          {/* Payment */}
+          {clientSecret && (
+            <Elements stripe={stripePromise} options={{ clientSecret }}>
+              <PaymentForm email={email} setEmail={setEmail} clientSecret={clientSecret} finalizeOrder={finalizeOrder} />
+            </Elements>
+          )}
+        </>
+      )}
+    </main>
+  )
+}
