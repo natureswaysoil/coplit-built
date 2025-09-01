@@ -1,50 +1,74 @@
-// @ts-nocheck
-import Stripe from 'stripe'
+// pages/api/create-payment-intent.ts
+import type { NextApiRequest, NextApiResponse } from 'next';
+import Stripe from 'stripe';
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+  apiVersion: '2024-06-20',
+});
 
-  const secret = process.env.STRIPE_SECRET_KEY
-  if (!secret) return res.status(500).json({ error: 'Missing STRIPE_SECRET_KEY' })
+type ReqBody = {
+  amount: number;         // subtotal in cents (without shipping/tax)
+  currency?: string;      // default 'usd'
+  zip?: string;
+  state?: string;         // default from NEXT_PUBLIC_TAX_STATE
+  shipping?: number;      // shipping in cents (optional)
+  tax?: number;           // explicit tax in cents (optional)
+  metadata?: Record<string, string>;
+};
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const stripe = new Stripe(secret)
+    const {
+      amount,
+      currency = 'usd',
+      zip,
+      state = process.env.NEXT_PUBLIC_TAX_STATE || 'NC',
+      shipping = 0,
+      tax: taxFromClient,
+      metadata = {},
+    } = (req.body || {}) as ReqBody;
 
-    const { amount, currency = 'usd', email, name, items, shipping, billingSame, billing, isCents = false } = req.body || {}
-    const amt = isCents ? Math.floor(amount) : Math.round(Number(amount) * 100)
-    if (!Number.isFinite(amt) || amt < 50) return res.status(400).json({ error: 'Invalid amount (min 50¢)' })
+    if (!process.env.STRIPE_SECRET_KEY) {
+      return res.status(500).json({ error: 'Missing STRIPE_SECRET_KEY' });
+    }
+    if (!amount || amount <= 0) {
+      return res.status(400).json({ error: 'Invalid amount' });
+    }
+
+    // --- Simple NC tax fallback (replace with your ZIP→county logic when ready)
+    let tax = typeof taxFromClient === 'number' ? taxFromClient : 0;
+    if (tax === 0 && (state || '').toUpperCase() === 'NC') {
+      const defaultRate = parseFloat(process.env.NEXT_PUBLIC_TAX_DEFAULT_RATE || '0.0725'); // 7.25% default
+      // You can branch per-county using the ZIP later
+      tax = Math.round((amount + shipping) * defaultRate);
+    }
+
+    const total = amount + shipping + tax;
 
     const pi = await stripe.paymentIntents.create({
-      amount: amt,
+      amount: total,
       currency,
-      payment_method_types: ['card', 'link'],   // stay on-site with Link + card
-      receipt_email: email || undefined,
+      automatic_payment_methods: { enabled: true },
       metadata: {
-        order_name: String(name ?? '').slice(0, 120),
-        order_email: String(email ?? '').slice(0, 120),
-        billing_same: String(!!billingSame),
-        items: items ? JSON.stringify(items).slice(0, 450) : '',
-        // if you added address mirroring earlier, include those flattened keys here
+        ...metadata,
+        state,
+        zip: zip || '',
+        shipping_cents: String(shipping ?? 0),
+        tax_cents: String(tax),
+        subtotal_cents: String(amount),
       },
-      shipping: shipping?.address1
-        ? {
-            name: name || email || 'Customer',
-            phone: shipping.phone || undefined,
-            address: {
-              line1: shipping.address1,
-              line2: shipping.address2 || undefined,
-              city: shipping.city,
-              state: shipping.state,
-              postal_code: shipping.zip,
-              country: 'US',
-            },
-          }
-        : undefined,
-    })
+    });
 
-    return res.status(200).json({ clientSecret: pi.client_secret })
-  } catch (err) {
-    return res.status(500).json({ error: err?.message || 'Stripe error' })
+    return res.status(200).json({
+      clientSecret: pi.client_secret,
+      total,
+      breakdown: { subtotal: amount, shipping, tax },
+    });
+  } catch (err: any) {
+    console.error('create-payment-intent error', err);
+    return res.status(500).json({ error: err?.message || 'Server error' });
   }
 }
 
