@@ -31,6 +31,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   });
 
+  // Ensure we hydrate from localStorage after mount (SSR-safe)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const raw = localStorage.getItem('cart');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          setItems((prev) => (prev.length === 0 ? parsed : prev));
+        }
+      }
+    } catch {
+      // ignore invalid JSON
+    }
+  }, []);
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('cart', JSON.stringify(items));
@@ -38,6 +54,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [items]);
 
   const addItem = (item: CartItem) => {
+    try {
+      console.log('[Cart] Adding item', item);
+    } catch {}
     setItems(prev => {
       const idx = prev.findIndex(i => i.sku === item.sku);
       if (idx >= 0) {

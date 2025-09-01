@@ -1,0 +1,32 @@
+[
+  {
+    "id": "order_1756676212373_m39bdi73s",
+    "orderNumber": "ORD-20250831-213652",
+    "customerId": "cust_1756676212372_me86l1mdo",
+    "customer": {
+      "name": "Smoke Run",
+      "email": "smoke-run@example.com",
+      "phone": "555-111-2222",
+      "address1": "1 Test Way",
+      "city": "Raleigh",
+      "state": "NC",
+      "zip": "27601",
+      "county": "Wake"
+    },
+    "items": [
+      {
+        "sku": "SMOKE-001",
+        "title": "Smoke Test Item",
+        "size": "1 Gallon",
+        "qty": 1,
+        "price": 10,
+        "total": 10
+      }
+    ],
+    "subtotal": 10,
+    "tax": 0.48,
+    "total": 10.48,
+    "status": "confirmed",
+    "createdAt": "2025-08-31T21:36:52.373Z"
+  }
+]

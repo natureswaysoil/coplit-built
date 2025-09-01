@@ -7,7 +7,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey) return res.status(501).json({ error: 'Email not configured' })
 
-  const { orderId, email, name, items, subtotal, tax = 0, total } = req.body || {}
+  const { orderId, email, name, items, subtotal, tax = 0, total, shipping } = req.body || {}
   if (!orderId || !email || !name || !Array.isArray(items)) {
     return res.status(400).json({ error: 'Missing required fields' })
   }
@@ -32,7 +32,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         bcc: bccList,
         subject: `Your Nature's Way Soil order ${orderId}`,
         text,
-  html: orderConfirmationHTML({ orderId, name, email, items, subtotal, tax, total }),
+        html: orderConfirmationHTML({
+          orderId,
+          name,
+          email,
+          items,
+          subtotal,
+          tax,
+          total,
+          shipping
+        }),
       }),
     })
     const data = await resp.json()

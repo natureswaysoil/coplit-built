@@ -12,6 +12,7 @@ export default function Home() {
   const { addItem } = useCart();
   const [selected, setSelected] = useState<Record<string, string>>({});
   const [items, setItems] = useState(Array.isArray(products) ? products : []);
+  const [added, setAdded] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     let cancelled = false;
@@ -122,7 +123,8 @@ export default function Home() {
                   if (!p.variations || p.variations.length === 0) return;
                   const sku = selected[p.id] || p.variations[0]?.sku;
                   const variant = p.variations.find(v => v.sku === sku) || p.variations[0]!;
-                  addItem({
+                  try {
+                    addItem({
                     id: p.id,
                     title: p.title,
                     image: p.image,
@@ -130,13 +132,21 @@ export default function Home() {
                     size: variant.size,
                     price: variant.price,
                     qty: 1,
-                  });
+                    });
+                    setAdded((a) => ({ ...a, [p.id]: true }));
+                    setTimeout(() => setAdded((a) => ({ ...a, [p.id]: false })), 1500);
+                  } catch (e) {
+                    console.error('Failed to add to cart', e);
+                  }
                 }}
                 disabled={!p.variations || p.variations.length === 0}
                 style={{ background: '#174F2E', color: 'white', border: 'none', borderRadius: 6, padding: '0.5rem 1.2rem', fontWeight: 'bold', cursor: (!p.variations || p.variations.length === 0) ? 'not-allowed' : 'pointer', opacity: (!p.variations || p.variations.length === 0) ? 0.6 : 1, marginTop: '0.5rem' }}
               >
                 {(!p.variations || p.variations.length === 0) ? 'Unavailable' : 'Add to Cart'}
               </button>
+              {added[p.id] && (
+                <div style={{ color: '#174F2E', fontSize: 12, marginTop: 6 }}>Added!</div>
+              )}
             </div>
           ))}
         </div>
