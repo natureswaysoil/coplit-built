@@ -144,3 +144,8 @@ export default function Home() {
     </div>
   );
 }
+
+// app/page.tsx  (App Router)
+export default function Home() {
+  return <div>hello 🌱</div>;
+}
