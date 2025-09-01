@@ -25,4 +25,6 @@ export const useStripe = () => ({
   }),
 });
 
-export const useElements = () => ({ });
+export const useElements = () => ({
+  getElement: (_type?: any) => null,
+});
