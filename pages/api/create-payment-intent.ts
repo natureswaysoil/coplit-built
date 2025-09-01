@@ -28,3 +28,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(500).json({ error: e?.message || 'Server error' });
   }
 }
+
+const resp = await fetch('/api/create-payment-intent', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ amount: subtotalInCents }),
+});
