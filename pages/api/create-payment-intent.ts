@@ -2,43 +2,69 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import Stripe from 'stripe'
 
-// Optional: keep a price list on the server so you don't trust client prices
+/**
+ * Optional server-side price book. If a SKU exists here, we ignore any client
+ * price and use this value (USD dollars). Leave empty to trust client prices.
+ */
 const PRICE_BY_SKU: Record<string, number> = {
-  // dollars; fill in your SKUs
-  'SEAWEED-HUMIC-32OZ': 29.99,
-  'BONE-MEAL-LIQ-1GAL': 39.99,
-  // ...
+  // 'SEAWEED-HUMIC-32OZ': 29.99,
+  // 'BONE-MEAL-LIQ-1GAL': 39.99,
 }
 
-// ---- NC tax helpers (county rates come from env JSON; fallback to 0)
-const countyRates: Record<string, number> = (() => {
+type CartItem = { sku: string; qty: number; price?: number }
+type Address = {
+  name?: string
+  email?: string
+  phone?: string
+  address1?: string
+  address2?: string
+  city?: string
+  state?: string
+  zip?: string
+  county?: string
+}
+
+type Body = {
+  intentId?: string
+  items: CartItem[]
+  email?: string
+  name?: string
+  currency?: string
+  state?: 'NC' | 'Other'
+  county?: string
+  billing?: Address
+  shipping?: Address
+}
+
+const norm = (s?: string) => (s ?? '').trim().toLowerCase()
+
+// Parse county rates JSON from env, normalize keys (e.g., "wake" -> 0.02)
+const COUNTY_RATES: Record<string, number> = (() => {
   try {
-    return JSON.parse(process.env.NEXT_PUBLIC_NC_COUNTY_RATES || '{}')
+    const raw = process.env.NEXT_PUBLIC_NC_COUNTY_RATES || '{}'
+    const parsed = JSON.parse(raw) as Record<string, number>
+    const out: Record<string, number> = {}
+    for (const [k, v] of Object.entries(parsed)) {
+      const n = Number(v)
+      if (Number.isFinite(n)) out[norm(k)] = n
+    }
+    return out
   } catch {
     return {}
   }
 })()
 
-const norm = (s: string) => (s || '').trim().toLowerCase()
-
-function calcTotals(
-  items: Array<{ sku: string; qty: number; price?: number }>,
-  state: 'NC' | 'Other',
-  county?: string
-) {
-  // Subtotal from server truth if available; else trust client but coerce
+function calcTotals(items: CartItem[], state: 'NC' | 'Other' = 'Other', county?: string) {
   let subtotal = 0
   for (const it of items || []) {
-    const unit = Number.isFinite(PRICE_BY_SKU[it.sku])
-      ? PRICE_BY_SKU[it.sku]
-      : Number(it.price)
-    if (!Number.isFinite(unit) || !Number.isFinite(it.qty)) continue
-    subtotal += unit * it.qty
+    const qty = Number(it.qty)
+    const unit = Number.isFinite(PRICE_BY_SKU[it.sku]) ? PRICE_BY_SKU[it.sku] : Number(it.price)
+    if (Number.isFinite(qty) && Number.isFinite(unit)) subtotal += qty * unit
   }
-  subtotal = Math.max(0, Number(subtotal.toFixed(2)))
+  subtotal = Number(subtotal.toFixed(2))
 
   const baseNc = Number(process.env.NEXT_PUBLIC_NC_TAX_RATE ?? 0.0475) || 0
-  const countyRate = state === 'NC' ? (countyRates[norm(county || '')] || 0) : 0
+  const countyRate = state === 'NC' ? (COUNTY_RATES[norm(county)] || 0) : 0
   const tax = Number((subtotal * (state === 'NC' ? baseNc + countyRate : 0)).toFixed(2))
   const total = Number((subtotal + tax).toFixed(2))
   const totalCents = Math.round(total * 100)
@@ -49,59 +75,90 @@ function calcTotals(
   return { subtotal, tax, total, totalCents }
 }
 
+function metaFrom(prefix: string, src?: Address): Record<string, string> {
+  if (!src) return {}
+  const m: Record<string, string> = {}
+  const add = (k: keyof Address) => {
+    const v = src[k]
+    if (v !== undefined && v !== null && String(v).trim() !== '') m[`${prefix}_${k}`] = String(v)
+  }
+  add('name'); add('email'); add('phone')
+  add('address1'); add('address2'); add('city'); add('state'); add('zip'); add('county')
+  return m
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST')
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
 
   const secret = process.env.STRIPE_SECRET_KEY
   if (!secret) return res.status(500).json({ error: 'Missing STRIPE_SECRET_KEY' })
 
-  const stripe = new Stripe(secret) // don't hard-code apiVersion
+  let body: Body
+  try {
+    body = (typeof req.body === 'string') ? JSON.parse(req.body) : (req.body as Body)
+  } catch {
+    return res.status(400).json({ error: 'Invalid JSON body' })
+  }
+
+  const {
+    intentId,
+    items = [],
+    email = '',
+    name = '',
+    currency = 'usd',
+    state = 'Other',
+    county = '',
+    billing,
+    shipping,
+  } = body
 
   try {
-    const {
-      intentId,                // optional: update an existing PI when address/tax changes
-      items = [],
-      billing,
-      shipping,
-      state = 'Other',
-      county = '',
-      email = '',
-      name = '',
-      currency = 'usd'
-    } = (req.body || {}) as any
+    // Do NOT hard-code apiVersion (prevents TS error with latest types)
+    const stripe = new Stripe(secret)
 
     const { subtotal, tax, total, totalCents } = calcTotals(items, state, county)
 
-    // Create or update the PaymentIntent so amount always matches current tax math
-    const intent = intentId
+    const baseMeta: Record<string, string> = {
+      email,
+      name,
+      subtotal: subtotal.toFixed(2),
+      tax: tax.toFixed(2),
+      total: total.toFixed(2),
+      state,
+      county: county || '',
+    }
+    const metadata = {
+      ...baseMeta,
+      ...metaFrom('billing', billing),
+      ...metaFrom('shipping', shipping),
+    }
+
+    const resp = intentId
       ? await stripe.paymentIntents.update(intentId, {
           amount: totalCents,
           currency,
-          metadata: {
-            email, name,
-            subtotal: subtotal.toFixed(2),
-            tax: tax.toFixed(2),
-            total: total.toFixed(2),
-            state, county
-          }
+          receipt_email: email || undefined,
+          metadata,
         })
       : await stripe.paymentIntents.create({
           amount: totalCents,
           currency,
           automatic_payment_methods: { enabled: true },
           receipt_email: email || undefined,
-          metadata: {
-            email, name,
-            subtotal: subtotal.toFixed(2),
-            tax: tax.toFixed(2),
-            total: total.toFixed(2),
-            state, county
-          }
+          metadata,
         })
 
-    return res.status(200).json({ clientSecret: intent.client_secret, intentId: intent.id, totals: { subtotal, tax, total } })
+    return res.status(200).json({
+      clientSecret: resp.client_secret,
+      intentId: resp.id,
+      totals: { subtotal, tax, total },
+    })
   } catch (err: any) {
     console.error('PI error:', err)
-    return res.status(500).json({ error: err?.message || 'Stripe error' })
+    const msg = err?.raw?.message || err?.message || 'Stripe error'
+    return res.status(500).json({ error: msg })
   }
 }
