@@ -9,7 +9,7 @@ type Props = {
   intentId: string;   // from /api/create-payment-intent
   email: string;
   name: string;
-  onPaid?: (piId: string) => void; // optional callback after success
+  onPaid?: (piId: string) => void;
 };
 
 export default function CheckoutForm_Tax({ intentId, email, name, onPaid }: Props) {
