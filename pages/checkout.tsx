@@ -8,6 +8,7 @@ export default function CheckoutPage() {
   useEffect(() => setMounted(true), []);
   const subtotal = mounted ? items.reduce((sum, it) => sum + it.price * it.qty, 0) : 0;
   const [zip, setZip] = useState('');
+  const [city, setCity] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
@@ -24,6 +25,7 @@ export default function CheckoutPage() {
           amount: Math.round(subtotal * 100),          // cents
           currency: 'usd',
           zip,
+          city,
           state: process.env.NEXT_PUBLIC_TAX_STATE || 'NC',
           shipping: 0,               // plug in your shipping logic if any
           metadata: { orderSource: 'web' },
@@ -56,6 +58,17 @@ export default function CheckoutPage() {
           type="text"
           value={zip}
           onChange={e => setZip(e.target.value)}
+          style={{ display: 'block', width: '100%', padding: 8, marginTop: 6 }}
+        />
+      </label>
+
+      <label style={{ display: 'block', marginTop: 12 }}>
+        City
+        <input
+          type="text"
+          value={city}
+          onChange={e => setCity(e.target.value)}
+          placeholder="e.g., Snow Hill"
           style={{ display: 'block', width: '100%', padding: 8, marginTop: 6 }}
         />
       </label>

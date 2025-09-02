@@ -1,6 +1,8 @@
 // pages/api/create-payment-intent.ts
 import type { NextApiRequest, NextApiResponse } from 'next'
 import Stripe from 'stripe'
+import { NC_ZIP_TO_COUNTY, NC_CITY_TO_COUNTY } from '../../lib/nc_data'
+import { getCountyRate } from '../../lib/nc_tax'
 
 /**
  * Optional server-side price book. If a SKU exists here, we ignore any client
@@ -26,14 +28,21 @@ type Address = {
 
 type Body = {
   intentId?: string
-  items: CartItem[]
+  // Option A: itemized cart in dollars
+  items?: CartItem[]
+  // Option B: precomputed subtotal (in cents)
+  amount?: number // cents
+  // Common fields
+  shipping?: number // cents
   email?: string
   name?: string
   currency?: string
   state?: 'NC' | 'Other'
   county?: string
+  zip?: string
+  city?: string
   billing?: Address
-  shipping?: Address
+  shippingAddress?: Address
 }
 
 const norm = (s?: string) => (s ?? '').trim().toLowerCase()
@@ -54,25 +63,53 @@ const COUNTY_RATES: Record<string, number> = (() => {
   }
 })()
 
-function calcTotals(items: CartItem[], state: 'NC' | 'Other' = 'Other', county?: string) {
+function resolveCounty(zip?: string, city?: string, fallbackCounty?: string): string | undefined {
+  const z = (zip || '').trim()
+  if (z && NC_ZIP_TO_COUNTY[z]) return NC_ZIP_TO_COUNTY[z]
+  const c = (city || '').trim().toLowerCase()
+  if (c && NC_CITY_TO_COUNTY[c]) return NC_CITY_TO_COUNTY[c]
+  return fallbackCounty
+}
+
+function calcTotals({
+  items,
+  amountCents,
+  state = 'Other',
+  county,
+  shippingCents = 0,
+}: {
+  items?: CartItem[]
+  amountCents?: number
+  state?: 'NC' | 'Other'
+  county?: string
+  shippingCents?: number
+}) {
+  // Determine subtotal dollars from items or cents
   let subtotal = 0
-  for (const it of items || []) {
-    const qty = Number(it.qty)
-    const unit = Number.isFinite(PRICE_BY_SKU[it.sku]) ? PRICE_BY_SKU[it.sku] : Number(it.price)
-    if (Number.isFinite(qty) && Number.isFinite(unit)) subtotal += qty * unit
+  if (items && items.length) {
+    for (const it of items) {
+      const qty = Number(it.qty)
+      const unit = Number.isFinite(PRICE_BY_SKU[it.sku]) ? PRICE_BY_SKU[it.sku] : Number(it.price)
+      if (Number.isFinite(qty) && Number.isFinite(unit)) subtotal += qty * unit
+    }
+  } else if (Number.isFinite(amountCents as number)) {
+    subtotal = Number(((amountCents as number) / 100).toFixed(2))
   }
   subtotal = Number(subtotal.toFixed(2))
 
   const baseNc = Number(process.env.NEXT_PUBLIC_NC_TAX_RATE ?? 0.0475) || 0
-  const countyRate = state === 'NC' ? (COUNTY_RATES[norm(county)] || 0) : 0
+  const countyRate = state === 'NC' ? getCountyRate(county) : 0
   const tax = Number((subtotal * (state === 'NC' ? baseNc + countyRate : 0)).toFixed(2))
-  const total = Number((subtotal + tax).toFixed(2))
-  const totalCents = Math.round(total * 100)
+  const total = Number((subtotal + tax + (shippingCents / 100)).toFixed(2))
+
+  const subtotalCents = Math.round(subtotal * 100)
+  const taxCents = Math.round(tax * 100)
+  const totalCents = subtotalCents + taxCents + Math.round(shippingCents)
 
   if (!Number.isFinite(totalCents) || totalCents < 50) {
     throw new Error('Bad total after tax (must be ≥ $0.50)')
   }
-  return { subtotal, tax, total, totalCents }
+  return { subtotal, tax, total, subtotalCents, taxCents, totalCents, shippingCents }
 }
 
 function metaFrom(prefix: string, src?: Address): Record<string, string> {
@@ -109,18 +146,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const {
     intentId,
-    items = [],
+    items,
+    amount: amountCents,
+    shipping: shippingCents = 0,
     email = '',
     name = '',
     currency = 'usd',
-    state = 'Other',
-    county = '',
+  state = 'Other',
+  county: countyRaw = '',
+  zip = '',
+  city = '',
     billing,
-    shipping,
+    shippingAddress,
   } = body
 
   try {
-    const { subtotal, tax, total, totalCents } = calcTotals(items, state, county)
+  const resolvedCounty = resolveCounty(zip, city, countyRaw)
+    const { subtotal, tax, total, totalCents, subtotalCents, taxCents } = calcTotals({
+      items,
+      amountCents,
+      state,
+      county: resolvedCounty,
+      shippingCents,
+    })
 
     const baseMeta: Record<string, string> = {
       email,
@@ -129,12 +177,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       tax: tax.toFixed(2),
       total: total.toFixed(2),
       state,
-      county: county || '',
+  county: resolvedCounty || '',
     }
     const metadata = {
       ...baseMeta,
-      ...metaFrom('billing', billing),
-      ...metaFrom('shipping', shipping),
+  ...metaFrom('billing', billing),
+  ...metaFrom('shipping', shippingAddress),
     }
 
     const resp = intentId
@@ -155,7 +203,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({
       clientSecret: resp.client_secret,
       intentId: resp.id,
-      totals: { subtotal, tax, total },
+      totals: { subtotal, tax, total }, // dollars
+      breakdown: { subtotal: subtotalCents, tax: taxCents, shipping: Math.round(shippingCents) }, // cents for UI
     })
   } catch (err: any) {
     console.error('PI error:', err)

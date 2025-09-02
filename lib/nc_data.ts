@@ -126,4 +126,8 @@ export const NC_ZIP_TO_COUNTY: Record<string, string> = {
   // Nash County (Rocky Mount)
   '27801': 'Nash', '27802': 'Nash', '27803': 'Nash', '27804': 'Nash', '27807': 'Nash', '27809': 'Nash',
   '27856': 'Nash', '27891': 'Nash', '27896': 'Nash'
+  ,
+
+  // Greene County (Snow Hill and surrounding)
+  '28580': 'Greene',
 };
