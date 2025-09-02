@@ -61,5 +61,14 @@ export function loadCountyRates(): CountyRates {
 export function getCountyRate(county?: string): number {
   if (!county) return 0
   const map = loadCountyRates()
-  return map[norm(county)] || 0
+  const v = map[norm(county)] || 0
+  if (!v) return 0
+  // Support either county add-on (e.g., 0.0225) or total combined (e.g., 0.07)
+  // If it looks like a combined total, convert to add-on by subtracting base.
+  const baseNc = Number(process.env.NEXT_PUBLIC_NC_TAX_RATE ?? 0.0475) || 0.0475
+  if (v > 0.04 && v < 0.12) {
+    const addon = v - baseNc
+    return addon > 0 ? addon : 0
+  }
+  return v
 }

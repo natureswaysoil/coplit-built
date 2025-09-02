@@ -21,11 +21,14 @@ If Row Level Security (RLS) is enabled, ensure your inserts are allowed for anon
 
 In Vercel → Project → Settings → Environment Variables:
 - `NEXT_PUBLIC_NC_TAX_RATE` — base NC rate (e.g., `0.0475` for 4.75%)
-- `NEXT_PUBLIC_NC_COUNTY_RATES` — JSON mapping for county add-ons (keys lowercased). Example:
+- `NEXT_PUBLIC_NC_COUNTY_RATES` — JSON mapping for county rates (keys lowercased). You can supply either:
+  - county add-on only (e.g., `0.0225`), or
+  - combined total (e.g., `0.07`). When a combined total is provided, the app automatically subtracts the base NC rate to derive the add-on.
+  Example:
   {
     "wake": 0.0225,
     "mecklenburg": 0.02,
-    "durham": 0.0225
+    "durham": 0.07
   }
 
 ## 3) What the app does
