@@ -145,11 +145,5 @@ export default function Home() {
   );
 }
 
-// app/page.tsx  (App Router)
-export default function Home() {
-  return <div>hello 🌱</div>;
-}
-export default function Home() {
-  return <main style={{ padding: 24 }}>home ok</main>;
-}
+// ...removed duplicate default exports...
 

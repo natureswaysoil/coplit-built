@@ -4,8 +4,8 @@ import Stripe from "stripe";
 import { supabaseAdmin } from "../../lib/supabaseAdmin";
 import { loadSkuTaxCodeMap } from "../../lib/taxCodes";
 
-const apiVersion = (process.env.STRIPE_API_VERSION as Stripe.LatestApiVersion | undefined) || "2024-06-20";
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, { apiVersion });
+const apiVersion = process.env.STRIPE_API_VERSION || "2024-06-20";
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, { apiVersion } as any);
 
 type CartItem = { id: string; title: string; image: string; sku: string; size: string; price: number; qty: number; };
 
@@ -109,7 +109,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       shipping_cost: shipping?.amount ? { amount: Math.round(shipping.amount) } : undefined,
     });
 
-    const subtotal = calc.amount_subtotal;
+  const subtotal = calc.amount_total;
     const tax = calc.tax_amount_exclusive;
     const total = calc.amount_total;
 

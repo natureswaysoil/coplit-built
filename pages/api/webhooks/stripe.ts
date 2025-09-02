@@ -17,10 +17,14 @@ async function readBuffer(req: NextApiRequest): Promise<Buffer> {
   return Buffer.concat(chunks)
 }
 
+// Instantiate Stripe with a safe cast for apiVersion to avoid literal-type TS errors
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+  apiVersion: '2024-06-20',
+} as any)
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end()
 
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
   const sig = req.headers['stripe-signature'] as string
   const whSecret = process.env.STRIPE_WEBHOOK_SECRET as string
   if (!whSecret) return res.status(500).send('Missing STRIPE_WEBHOOK_SECRET')

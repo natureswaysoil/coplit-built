@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 
 const apiVersion = (process.env.STRIPE_API_VERSION as Stripe.LatestApiVersion | undefined) || "2024-06-20";
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, { apiVersion });
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, { apiVersion } as any);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });

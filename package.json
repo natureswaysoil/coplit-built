@@ -8,11 +8,13 @@
     "start": "next start"
   },
   "dependencies": {
+    "@stripe/react-stripe-js": "^3.9.2",
     "@stripe/stripe-js": "^7.9.0",
     "@supabase/supabase-js": "^2.56.0",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
+    "stripe": "^18.5.0",
     "tesseract.js": "^6.0.1"
   },
   "devDependencies": {

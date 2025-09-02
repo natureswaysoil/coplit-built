@@ -87,14 +87,18 @@ function metaFrom(prefix: string, src?: Address): Record<string, string> {
   return m
 }
 
+// Instantiate Stripe with a safe cast for apiVersion to avoid literal-type TS errors
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+  apiVersion: '2024-06-20',
+} as any)
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST')
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const secret = process.env.STRIPE_SECRET_KEY
-  if (!secret) return res.status(500).json({ error: 'Missing STRIPE_SECRET_KEY' })
+  if (!process.env.STRIPE_SECRET_KEY) return res.status(500).json({ error: 'Missing STRIPE_SECRET_KEY' })
 
   let body: Body
   try {
@@ -116,9 +120,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } = body
 
   try {
-    // Do NOT hard-code apiVersion (prevents TS error with latest types)
-    const stripe = new Stripe(secret)
-
     const { subtotal, tax, total, totalCents } = calcTotals(items, state, county)
 
     const baseMeta: Record<string, string> = {

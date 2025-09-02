@@ -3,11 +3,11 @@ import type { AppProps } from 'next/app'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-// Use the single canonical cart context; alias provider to avoid name clashes
+// ✅ Import the cart context ONCE and alias the provider to avoid any name collisions
 import { CartProvider as CartCtxProvider, useCart } from '../lib/cartContext'
 
-// If your project uses styles.css instead, change this path:
-import '../styles/globals.css'
+// Adjust to your actual CSS file
+import '../styles/globals.css' // or: import '../styles.css'
 
 function TopNav() {
   const { items } = useCart()
