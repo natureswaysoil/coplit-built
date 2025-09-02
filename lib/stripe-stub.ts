@@ -41,6 +41,16 @@ export default class Stripe {
   };
 }
 
-export namespace Stripe {
-  export type LatestApiVersion = string;
+  export type LatestApiVersion =
+    | '2024-06-20'
+    | '2024-04-10'
+    | '2023-10-16'
+    | '2023-08-16'
+    | '2022-11-15'
+    | '2022-08-01'
+    | '2022-07-01'
+    | '2022-06-01'
+    | '2022-05-01'
+    | '2022-04-01'
+    | string; // fallback for future versions
 }
