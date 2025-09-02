@@ -1,9 +1,13 @@
 // pages/checkout.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useCart } from '../lib/cartContext';
 
 export default function CheckoutPage() {
+  const { items } = useCart();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const subtotal = mounted ? items.reduce((sum, it) => sum + it.price * it.qty, 0) : 0;
   const [zip, setZip] = useState('');
-  const [subtotal, setSubtotal] = useState(4999); // example: $49.99
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
@@ -17,7 +21,7 @@ export default function CheckoutPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: subtotal,          // cents
+          amount: Math.round(subtotal * 100),          // cents
           currency: 'usd',
           zip,
           state: process.env.NEXT_PUBLIC_TAX_STATE || 'NC',
@@ -39,15 +43,12 @@ export default function CheckoutPage() {
     <main style={{ maxWidth: 520, margin: '2rem auto', fontFamily: 'system-ui' }}>
       <h1>Checkout</h1>
 
-      <label style={{ display: 'block', marginTop: 12 }}>
-        Subtotal (cents)
-        <input
-          type="number"
-          value={subtotal}
-          onChange={e => setSubtotal(parseInt(e.target.value || '0', 10))}
-          style={{ display: 'block', width: '100%', padding: 8, marginTop: 6 }}
-        />
-      </label>
+      <div style={{ marginTop: 12 }}>
+        Subtotal: <span suppressHydrationWarning>${subtotal.toFixed(2)}</span>
+      </div>
+      {mounted && items.length === 0 && (
+        <p style={{ marginTop: 8 }}>Your cart is empty.</p>
+      )}
 
       <label style={{ display: 'block', marginTop: 12 }}>
         ZIP
@@ -59,7 +60,7 @@ export default function CheckoutPage() {
         />
       </label>
 
-      <button disabled={loading} onClick={createPI} style={{ marginTop: 16, padding: '10px 16px' }}>
+      <button disabled={loading || subtotal <= 0} onClick={createPI} style={{ marginTop: 16, padding: '10px 16px' }}>
         {loading ? 'Creating…' : 'Create Payment Intent'}
       </button>
 
