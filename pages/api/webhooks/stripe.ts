@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const whSecret = process.env.STRIPE_WEBHOOK_SECRET as string
   if (!whSecret) return res.status(500).send('Missing STRIPE_WEBHOOK_SECRET')
 
-  let event: Stripe.Event
+  let event: any
   try {
     const buf = await readBuffer(req)
     event = stripe.webhooks.constructEvent(buf, sig, whSecret)
@@ -37,7 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     switch (event.type) {
       case 'payment_intent.succeeded': {
-        const pi = event.data.object as Stripe.PaymentIntent
+        const pi = event.data.object as any
         const meta = pi.metadata || {}
         // Update existing order by pi_id; if none, insert a new order record
         const { data: existing } = await supabase
@@ -97,7 +97,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       case 'payment_intent.payment_failed': {
-        const pi = event.data.object as Stripe.PaymentIntent
+        const pi = event.data.object as any
         // Optionally record failure reason
         await supabase.from('orders').update({
           status: 'failed',
