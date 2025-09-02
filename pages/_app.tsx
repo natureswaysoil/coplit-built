@@ -3,12 +3,7 @@ import type { AppProps } from 'next/app'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { CartProvider, useCart } from '../lib/cartContext'
-
-// Use the one that actually exists in your project:
-// If your global CSS file is styles/globals.css:
-import '../styles/globals.css'
-// If your project instead uses styles.css, delete the line above and uncomment:
-// import '../styles.css'
+import '../styles/globals.css' // or '../styles.css' if that's your file
 
 function TopNav() {
   const { items } = useCart()
@@ -17,16 +12,10 @@ function TopNav() {
   const count = items.reduce((sum, i) => sum + i.qty, 0)
 
   return (
-    <nav
-      style={{
-        padding: '1rem',
-        background: '#1a202c',
-        color: '#fff',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}
-    >
+    <nav style={{
+      padding: '1rem', background: '#1a202c', color: '#fff',
+      display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+    }}>
       <div style={{ display: 'flex', gap: 16 }}>
         <Link href="/" style={{ color: '#fff' }}>Home</Link>
         <Link href="/products" style={{ color: '#fff' }}>Products</Link>
@@ -53,4 +42,3 @@ export default function App({ Component, pageProps }: AppProps) {
     </CartProvider>
   )
 }
-
