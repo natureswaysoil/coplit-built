@@ -6,7 +6,7 @@ import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import { useCart } from "../lib/cartContext";
 
 type Props = {
-  intentId: string;             // from /api/create-payment-intent
+  intentId: string;   // from /api/create-payment-intent
   email: string;
   name: string;
   onPaid?: (piId: string) => void; // optional callback after success
@@ -61,4 +61,5 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid }: Prop
     </form>
   );
 }
+
 
