@@ -1,12 +1,17 @@
+# 1) Back it up (optional)
+cp pages/_app.tsx pages/_app.backup.tsx
+
+# 2) Overwrite with a clean file
+cat > pages/_app.tsx <<'TS'
 // pages/_app.tsx
 import type { AppProps } from 'next/app'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-// ✅ Import the ONLY cart context we use, with an alias to avoid any conflicts
+// Use the single canonical cart context; alias to avoid any naming collisions
 import { CartProvider as CartCtxProvider, useCart } from '../lib/cartContext'
 
-// Use whichever global CSS your project actually has:
+// Adjust this import to your actual global CSS file:
 import '../styles/globals.css' // or: import '../styles.css'
 
 function TopNav() {
@@ -16,10 +21,16 @@ function TopNav() {
   const count = items.reduce((sum, i) => sum + i.qty, 0)
 
   return (
-    <nav style={{
-      padding: '1rem', background: '#1a202c', color: '#fff',
-      display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-    }}>
+    <nav
+      style={{
+        padding: '1rem',
+        background: '#1a202c',
+        color: '#fff',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      }}
+    >
       <div style={{ display: 'flex', gap: 16 }}>
         <Link href="/" style={{ color: '#fff' }}>Home</Link>
         <Link href="/products" style={{ color: '#fff' }}>Products</Link>
@@ -46,3 +57,12 @@ export default function App({ Component, pageProps }: AppProps) {
     </CartCtxProvider>
   )
 }
+TS
+
+# 3) Confirm there are no other CartProvider mentions left in this file
+grep -n "CartProvider" pages/_app.tsx
+
+# 4) Clean build
+rm -rf .next
+npm run build
+
