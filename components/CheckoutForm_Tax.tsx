@@ -1,6 +1,4 @@
-// components/CheckoutForm_Tax.tsx
 "use client";
-
 import { FormEvent, useState } from "react";
 import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useCart } from "../lib/cartContext";
@@ -59,5 +57,5 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid }: Prop
       </button>
       {error && <div style={{ color: "crimson" }}>{error}</div>}
     </form>
-  )
+  );
 }
