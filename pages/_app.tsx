@@ -2,8 +2,12 @@
 import type { AppProps } from 'next/app'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { CartProvider, useCart } from '../lib/cartContext'
-import '../styles/globals.css' // or '../styles.css' if that's your file
+
+// ✅ Import the ONLY cart context we use, with an alias to avoid any conflicts
+import { CartProvider as CartCtxProvider, useCart } from '../lib/cartContext'
+
+// Use whichever global CSS your project actually has:
+import '../styles/globals.css' // or: import '../styles.css'
 
 function TopNav() {
   const { items } = useCart()
@@ -36,9 +40,9 @@ function TopNav() {
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <CartProvider>
+    <CartCtxProvider>
       <TopNav />
       <Component {...pageProps} />
-    </CartProvider>
+    </CartCtxProvider>
   )
 }
