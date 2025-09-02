@@ -61,8 +61,3 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid }: Prop
     </form>
   );
 }
-
-// components/PromoField.tsx (optional stub)
-"use client";
-export default function PromoField() { return null; }
-
