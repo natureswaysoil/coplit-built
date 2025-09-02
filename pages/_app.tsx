@@ -3,6 +3,19 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { CartProvider, useCart } from '../lib/cartContext';
 
+// pages/_app.tsx
+import type { AppProps } from 'next/app'
+import { CartProvider } from '../lib/cartContext'
+
+export default function App({ Component, pageProps }: AppProps) {
+  return (
+    <CartProvider>
+      <Component {...pageProps} />
+    </CartProvider>
+  )
+}
+
+
 function TopNav() {
   const { items } = useCart();
   const [mounted, setMounted] = useState(false);
