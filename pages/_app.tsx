@@ -1,18 +1,13 @@
-# 1) Back it up (optional)
-cp pages/_app.tsx pages/_app.backup.tsx
-
-# 2) Overwrite with a clean file
-cat > pages/_app.tsx <<'TS'
 // pages/_app.tsx
 import type { AppProps } from 'next/app'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-// Use the single canonical cart context; alias to avoid any naming collisions
+// Use the single canonical cart context; alias provider to avoid name clashes
 import { CartProvider as CartCtxProvider, useCart } from '../lib/cartContext'
 
-// Adjust this import to your actual global CSS file:
-import '../styles/globals.css' // or: import '../styles.css'
+// If your project uses styles.css instead, change this path:
+import '../styles/globals.css'
 
 function TopNav() {
   const { items } = useCart()
@@ -57,13 +52,6 @@ export default function App({ Component, pageProps }: AppProps) {
     </CartCtxProvider>
   )
 }
-TS
 
-# 3) Confirm there are no other CartProvider mentions left in this file
-grep -n "CartProvider" pages/_app.tsx
-
-# 4) Clean build
-rm -rf .next
-npm run build
 
 
