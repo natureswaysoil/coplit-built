@@ -59,5 +59,5 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid }: Prop
       </button>
       {error && <div style={{ color: "crimson" }}>{error}</div>}
     </form>
-  );
+  )
 }
