@@ -1,4 +1,3 @@
-
 // components/CheckoutForm_Tax.tsx
 "use client";
 
@@ -32,9 +31,7 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid }: Prop
       elements,
       confirmParams: {
         receipt_email: email,
-        payment_method_data: {
-          billing_details: { name, email },
-        },
+        payment_method_data: { billing_details: { name, email } },
         return_url: `${window.location.origin}/success?pi=${intentId}`,
       },
       redirect: "if_required",
@@ -64,3 +61,4 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid }: Prop
     </form>
   );
 }
+
