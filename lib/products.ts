@@ -100,9 +100,8 @@ export const products: Product[] = [
     keyword: 'DOG SAFE',
     details: 'A completely pet-safe organic fertilizer blend designed for lawns and gardens where dogs play. Non-toxic formula promotes healthy grass growth while ensuring your furry friends stay safe. Perfect for dog owners who want a beautiful yard without worry.',
     variations: [
-      { size: '32 oz', price: 19.99, sku: 'NWS-DOGSAFE-32OZ' },
-      { size: '1 Gallon', price: 34.99, sku: 'NWS-DOGSAFE-1GAL' },
-      { size: '2.5 Gallon', price: 59.99, sku: 'NWS-DOGSAFE-25GAL' }
+      { size: '32 oz', price: 29.99, sku: 'NWS-DOGSAFE-32OZ' },
+      { size: '1 Gallon', price: 59.99, sku: 'NWS-DOGSAFE-1GAL' }
     ]
   }
 ];
