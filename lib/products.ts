@@ -106,13 +106,13 @@ export const products: Product[] = [
   },
   {
     id: '9',
-    title: "Premium Liquid Fertilizer",
+    title: "Nature's Way Soil Organic Tomato Liquid Fertilizer – Made Fresh Weekly- Concentrate/Includes Vitamin B-1 and Aloe Vera for Faster Root Establishment, Healthier Transplants/Stops Blossom End Rot",
     image: '/screenshots/Screenshot 2025-08-21 103351 liquid fertilizer details.png',
-    keyword: 'LIQUID FERTILIZER',
-    details: 'High-performance liquid fertilizer concentrate designed for maximum plant nutrition and growth. Perfect for gardens, lawns, and landscaping applications. Easy-to-use liquid formula for quick nutrient absorption.',
+    keyword: 'TOMATO FERTILIZER',
+    details: 'Balanced Nutrition: Provides essential nutrients in an easily absorbable form, promoting healthy growth and increased yields. Organic and Natural: Made from all-natural ingredients, ensuring a safe and eco-friendly product. Easy to Use: Concentrated formula is simple to mix and apply, suitable for gardeners of all experience levels. Improves Soil Health: Enhances soil structure and fertility, supporting long-term plant health. Includes Vitamin B-1 and Aloe Vera for Faster Root Establishment, Healthier Transplants, and Maximum Nutrient Absorption – Perfect for Organic Farms & Greenhouses.',
     variations: [
-      { size: '32 oz', price: 24.99, sku: 'NWS-LIQUIDFERT-32OZ' },
-      { size: '1 Gallon', price: 44.99, sku: 'NWS-LIQUIDFERT-1GAL' }
+      { size: '32 oz', price: 20.99, sku: 'NWS-TOMATO-LF-32OZ' },
+      { size: '1 Gallon', price: 64.99, sku: 'NWS-TOMATO-LF-1GAL' }
     ]
   }
 ];
