@@ -54,7 +54,7 @@ export default function Home() {
   return (
     <div style={{ background: '#174F2E', color: 'white', padding: '1rem 0' }}>
               <p style={{ fontSize: '1.2rem', margin: '1rem 0', color: '#22c55e' }}>
-        FREE SHIPPING ON ORDERS OVER $150
+        FREE SHIPPING ON ORDERS OVER $75
         </p>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', maxWidth: 1200, margin: '0 auto', padding: '1rem' }}>
         <div style={{ maxWidth: 600 }}>

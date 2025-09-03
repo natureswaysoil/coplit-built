@@ -23,19 +23,19 @@ const PRODUCT_WEIGHTS: Record<string, number> = {
   'Bag 10 lb': 12.0,  // 10 lbs product + 2 lbs packaging
 };
 
-// Shipping rate tiers based on total weight
+// Shipping rate tiers based on total weight  
 const SHIPPING_TIERS = [
-  { maxWeight: 5, rate: 12.99 },    // Up to 5 lbs
-  { maxWeight: 15, rate: 18.99 },   // 5.1-15 lbs  
-  { maxWeight: 30, rate: 25.99 },   // 15.1-30 lbs
-  { maxWeight: 50, rate: 35.99 },   // 30.1-50 lbs
-  { maxWeight: 100, rate: 49.99 },  // 50.1-100 lbs
-  { maxWeight: Infinity, rate: 69.99 } // Over 100 lbs
+  { maxWeight: 5, rate: 8.99 },     // Up to 5 lbs - competitive with Amazon
+  { maxWeight: 15, rate: 12.99 },   // 5.1-15 lbs  
+  { maxWeight: 30, rate: 18.99 },   // 15.1-30 lbs
+  { maxWeight: 50, rate: 24.99 },   // 30.1-50 lbs
+  { maxWeight: 100, rate: 34.99 },  // 50.1-100 lbs
+  { maxWeight: Infinity, rate: 44.99 } // Over 100 lbs
 ];
 
 // Free shipping thresholds
-export const FREE_SHIPPING_MINIMUM = 150.00; // Free shipping on orders over $150
-export const FLAT_RATE_OPTION = 8.99; // Flat rate for orders under threshold
+export const FREE_SHIPPING_MINIMUM = 75.00; // Lowered from $150 to $75
+export const FLAT_RATE_OPTION = 8.99; // Competitive flat rate option
 
 export function calculateShipping(items: ShippingItem[], subtotal: number): ShippingRates {
   // Free shipping for orders over threshold
