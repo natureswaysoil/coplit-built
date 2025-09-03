@@ -12,6 +12,7 @@ export default function Navbar() {
       <Link href="/">Home</Link>
       <Link href="/products">Products</Link>
       <Link href="/cart">Cart</Link>
+      <Link href="/tiktok-tools" style={{ color: '#22c55e', fontWeight: 'bold' }}>📱 TikTok Tools</Link>
       <Link href="/privacy-policy">Privacy Policy</Link>
       <Link href="/refund-policy">Refund Policy</Link>
       <Link href="/auth">Sign In/Up</Link>
