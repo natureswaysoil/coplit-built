@@ -13,7 +13,12 @@
     "isolatedModules": true,
     "esModuleInterop": true,
     "jsx": "preserve",
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@stripe/react-stripe-js": ["lib/stripe-react-stub"],
+      "stripe": ["lib/stripe-stub"]
+    }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
