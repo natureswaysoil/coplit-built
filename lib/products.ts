@@ -92,5 +92,17 @@ export const products: Product[] = [
       { size: '32 oz', price: 24.99, sku: 'NWS-BONEMEAL-32OZ' },
       { size: '1 Gallon', price: 39.99, sku: 'NWS-BONEMEAL-1GAL' }
     ]
+  },
+  {
+    id: '8',
+    title: "Pet-Safe Lawn & Garden Fertilizer",
+    image: '/screenshots/Screenshot 2025-08-21 103911 dog details.png',
+    keyword: 'DOG SAFE',
+    details: 'A completely pet-safe organic fertilizer blend designed for lawns and gardens where dogs play. Non-toxic formula promotes healthy grass growth while ensuring your furry friends stay safe. Perfect for dog owners who want a beautiful yard without worry.',
+    variations: [
+      { size: '32 oz', price: 19.99, sku: 'NWS-DOGSAFE-32OZ' },
+      { size: '1 Gallon', price: 34.99, sku: 'NWS-DOGSAFE-1GAL' },
+      { size: '2.5 Gallon', price: 59.99, sku: 'NWS-DOGSAFE-25GAL' }
+    ]
   }
 ];
