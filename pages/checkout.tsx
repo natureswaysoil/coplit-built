@@ -2,12 +2,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useCart } from '../lib/cartContext'
 import { Elements } from '@stripe/react-stripe-js'
-import { loadStripe } from '@stripe/stripe-js'
+import { loadStripe, Stripe } from '@stripe/stripe-js'
 import CheckoutForm_Tax from '../components/CheckoutForm_Tax'
-
-const stripePromise = typeof window !== 'undefined'
-  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '')
-  : null
 
 export default function CheckoutPage() {
   const { items, subtotal } = useCart()
@@ -25,8 +21,27 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [breakdown, setBreakdown] = useState<{subtotal: number; tax: number; shipping: number} | null>(null)
+  const [stripe, setStripe] = useState<Stripe | null>(null)
 
   useEffect(() => setMounted(true), [])
+
+  // Load publishable key at runtime and initialize Stripe
+  useEffect(() => {
+    if (!mounted) return
+    let cancelled = false
+    ;(async () => {
+      try {
+        const r = await fetch('/api/config/stripe-pk')
+        const j = await r.json()
+        if (!r.ok) throw new Error(j?.error || 'Failed to load Stripe key')
+        const s = await loadStripe(j.publishableKey)
+        if (!cancelled) setStripe(s)
+      } catch (e: any) {
+        if (!cancelled) setError(e?.message || 'Stripe init failed')
+      }
+    })()
+    return () => { cancelled = true }
+  }, [mounted])
 
   const disabled = useMemo(() => {
     return !mounted || items.length === 0 || subtotal <= 0
@@ -34,10 +49,7 @@ export default function CheckoutPage() {
 
   async function ensurePaymentIntent() {
     if (disabled) return
-    if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
-      setError('Missing NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY')
-      return
-    }
+  // Stripe will be initialized separately; don't block on env here
     setLoading(true)
     setError(null)
     try {
@@ -192,9 +204,9 @@ export default function CheckoutPage() {
       </section>
 
       {/* Stripe Elements */}
-      {clientSecret && stripePromise && (
+    {clientSecret && stripe && (
         <section style={{ marginTop: 24 }}>
-          <Elements stripe={stripePromise} options={{ clientSecret, appearance }}>
+      <Elements stripe={stripe} options={{ clientSecret, appearance }}>
             <CheckoutForm_Tax
               intentId={intentId as string}
               email={email}
