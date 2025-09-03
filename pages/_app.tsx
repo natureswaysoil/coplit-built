@@ -3,11 +3,14 @@ import type { AppProps } from 'next/app'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-// Use the single canonical cart context; alias provider to avoid name clashes
+// Canonical cart context (aliased to avoid name collisions)
 import { CartProvider as CartCtxProvider, useCart } from '../lib/cartContext'
 
-// If your project uses styles.css instead, change this path:
+// Global CSS (switch to '../styles.css' if that's your file)
 import '../styles/globals.css'
+
+// ✅ Vercel Web Analytics
+import { Analytics } from '@vercel/analytics/next'
 
 function TopNav() {
   const { items } = useCart()
@@ -49,6 +52,9 @@ export default function App({ Component, pageProps }: AppProps) {
     <CartCtxProvider>
       <TopNav />
       <Component {...pageProps} />
+      {/* Sends pageview events to Vercel Analytics (cookieless) */}
+      <Analytics />
     </CartCtxProvider>
   )
 }
+
