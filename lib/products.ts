@@ -103,5 +103,16 @@ export const products: Product[] = [
       { size: '32 oz', price: 29.99, sku: 'NWS-DOGSAFE-32OZ' },
       { size: '1 Gallon', price: 59.99, sku: 'NWS-DOGSAFE-1GAL' }
     ]
+  },
+  {
+    id: '9',
+    title: "Premium Liquid Fertilizer",
+    image: '/screenshots/Screenshot 2025-08-21 103351 liquid fertilizer details.png',
+    keyword: 'LIQUID FERTILIZER',
+    details: 'High-performance liquid fertilizer concentrate designed for maximum plant nutrition and growth. Perfect for gardens, lawns, and landscaping applications. Easy-to-use liquid formula for quick nutrient absorption.',
+    variations: [
+      { size: '32 oz', price: 24.99, sku: 'NWS-LIQUIDFERT-32OZ' },
+      { size: '1 Gallon', price: 44.99, sku: 'NWS-LIQUIDFERT-1GAL' }
+    ]
   }
 ];
