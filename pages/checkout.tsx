@@ -218,7 +218,6 @@ export default function CheckoutPage() {
             </p>
           </div>
         )}
-        </div>
 
         {/* Address / contact */}
         <div style={{ flex: 1, minWidth: 280 }}>

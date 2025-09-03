@@ -56,8 +56,20 @@ export default function Home() {
               <p style={{ fontSize: '1.2rem', margin: '1rem 0', color: '#22c55e' }}>
         FREE SHIPPING ON ORDERS OVER $75
         </p>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', maxWidth: 1200, margin: '0 auto', padding: '1rem' }}>
-        <div style={{ maxWidth: 600 }}>
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'space-between', 
+        maxWidth: 1200, 
+        margin: '0 auto', 
+        padding: '1rem',
+        gap: '2rem',
+        flexWrap: 'wrap'
+      }}>
+        <div style={{ 
+          flex: '1 1 400px',
+          minWidth: '300px'
+        }}>
           <h1 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Nature's Way Soil</h1>
           <p style={{ fontSize: '1rem', margin: '1rem 0' }}>
             At Nature’s Way Soil, our mission is simple: to bring life back to the soil, naturally.<br /><br />
@@ -72,8 +84,29 @@ export default function Home() {
             Every bottle and bag of Nature’s Way Soil® carries this commitment: to restore the balance between people, plants, and the planet.
           </p>
         </div>
-        <div style={{ minWidth: 120, maxWidth: 240, flex: '0 1 240px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Image src="/screenshots/logo-with-tagline.png" alt="Nature's Way Soil Logo" width={240} height={120} style={{ borderRadius: 16, background: 'white', objectFit: 'contain', width: '100%', height: 'auto' }} />
+        <div style={{ 
+          flex: '0 1 300px', 
+          maxWidth: '300px',
+          minWidth: '200px',
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          padding: '1rem'
+        }}>
+          <Image 
+            src="/screenshots/logo-with-tagline.png" 
+            alt="Nature's Way Soil Logo" 
+            width={300} 
+            height={150} 
+            style={{ 
+              borderRadius: 16, 
+              background: 'white', 
+              objectFit: 'contain', 
+              width: '100%', 
+              height: 'auto',
+              maxHeight: '200px'
+            }} 
+          />
         </div>
       </div>
       <div style={{ background: '#F6FFF7', color: '#174F2E', padding: '2rem 0', borderRadius: '0 0 16px 16px' }}>
