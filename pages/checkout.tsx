@@ -14,6 +14,10 @@ export default function CheckoutPage() {
   const [mounted, setMounted] = useState(false)
   const [zip, setZip] = useState('')
   const [city, setCity] = useState('')
+  const [stateCode, setStateCode] = useState('NC')
+  const [address1, setAddress1] = useState('')
+  const [address2, setAddress2] = useState('')
+  const [phone, setPhone] = useState('')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [clientSecret, setClientSecret] = useState<string | null>(null)
@@ -43,11 +47,31 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           intentId: intentId || undefined,
           items: items.map(it => ({ sku: it.sku, qty: it.qty, price: it.price })),
-          state: (process.env.NEXT_PUBLIC_TAX_STATE || 'NC') as 'NC' | 'Other',
+          state: (stateCode?.toUpperCase() === 'NC' ? 'NC' : 'Other') as 'NC' | 'Other',
           zip,
           city,
           email,
           name,
+          billing: {
+            name,
+            email,
+            phone,
+            address1,
+            address2,
+            city,
+            state: stateCode,
+            zip,
+          },
+          shippingAddress: {
+            name,
+            email,
+            phone,
+            address1,
+            address2,
+            city,
+            state: stateCode,
+            zip,
+          },
           shipping: 0,
           currency: 'usd',
           metadata: { orderSource: 'web' },
@@ -134,6 +158,18 @@ export default function CheckoutPage() {
             Email
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} style={{ width: '100%', padding: 8, marginTop: 6 }} />
           </label>
+          <label style={{ display: 'block', marginTop: 8 }}>
+            Phone (optional)
+            <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} style={{ width: '100%', padding: 8, marginTop: 6 }} />
+          </label>
+          <label style={{ display: 'block', marginTop: 8 }}>
+            Address line 1
+            <input type="text" value={address1} onChange={e => setAddress1(e.target.value)} placeholder="Street address" style={{ width: '100%', padding: 8, marginTop: 6 }} />
+          </label>
+          <label style={{ display: 'block', marginTop: 8 }}>
+            Address line 2 (optional)
+            <input type="text" value={address2} onChange={e => setAddress2(e.target.value)} placeholder="Apt, suite, etc." style={{ width: '100%', padding: 8, marginTop: 6 }} />
+          </label>
           <div style={{ display: 'flex', gap: 12 }}>
             <label style={{ display: 'block', marginTop: 8, flex: 1 }}>
               ZIP
@@ -142,6 +178,10 @@ export default function CheckoutPage() {
             <label style={{ display: 'block', marginTop: 8, flex: 1 }}>
               City
               <input type="text" value={city} onChange={e => setCity(e.target.value)} placeholder="e.g., Snow Hill" style={{ width: '100%', padding: 8, marginTop: 6 }} />
+            </label>
+            <label style={{ display: 'block', marginTop: 8, flex: 1 }}>
+              State
+              <input type="text" value={stateCode} onChange={e => setStateCode(e.target.value.toUpperCase())} placeholder="NC" maxLength={2} style={{ width: '100%', padding: 8, marginTop: 6 }} />
             </label>
           </div>
           <button disabled={disabled || loading} onClick={ensurePaymentIntent} style={{ marginTop: 12, padding: '10px 16px' }}>
@@ -155,7 +195,20 @@ export default function CheckoutPage() {
       {clientSecret && stripePromise && (
         <section style={{ marginTop: 24 }}>
           <Elements stripe={stripePromise} options={{ clientSecret, appearance }}>
-            <CheckoutForm_Tax intentId={intentId as string} email={email} name={name} onPaid={() => { /* noop, redirect happens in form */ }} />
+            <CheckoutForm_Tax
+              intentId={intentId as string}
+              email={email}
+              name={name}
+              address={{
+                address1,
+                address2,
+                city,
+                state: stateCode,
+                zip,
+                phone,
+              }}
+              onPaid={() => { /* noop, redirect happens in form */ }}
+            />
           </Elements>
         </section>
       )}
