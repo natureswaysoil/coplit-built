@@ -68,7 +68,7 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
         } : undefined,
         return_url: `${window.location.origin}/success?pi=${intentId}`,
       },
-      redirect: "if_required",
+      redirect: "always", // Always redirect for better customer experience
     });
 
     setSubmitting(false);
@@ -77,21 +77,75 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
       setError(error.message || "Payment failed");
       return;
     }
+    // If no redirect happens, call success callback
     onPaid?.(intentId);
-    window.location.href = `/success?pi=${intentId}`;
   }
+
+  // Verify payment link for customers who want to check status
+  const verifyPaymentLink = `https://dashboard.stripe.com/payments/${intentId}`;
 
   return (
     <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
       <PaymentElement />
+      
+      {/* Payment verification info */}
+      <div style={{ 
+        background: '#f8f9fa', 
+        padding: '12px', 
+        borderRadius: '6px', 
+        fontSize: '14px',
+        border: '1px solid #e9ecef'
+      }}>
+        <div style={{ fontWeight: 600, marginBottom: '4px' }}>Payment Security</div>
+        <div>Your payment is secured by Stripe. After payment, you'll receive a confirmation email.</div>
+        <div style={{ marginTop: '8px' }}>
+          <a 
+            href={`/verify-payment?pi=${intentId}`}
+            style={{ color: '#0066cc', textDecoration: 'none' }}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            → Verify Payment Status
+          </a>
+        </div>
+      </div>
+
       <button
         type="submit"
         disabled={!stripe || !elements || submitting || items.length === 0}
-        style={{ padding: "0.6rem 1.2rem", fontWeight: 700 }}
+        style={{ 
+          padding: "0.8rem 1.5rem", 
+          fontWeight: 700, 
+          fontSize: '16px',
+          background: submitting ? '#6c757d' : '#28a745',
+          color: 'white',
+          border: 'none',
+          borderRadius: '6px',
+          cursor: submitting ? 'not-allowed' : 'pointer'
+        }}
       >
-        {submitting ? "Processing…" : "Pay now"}
+        {submitting ? "Processing Payment..." : `Pay Now - Complete Transaction`}
       </button>
-      {error && <div style={{ color: "crimson" }}>{error}</div>}
+      
+      {error && (
+        <div style={{ 
+          color: "crimson", 
+          background: '#ffeaea', 
+          padding: '12px', 
+          borderRadius: '6px',
+          border: '1px solid #ffcccc'
+        }}>
+          <strong>Payment Error:</strong> {error}
+          <div style={{ marginTop: '8px', fontSize: '14px' }}>
+            <a 
+              href={`/verify-payment?pi=${intentId}`}
+              style={{ color: '#0066cc', textDecoration: 'none' }}
+            >
+              Check payment status here →
+            </a>
+          </div>
+        </div>
+      )}
     </form>
   );
 }

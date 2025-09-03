@@ -204,9 +204,22 @@ export default function CheckoutPage() {
       </section>
 
       {/* Stripe Elements */}
-    {clientSecret && stripe && (
+      {clientSecret && stripe && (
         <section style={{ marginTop: 24 }}>
-      <Elements stripe={stripe} options={{ clientSecret, appearance }}>
+          <div style={{ 
+            background: '#e7f3ff', 
+            padding: '16px', 
+            borderRadius: '8px', 
+            marginBottom: '16px',
+            border: '2px solid #0066cc'
+          }}>
+            <h3 style={{ margin: '0 0 8px 0', color: '#0066cc' }}>Complete Your Transaction</h3>
+            <p style={{ margin: 0, fontSize: '14px' }}>
+              Fill out your payment information below and click "Pay Now" to complete your purchase securely.
+            </p>
+          </div>
+          
+          <Elements stripe={stripe} options={{ clientSecret, appearance }}>
             <CheckoutForm_Tax
               intentId={intentId as string}
               email={email}
@@ -224,6 +237,23 @@ export default function CheckoutPage() {
           </Elements>
         </section>
       )}
+      
+      {/* Help section */}
+      <section style={{ marginTop: '32px', padding: '16px', background: '#f8f9fa', borderRadius: '6px' }}>
+        <h4 style={{ margin: '0 0 12px 0' }}>Need Help?</h4>
+        <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>
+          • Your payment is secured by Stripe encryption<br />
+          • You'll receive an email confirmation after payment<br />
+          • Contact us if you have any questions: support@natureswaysoil.com
+        </p>
+        {intentId && (
+          <p style={{ margin: 0, fontSize: '14px' }}>
+            <a href={`/verify-payment?pi=${intentId}`} style={{ color: '#0066cc', textDecoration: 'none' }}>
+              → Check your payment status anytime
+            </a>
+          </p>
+        )}
+      </section>
     </main>
   )
 }
