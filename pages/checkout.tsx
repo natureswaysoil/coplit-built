@@ -4,6 +4,7 @@ import { useCart } from '../lib/cartContext'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, Stripe } from '@stripe/stripe-js'
 import CheckoutForm_Tax from '../components/CheckoutForm_Tax'
+import { calculateShipping, FREE_SHIPPING_MINIMUM } from '../lib/shippingCalculator'
 
 export default function CheckoutPage() {
   const { items, subtotal } = useCart()
@@ -47,47 +48,43 @@ export default function CheckoutPage() {
     return !mounted || items.length === 0 || subtotal <= 0
   }, [mounted, items.length, subtotal])
 
+  // Calculate shipping rates
+  const shippingRates = useMemo(() => {
+    if (!mounted || items.length === 0) return { standard: 0 };
+    const shippingItems = items.map(item => ({
+      sku: item.sku,
+      size: item.size || '32 oz', // default size
+      qty: item.qty
+    }));
+    return calculateShipping(shippingItems, subtotal);
+  }, [mounted, items, subtotal]);
+
+  const [selectedShipping, setSelectedShipping] = useState<'standard' | 'expedited' | 'priority'>('standard');
+  const shippingCost = shippingRates[selectedShipping] || 0;
+
   async function ensurePaymentIntent() {
     if (disabled) return
-  // Stripe will be initialized separately; don't block on env here
+    // Stripe will be initialized separately; don't block on env here
     setLoading(true)
     setError(null)
     try {
-      const resp = await fetch('/api/create-payment-intent', {
+      const resp = await fetch('/api/create-payment-intent-with-tax', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          intentId: intentId || undefined,
-          items: items.map(it => ({ sku: it.sku, qty: it.qty, price: it.price })),
-          state: (stateCode?.toUpperCase() === 'NC' ? 'NC' : 'Other') as 'NC' | 'Other',
-          zip,
-          city,
-          email,
-          name,
-          billing: {
-            name,
-            email,
-            phone,
-            address1,
-            address2,
-            city,
-            state: stateCode,
-            zip,
-          },
-          shippingAddress: {
-            name,
-            email,
-            phone,
-            address1,
-            address2,
-            city,
-            state: stateCode,
-            zip,
-          },
-          shipping: 0,
-          currency: 'usd',
-          metadata: { orderSource: 'web' },
-        }),
+          items: items.map(it => ({ 
+            id: it.id, 
+            title: it.title, 
+            image: it.image, 
+            sku: it.sku, 
+            size: it.size, 
+            price: it.price, 
+            qty: it.qty 
+          })),
+          customer: { name, email },
+          address: { line1: address1, city, state: stateCode, postal_code: zip, country: 'US' },
+          shipping: { amount: Math.round(shippingCost * 100) } // Convert to cents
+        })
       })
       const data = await resp.json()
       if (!resp.ok) throw new Error(data?.error || 'Failed to create/update PaymentIntent')
@@ -153,11 +150,74 @@ export default function CheckoutPage() {
                 <strong>${(breakdown.tax / 100).toFixed(2)}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
+                <span>Shipping</span>
+                <strong>${shippingCost.toFixed(2)}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
                 <span>Total</span>
                 <strong>${(((breakdown.subtotal + breakdown.tax + breakdown.shipping) / 100)).toFixed(2)}</strong>
               </div>
             </>
           )}
+          {!breakdown && shippingCost > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
+              <span>Est. Shipping</span>
+              <strong>${shippingCost.toFixed(2)}</strong>
+            </div>
+          )}
+          {subtotal >= FREE_SHIPPING_MINIMUM && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, color: '#22c55e' }}>
+              <span>🎉 Free Shipping!</span>
+              <strong>$0.00</strong>
+            </div>
+          )}
+        </div>
+
+        {/* Shipping Options */}
+        {subtotal < FREE_SHIPPING_MINIMUM && (
+          <div style={{ minWidth: 280, padding: 16, background: '#f8f9fa', borderRadius: 8 }}>
+            <h3 style={{ margin: '0 0 12px 0', fontSize: 16 }}>Shipping Options</h3>
+            {shippingRates.standard !== undefined && (
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, cursor: 'pointer' }}>
+                <input 
+                  type="radio" 
+                  name="shipping" 
+                  value="standard" 
+                  checked={selectedShipping === 'standard'} 
+                  onChange={e => setSelectedShipping(e.target.value as 'standard')}
+                />
+                <span>Standard Shipping (5-7 business days) - ${shippingRates.standard.toFixed(2)}</span>
+              </label>
+            )}
+            {shippingRates.expedited && (
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, cursor: 'pointer' }}>
+                <input 
+                  type="radio" 
+                  name="shipping" 
+                  value="expedited" 
+                  checked={selectedShipping === 'expedited'} 
+                  onChange={e => setSelectedShipping(e.target.value as 'expedited')}
+                />
+                <span>Expedited Shipping (2-3 business days) - ${shippingRates.expedited.toFixed(2)}</span>
+              </label>
+            )}
+            {shippingRates.priority && (
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, cursor: 'pointer' }}>
+                <input 
+                  type="radio" 
+                  name="shipping" 
+                  value="priority" 
+                  checked={selectedShipping === 'priority'} 
+                  onChange={e => setSelectedShipping(e.target.value as 'priority')}
+                />
+                <span>Priority Shipping (1-2 business days) - ${shippingRates.priority.toFixed(2)}</span>
+              </label>
+            )}
+            <p style={{ fontSize: 14, color: '#666', margin: '8px 0 0 0' }}>
+              💡 Get <strong>FREE SHIPPING</strong> on orders over ${FREE_SHIPPING_MINIMUM.toFixed(2)}!
+            </p>
+          </div>
+        )}
         </div>
 
         {/* Address / contact */}
