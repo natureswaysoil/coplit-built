@@ -60,8 +60,8 @@ export class Stripe {
 
 export namespace Stripe {
   export type LatestApiVersion = string;
-  export type Event = import('./stripe-stub').Event;
-  export type PaymentIntent = import('./stripe-stub').PaymentIntent;
+  export type Event = Event;
+  export type PaymentIntent = PaymentIntent;
 }
 
 export default Stripe;
