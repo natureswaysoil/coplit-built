@@ -111,7 +111,7 @@ export const products: Product[] = [
     keyword: 'TOMATO FERTILIZER',
     details: 'Balanced Nutrition: Provides essential nutrients in an easily absorbable form, promoting healthy growth and increased yields. Organic and Natural: Made from all-natural ingredients, ensuring a safe and eco-friendly product. Easy to Use: Concentrated formula is simple to mix and apply, suitable for gardeners of all experience levels. Improves Soil Health: Enhances soil structure and fertility, supporting long-term plant health. Includes Vitamin B-1 and Aloe Vera for Faster Root Establishment, Healthier Transplants, and Maximum Nutrient Absorption – Perfect for Organic Farms & Greenhouses.',
     variations: [
-      { size: '32 oz', price: 20.99, sku: 'NWS-TOMATO-LF-32OZ' },
+      { size: '32 oz', price: 29.99, sku: 'NWS-TOMATO-LF-32OZ' },
       { size: '1 Gallon', price: 64.99, sku: 'NWS-TOMATO-LF-1GAL' }
     ]
   }
