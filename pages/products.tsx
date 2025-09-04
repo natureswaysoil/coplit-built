@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import AutoCroppedImage from '../components/AutoCroppedImage';
 import { useState } from 'react';
 import { useCart } from '../lib/cartContext';
 import { products } from '../lib/products';
@@ -12,45 +11,9 @@ export default function Products() {
   const [selected, setSelected] = useState<Record<string, string>>({});
   const [items, setItems] = useState(Array.isArray(products) ? products : []);
 
-  // Client-side: verify each product's image matches its title using OCR; if a mismatch is detected,
-  // try to find the best-matching image from the catalog and swap it for display.
+  // OCR functionality disabled - using predefined product data instead
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const tokensCache = new Map<string, string[]>();
-        async function getTokens(url: string) {
-          if (tokensCache.has(url)) return tokensCache.get(url)!;
-          const tokens = await ocrImageToTokens(url);
-          tokensCache.set(url, tokens);
-          return tokens;
-        }
-        const updated = await Promise.all(products.map(async (p) => {
-          try {
-            const tokens = await getTokens(p.image);
-            const selfScore = scoreTitleAgainstTokens(p.title, tokens).score;
-            if (selfScore >= 0.34) return p; // seems fine
-            // find a better matching image from others
-            let best = { score: selfScore, image: p.image };
-            for (const candidate of products) {
-              const ct = await getTokens(candidate.image);
-              const s = scoreTitleAgainstTokens(p.title, ct).score;
-              if (s > best.score) best = { score: s, image: candidate.image };
-            }
-            if (best.image !== p.image && best.score > selfScore && best.score >= 0.34) {
-              return { ...p, image: best.image };
-            }
-            return p;
-          } catch {
-            return p;
-          }
-        }));
-        if (!cancelled) setItems(updated);
-      } catch {
-        // ignore OCR failures
-      }
-    })();
-    return () => { cancelled = true; };
+    setItems(products);
   }, []);
 
   return (
@@ -64,7 +27,13 @@ export default function Products() {
         {items.map(p => (
           <div key={p.id} style={{ background: 'white', borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.07)', padding: '1.5rem', minWidth: 220, maxWidth: 320, textAlign: 'center' }}>
             <div style={{ position: 'relative', display: 'inline-block' }}>
-              <AutoCroppedImage src={p.image} alt={p.title} width={180} height={180} />
+              <img 
+                src={p.image} 
+                alt={p.title} 
+                width={180} 
+                height={180} 
+                style={{ objectFit: 'contain', borderRadius: 8, backgroundColor: '#f6fff7' }}
+              />
               {p.keyword && (
                 <span style={{ position: 'absolute', top: 6, left: 6, background: '#174F2E', color: 'white', fontSize: 12, padding: '2px 6px', borderRadius: 6, letterSpacing: 0.5 }}>
                   {p.keyword}

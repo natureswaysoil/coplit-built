@@ -11,9 +11,17 @@ type Props = {
 
 export default function AutoCroppedImage({ src, width, height, alt = '', borderRadius = 8, background = '#fff' }: Props) {
   const [dataUrl, setDataUrl] = useState<string | null>(null);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
+    
+    // Skip processing for external URLs (Amazon, etc.) to avoid CORS issues
+    if (src.startsWith('http')) {
+      setHasError(true);
+      return;
+    }
+    
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
@@ -85,17 +93,19 @@ export default function AutoCroppedImage({ src, width, height, alt = '', borderR
         const url = out.toDataURL('image/png');
         if (!cancelled) setDataUrl(url);
       } catch (e) {
-        // ignore and leave dataUrl null to fallback to <img src>
+        console.warn('Failed to process image:', src, e);
+        if (!cancelled) setHasError(true);
       }
     };
     img.onerror = () => {
-      // leave dataUrl as null
+      console.warn('Failed to load image:', src);
+      if (!cancelled) setHasError(true);
     };
     img.src = src;
     return () => { cancelled = true; };
   }, [src, width, height, background]);
 
-  if (!dataUrl) {
+  if (hasError || !dataUrl) {
     return (
       <img
         src={src}

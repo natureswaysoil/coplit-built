@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import AutoCroppedImage from '../components/AutoCroppedImage';
 import { useEffect, useState } from 'react';
 import { products } from '../lib/products';
 import { useCart } from '../lib/cartContext';
@@ -13,6 +12,13 @@ export default function Home() {
   const [selected, setSelected] = useState<Record<string, string>>({});
   const [items, setItems] = useState(Array.isArray(products) ? products : []);
 
+  useEffect(() => {
+    // OCR functionality disabled - using predefined product data instead
+    setItems(products);
+  }, []);
+
+  /*
+  // Original OCR functionality - disabled to avoid CORS issues with external images
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -50,6 +56,7 @@ export default function Home() {
     })();
     return () => { cancelled = true; };
   }, []);
+  */
 
   return (
     <div style={{ background: '#174F2E', color: 'white', padding: '1rem 0' }}>
@@ -118,7 +125,13 @@ export default function Home() {
           {items.map(p => (
             <div key={p.id} style={{ background: 'white', borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.07)', padding: '1.5rem', minWidth: 220, maxWidth: 320, textAlign: 'center' }}>
               <div style={{ position: 'relative', display: 'inline-block' }}>
-                <AutoCroppedImage src={p.image} alt={p.title} width={180} height={180} />
+                <img 
+                  src={p.image} 
+                  alt={p.title} 
+                  width={180} 
+                  height={180} 
+                  style={{ objectFit: 'contain', borderRadius: 8, backgroundColor: '#f6fff7' }}
+                />
                 {p.keyword && (
                   <span style={{ position: 'absolute', top: 6, left: 6, background: '#174F2E', color: 'white', fontSize: 12, padding: '2px 6px', borderRadius: 6, letterSpacing: 0.5 }}>
                     {p.keyword}

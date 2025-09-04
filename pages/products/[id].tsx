@@ -1,5 +1,4 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
-import AutoCroppedImage from '../../components/AutoCroppedImage';
 import { products, type Product } from '../../lib/products';
 import { useCart } from '../../lib/cartContext';
 import { useState } from 'react';
@@ -19,7 +18,13 @@ export default function ProductDetail({ product }: Props) {
       <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div style={{ flex: '0 1 320px', background: 'white', borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.07)', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ position: 'relative', display: 'inline-block' }}>
-            <AutoCroppedImage src={product.image} alt={product.title} width={280} height={280} />
+            <img 
+              src={product.image} 
+              alt={product.title} 
+              width={280} 
+              height={280} 
+              style={{ objectFit: 'contain', borderRadius: 8, backgroundColor: '#f6fff7' }}
+            />
             {product.keyword && (
               <span style={{ position: 'absolute', top: 6, left: 6, background: '#174F2E', color: 'white', fontSize: 12, padding: '2px 6px', borderRadius: 6, letterSpacing: 0.5 }}>
                 {product.keyword}
