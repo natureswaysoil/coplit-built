@@ -14,7 +14,7 @@ function linesFromCart(items: CartItem[]) {
     id: it.id,
     sku: it.sku,
     name: it.title,
-    amount: Math.round(it.price), // cents
+    amount: Math.round(it.price * 100), // Convert dollars to cents
     quantity: Math.max(1, it.qty),
   }));
 }
