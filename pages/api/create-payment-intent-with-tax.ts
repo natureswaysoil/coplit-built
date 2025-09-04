@@ -139,7 +139,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       customer_email: customer?.email ?? null,
       customer_name: customer?.name ?? null,
       shipping: { address },
-      items: items.map(it => ({ sku: it.sku, title: it.title, qty: it.qty, unit_amount: Math.round(it.price) })),
+      items: items.map(it => ({ sku: it.sku, title: it.title, qty: it.qty, unit_amount: Math.round(it.price * 100) })),
       subtotal_cents: subtotal,
       discount_cents: discountCents,
       tax_cents: tax,
