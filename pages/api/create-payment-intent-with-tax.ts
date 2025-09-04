@@ -35,6 +35,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     };
     if (!items?.length) return res.status(400).json({ error: "No items" });
 
+    // Validate required address fields
+    if (!address?.line1?.trim()) return res.status(400).json({ error: "Address line 1 is required" });
+    if (!address?.city?.trim()) return res.status(400).json({ error: "City is required" });
+    if (!address?.state?.trim()) return res.status(400).json({ error: "State is required" });
+    if (!address?.postal_code?.trim()) return res.status(400).json({ error: "ZIP code is required" });
+    if (!customer?.name?.trim()) return res.status(400).json({ error: "Customer name is required" });
+    if (!customer?.email?.trim()) return res.status(400).json({ error: "Customer email is required" });
+
     const customersTable = process.env.SUPABASE_CUSTOMERS_TABLE || "customers";
     const ordersTable = process.env.SUPABASE_ORDERS_TABLE || "orders";
 
@@ -109,9 +117,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       shipping_cost: shipping?.amount ? { amount: Math.round(shipping.amount) } : undefined,
     });
 
-  const subtotal = calc.amount_total;
+  const subtotal = lines.reduce((sum, line) => sum + (line.amount * line.quantity), 0);
     const tax = calc.tax_amount_exclusive;
     const total = calc.amount_total;
+    const shippingAmount = shipping?.amount ? Math.round(shipping.amount) : 0;
 
     const pi = await stripe.paymentIntents.create({
       amount: total,
@@ -138,7 +147,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       promo_code: promoCode || null,
     });
 
-    return res.status(200).json({ clientSecret: pi.client_secret, breakdown: { subtotal, discount: discountCents, tax, total } });
+    return res.status(200).json({ clientSecret: pi.client_secret, breakdown: { subtotal, discount: discountCents, tax, shipping: shippingAmount, total } });
   } catch (err: any) {
     console.error("create-payment-intent-with-tax error:", err);
     return res.status(500).json({ error: err.message || "Server error" });

@@ -21,7 +21,7 @@ export default function CheckoutPage() {
   const [intentId, setIntentId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [breakdown, setBreakdown] = useState<{subtotal: number; tax: number; shipping: number} | null>(null)
+  const [breakdown, setBreakdown] = useState<{subtotal: number; tax: number; shipping: number; discount?: number; total: number} | null>(null)
   const [stripe, setStripe] = useState<Stripe | null>(null)
 
   useEffect(() => setMounted(true), [])
@@ -45,8 +45,8 @@ export default function CheckoutPage() {
   }, [mounted])
 
   const disabled = useMemo(() => {
-    return !mounted || items.length === 0 || subtotal <= 0
-  }, [mounted, items.length, subtotal])
+    return !mounted || items.length === 0 || subtotal <= 0 || !name.trim() || !email.trim() || !address1.trim() || !city.trim() || !stateCode.trim() || !zip.trim()
+  }, [mounted, items.length, subtotal, name, email, address1, city, stateCode, zip])
 
   // Calculate shipping rates
   const shippingRates = useMemo(() => {
@@ -64,6 +64,33 @@ export default function CheckoutPage() {
 
   async function ensurePaymentIntent() {
     if (disabled) return
+
+    // Additional validation for required fields
+    if (!name.trim()) {
+      setError('Name is required')
+      return
+    }
+    if (!email.trim()) {
+      setError('Email is required')
+      return
+    }
+    if (!address1.trim()) {
+      setError('Address is required')
+      return
+    }
+    if (!city.trim()) {
+      setError('City is required')
+      return
+    }
+    if (!stateCode.trim()) {
+      setError('State is required')
+      return
+    }
+    if (!zip.trim()) {
+      setError('ZIP code is required')
+      return
+    }
+
     // Stripe will be initialized separately; don't block on env here
     setLoading(true)
     setError(null)
@@ -72,14 +99,14 @@ export default function CheckoutPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: items.map(it => ({ 
-            id: it.id, 
-            title: it.title, 
-            image: it.image, 
-            sku: it.sku, 
-            size: it.size, 
-            price: it.price, 
-            qty: it.qty 
+          items: items.map(it => ({
+            id: it.id,
+            title: it.title,
+            image: it.image,
+            sku: it.sku,
+            size: it.size,
+            price: it.price,
+            qty: it.qty
           })),
           customer: { name, email },
           address: { line1: address1, city, state: stateCode, postal_code: zip, country: 'US' },
@@ -141,21 +168,27 @@ export default function CheckoutPage() {
         <div style={{ minWidth: 260 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>Subtotal</span>
-            <strong>${subtotal.toFixed(2)}</strong>
+            <strong>${breakdown ? (breakdown.subtotal / 100).toFixed(2) : subtotal.toFixed(2)}</strong>
           </div>
           {breakdown && (
             <>
+              {breakdown.discount && breakdown.discount > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, color: '#22c55e' }}>
+                  <span>Discount</span>
+                  <strong>-${(breakdown.discount / 100).toFixed(2)}</strong>
+                </div>
+              )}
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
                 <span>Sales Tax</span>
                 <strong>${(breakdown.tax / 100).toFixed(2)}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
                 <span>Shipping</span>
-                <strong>${shippingCost.toFixed(2)}</strong>
+                <strong>${((breakdown.shipping || 0) / 100).toFixed(2)}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
                 <span>Total</span>
-                <strong>${(((breakdown.subtotal + breakdown.tax + breakdown.shipping) / 100)).toFixed(2)}</strong>
+                <strong>${(((breakdown.subtotal + breakdown.tax + (breakdown.shipping || 0) - (breakdown.discount || 0)) / 100)).toFixed(2)}</strong>
               </div>
             </>
           )}
@@ -221,21 +254,25 @@ export default function CheckoutPage() {
 
         {/* Address / contact */}
         <div style={{ flex: 1, minWidth: 280 }}>
+          <h3 style={{ marginBottom: 16 }}>Shipping & Contact Information</h3>
+          <p style={{ fontSize: 14, color: '#666', marginBottom: 16 }}>
+            Fields marked with * are required. Please fill in your complete shipping address for accurate tax calculation.
+          </p>
           <label style={{ display: 'block', marginTop: 8 }}>
-            Name
-            <input type="text" value={name} onChange={e => setName(e.target.value)} style={{ width: '100%', padding: 8, marginTop: 6 }} />
+            Name *
+            <input type="text" value={name} onChange={e => setName(e.target.value)} style={{ width: '100%', padding: 8, marginTop: 6, border: !name.trim() ? '2px solid #ef4444' : '1px solid #ccc' }} />
           </label>
           <label style={{ display: 'block', marginTop: 8 }}>
-            Email
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} style={{ width: '100%', padding: 8, marginTop: 6 }} />
+            Email *
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} style={{ width: '100%', padding: 8, marginTop: 6, border: !email.trim() ? '2px solid #ef4444' : '1px solid #ccc' }} />
           </label>
           <label style={{ display: 'block', marginTop: 8 }}>
             Phone (optional)
             <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} style={{ width: '100%', padding: 8, marginTop: 6 }} />
           </label>
           <label style={{ display: 'block', marginTop: 8 }}>
-            Address line 1
-            <input type="text" value={address1} onChange={e => setAddress1(e.target.value)} placeholder="Street address" style={{ width: '100%', padding: 8, marginTop: 6 }} />
+            Address line 1 *
+            <input type="text" value={address1} onChange={e => setAddress1(e.target.value)} placeholder="Street address" style={{ width: '100%', padding: 8, marginTop: 6, border: !address1.trim() ? '2px solid #ef4444' : '1px solid #ccc' }} />
           </label>
           <label style={{ display: 'block', marginTop: 8 }}>
             Address line 2 (optional)
@@ -243,21 +280,26 @@ export default function CheckoutPage() {
           </label>
           <div style={{ display: 'flex', gap: 12 }}>
             <label style={{ display: 'block', marginTop: 8, flex: 1 }}>
-              ZIP
-              <input type="text" value={zip} onChange={e => setZip(e.target.value)} placeholder="e.g., 28580" style={{ width: '100%', padding: 8, marginTop: 6 }} />
+              ZIP *
+              <input type="text" value={zip} onChange={e => setZip(e.target.value)} placeholder="e.g., 28580" style={{ width: '100%', padding: 8, marginTop: 6, border: !zip.trim() ? '2px solid #ef4444' : '1px solid #ccc' }} />
             </label>
             <label style={{ display: 'block', marginTop: 8, flex: 1 }}>
-              City
-              <input type="text" value={city} onChange={e => setCity(e.target.value)} placeholder="e.g., Snow Hill" style={{ width: '100%', padding: 8, marginTop: 6 }} />
+              City *
+              <input type="text" value={city} onChange={e => setCity(e.target.value)} placeholder="e.g., Snow Hill" style={{ width: '100%', padding: 8, marginTop: 6, border: !city.trim() ? '2px solid #ef4444' : '1px solid #ccc' }} />
             </label>
             <label style={{ display: 'block', marginTop: 8, flex: 1 }}>
-              State
-              <input type="text" value={stateCode} onChange={e => setStateCode(e.target.value.toUpperCase())} placeholder="NC" maxLength={2} style={{ width: '100%', padding: 8, marginTop: 6 }} />
+              State *
+              <input type="text" value={stateCode} onChange={e => setStateCode(e.target.value.toUpperCase())} placeholder="NC" maxLength={2} style={{ width: '100%', padding: 8, marginTop: 6, border: !stateCode.trim() ? '2px solid #ef4444' : '1px solid #ccc' }} />
             </label>
           </div>
           <button disabled={disabled || loading} onClick={ensurePaymentIntent} style={{ marginTop: 12, padding: '10px 16px' }}>
             {loading ? 'Preparing…' : (clientSecret ? 'Refresh totals' : 'Calculate totals')}
           </button>
+          {disabled && !loading && (
+            <p style={{ fontSize: 14, color: '#666', marginTop: 8 }}>
+              Please fill in all required fields (marked with *) to continue.
+            </p>
+          )}
           {error && <p style={{ color: 'crimson', marginTop: 8 }}>{error}</p>}
         </div>
       </section>
