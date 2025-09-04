@@ -147,7 +147,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       promo_code: promoCode || null,
     });
 
-    return res.status(200).json({ clientSecret: pi.client_secret, breakdown: { subtotal, discount: discountCents, tax, shipping: shippingAmount, total } });
+    return res.status(200).json({
+      clientSecret: pi.client_secret,
+      breakdown: {
+        subtotal: subtotal || 0,
+        discount: discountCents || 0,
+        tax: tax || 0,
+        shipping: shippingAmount || 0,
+        total: total || 0
+      }
+    });
   } catch (err: any) {
     console.error("create-payment-intent-with-tax error:", err);
     return res.status(500).json({ error: err.message || "Server error" });
