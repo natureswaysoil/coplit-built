@@ -137,7 +137,22 @@ export default function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items.map(i => `${i.sku}:${i.qty}:${i.price}`).join('|')])
 
-  const appearance = { theme: 'stripe' as const }
+  const appearance = { 
+    theme: 'stripe' as const,
+    variables: {
+      colorPrimary: '#0066cc',
+    }
+  }
+
+  const elementsOptions = {
+    clientSecret,
+    appearance,
+    fonts: [
+      {
+        cssSrc: 'https://fonts.googleapis.com/css?family=Inter:400,500,600',
+      },
+    ],
+  }
 
   return (
     <main style={{ maxWidth: 900, margin: '2rem auto', fontFamily: 'system-ui', padding: '0 1rem' }}>
@@ -316,11 +331,11 @@ export default function CheckoutPage() {
           }}>
             <h3 style={{ margin: '0 0 8px 0', color: '#0066cc' }}>Complete Your Transaction</h3>
             <p style={{ margin: 0, fontSize: '14px' }}>
-              Fill out your payment information below and click "Pay Now" to complete your purchase securely.
+              Choose your payment method below. Use <strong>Link</strong> for faster checkout with saved payment methods, or enter card details manually.
             </p>
           </div>
           
-          <Elements stripe={stripe} options={{ clientSecret, appearance }}>
+          <Elements stripe={stripe} options={elementsOptions}>
             <CheckoutForm_Tax
               intentId={intentId as string}
               email={email}
@@ -344,6 +359,7 @@ export default function CheckoutPage() {
         <h4 style={{ margin: '0 0 12px 0' }}>Need Help?</h4>
         <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>
           • Your payment is secured by Stripe encryption<br />
+          • Use <strong>Link</strong> for one-click payments with saved cards<br />
           • You'll receive an email confirmation after payment<br />
           • Contact us if you have any questions: support@natureswaysoil.com
         </p>

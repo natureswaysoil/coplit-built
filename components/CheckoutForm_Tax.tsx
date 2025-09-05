@@ -86,7 +86,18 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
 
   return (
     <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
-      <PaymentElement />
+      <PaymentElement 
+        options={{
+          layout: 'tabs',
+          paymentMethodOrder: ['card', 'link'],
+          defaultValues: {
+            billingDetails: {
+              name,
+              email,
+            }
+          }
+        }}
+      />
       
       {/* Payment verification info */}
       <div style={{ 
