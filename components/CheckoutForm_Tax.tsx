@@ -35,6 +35,13 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
       return;
     }
 
+    // Check if PaymentElement is mounted
+    const paymentElement = elements.getElement('payment');
+    if (!paymentElement) {
+      setError("Payment form is not ready. Please wait a moment and try again.");
+      return;
+    }
+
     setSubmitting(true);
     setError(null);
 
@@ -116,6 +123,20 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
         }}
       />
       
+      {/* Loading indicator for PaymentElement */}
+      {(!stripe || !elements || !elements.getElement('payment')) && (
+        <div style={{ 
+          background: '#fff3cd', 
+          color: '#856404',
+          padding: '8px 12px', 
+          borderRadius: '4px',
+          fontSize: '14px',
+          border: '1px solid #ffeaa7'
+        }}>
+          🔄 Preparing secure payment form...
+        </div>
+      )}
+      
       {/* Payment verification info */}
       <div style={{ 
         background: '#f8f9fa', 
@@ -140,7 +161,7 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
 
       <button
         type="submit"
-        disabled={!stripe || !elements || submitting || items.length === 0}
+        disabled={!stripe || !elements || !elements.getElement('payment') || submitting || items.length === 0}
         style={{ 
           padding: "0.8rem 1.5rem", 
           fontWeight: 700, 
