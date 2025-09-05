@@ -30,55 +30,72 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!stripe || !elements) return;
+    if (!stripe || !elements) {
+      setError("Stripe not initialized");
+      return;
+    }
 
     setSubmitting(true);
     setError(null);
 
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        receipt_email: email,
-        payment_method_data: {
-          billing_details: {
+    try {
+      console.log("Starting payment confirmation...");
+
+      const { error } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          receipt_email: email,
+          payment_method_data: {
+            billing_details: {
+              name,
+              email,
+              phone: address?.phone,
+              address: address?.address1 || address?.address2 || address?.city || address?.state || address?.zip ? {
+                line1: address?.address1,
+                line2: address?.address2,
+                city: address?.city,
+                state: address?.state,
+                postal_code: address?.zip,
+                country: 'US',
+              } : undefined,
+            },
+          },
+          shipping: address?.address1 ? {
             name,
-            email,
             phone: address?.phone,
-            address: address?.address1 || address?.address2 || address?.city || address?.state || address?.zip ? {
+            address: {
               line1: address?.address1,
               line2: address?.address2,
               city: address?.city,
               state: address?.state,
               postal_code: address?.zip,
               country: 'US',
-            } : undefined,
-          },
+            },
+          } : undefined,
+          return_url: `${window.location.origin}/success?pi=${intentId}`,
         },
-        shipping: address?.address1 ? {
-          name,
-          phone: address?.phone,
-          address: {
-            line1: address?.address1,
-            line2: address?.address2,
-            city: address?.city,
-            state: address?.state,
-            postal_code: address?.zip,
-            country: 'US',
-          },
-        } : undefined,
-        return_url: `${window.location.origin}/success?pi=${intentId}`,
-      },
-      redirect: "always", // Always redirect for better customer experience
-    });
+        redirect: "if_required", // Only redirect if required, handle success/failure in code
+      });
 
-    setSubmitting(false);
+      console.log("Payment confirmation result:", error ? "Error" : "Success");
 
-    if (error) {
-      setError(error.message || "Payment failed");
-      return;
+      // Handle the result immediately
+      if (error) {
+        console.error("Payment error:", error);
+        setError(error.message || "Payment failed");
+        setSubmitting(false);
+        return;
+      }
+
+      // If no error and no redirect needed, payment succeeded
+      console.log("Payment successful, calling onPaid callback");
+      setSubmitting(false);
+      onPaid?.(intentId);
+    } catch (err: any) {
+      console.error("Unexpected payment error:", err);
+      setError(err?.message || "An unexpected error occurred");
+      setSubmitting(false);
     }
-    // If no redirect happens, call success callback
-    onPaid?.(intentId);
   }
 
   // Verify payment link for customers who want to check status
