@@ -156,6 +156,12 @@ export default function CheckoutPage() {
     ],
   }
 
+  useEffect(() => {
+    if (clientSecret && stripe) {
+      console.log('DEBUG: About to render Elements', { clientSecret: clientSecret.substring(0, 10) + '...', stripe: !!stripe });
+    }
+  }, [clientSecret, stripe]);
+
   return (
     <main style={{ maxWidth: 900, margin: '2rem auto', fontFamily: 'system-ui', padding: '0 1rem' }}>
       <h1>Checkout</h1>
@@ -337,7 +343,7 @@ export default function CheckoutPage() {
             </p>
           </div>
           
-          <Elements stripe={stripe} options={{ clientSecret }}>
+          <Elements stripe={stripe} options={{ clientSecret, appearance, fonts: [{ cssSrc: 'https://fonts.googleapis.com/css?family=Inter:400,500,600' }] }}>
             <CheckoutForm_Tax
               intentId={intentId as string}
               email={email}
