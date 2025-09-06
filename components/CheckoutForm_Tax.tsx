@@ -131,7 +131,7 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
             }
           }
         }}
-        onReady={() => setPaymentElementReady(true)}
+        onReady={() => { setPaymentElementReady(true); console.log('DEBUG: PaymentElement onReady fired') }}
       />
       
       {/* Loading indicator for PaymentElement */}

@@ -116,6 +116,8 @@ export default function CheckoutPage() {
       const data = await resp.json()
       if (!resp.ok) throw new Error(data?.error || 'Failed to create/update PaymentIntent')
       setClientSecret(data.clientSecret || null)
+      // Diagnostic log: confirm we received a clientSecret (safe to log in test/staging)
+      if (data.clientSecret) console.log('DEBUG: received clientSecret for Stripe Elements', data.clientSecret.substring(0, 10) + '...')
       setIntentId(data.intentId || null)
       setBreakdown(data.breakdown || null)
     } catch (e: any) {
