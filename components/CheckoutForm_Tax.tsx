@@ -29,10 +29,15 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
   const [error, setError] = useState<string | null>(null);
   const [paymentElementReady, setPaymentElementReady] = useState(false);
 
+  // Debug logging
+  console.log('DEBUG: CheckoutForm_Tax render', { stripe: !!stripe, elements: !!elements, intentId });
+
   // Fallback: set ready after a short delay if onReady doesn't fire
   useEffect(() => {
+    console.log('DEBUG: useEffect for paymentElementReady', { stripe: !!stripe, elements: !!elements });
     if (stripe && elements) {
       const timer = setTimeout(() => {
+        console.log('DEBUG: Fallback timer fired, setting paymentElementReady');
         setPaymentElementReady(true);
       }, 2000); // 2 second fallback
       return () => clearTimeout(timer);
@@ -41,6 +46,9 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    
+    console.log('DEBUG: handleSubmit called', { stripe: !!stripe, elements: !!elements, paymentElementReady });
+    
     if (!stripe || !elements) {
       setError("Stripe not initialized");
       return;
@@ -49,6 +57,15 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
     // Check if PaymentElement is mounted
     if (!paymentElementReady) {
       setError("Payment form is not ready. Please wait a moment and try again.");
+      return;
+    }
+
+    // Additional check for mounted elements
+    const paymentElement = elements.getElement('payment');
+    console.log('DEBUG: PaymentElement check', { paymentElement: !!paymentElement });
+    
+    if (!paymentElement) {
+      setError("Payment form elements are not properly loaded. Please refresh the page and try again.");
       return;
     }
 
