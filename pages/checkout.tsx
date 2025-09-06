@@ -140,6 +140,14 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items.map(i => `${i.sku}:${i.qty}:${i.price}`).join('|')])
 
+  // Automatically create the PaymentIntent when all required fields are present
+  useEffect(() => {
+    if (!disabled && !clientSecret && items.length > 0 && !loading) {
+      ensurePaymentIntent()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabled, clientSecret, items.length])
+
   const appearance = { theme: 'stripe' as const }
 
   return (
@@ -296,7 +304,7 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
             </label>
           </div>
           <button disabled={disabled || loading} onClick={ensurePaymentIntent} style={{ marginTop: 12, padding: '10px 16px' }}>
-            {loading ? 'Preparing…' : (clientSecret ? 'Refresh totals' : 'Calculate totals')}
+            {loading ? 'Preparing…' : (clientSecret ? 'Update totals & payment form' : 'Calculate totals & show payment form')}
           </button>
           {disabled && !loading && (
             <p style={{ fontSize: 14, color: '#666', marginTop: 8 }}>

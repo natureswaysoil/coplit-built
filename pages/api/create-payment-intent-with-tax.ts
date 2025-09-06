@@ -149,6 +149,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json({
       clientSecret: pi.client_secret,
+      intentId: pi.id,
       breakdown: {
         subtotal: subtotal || 0,
         discount: discountCents || 0,
