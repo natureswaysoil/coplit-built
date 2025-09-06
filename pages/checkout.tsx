@@ -1,12 +1,16 @@
 // pages/checkout.tsx
 import { useEffect, useMemo, useState } from 'react'
+import type { GetServerSideProps } from 'next'
+import { getPublishableKey } from '../lib/stripeConfig'
 import { useCart } from '../lib/cartContext'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, Stripe } from '@stripe/stripe-js'
 import CheckoutForm_Tax from '../components/CheckoutForm_Tax'
 import { calculateShipping, FREE_SHIPPING_MINIMUM } from '../lib/shippingCalculator'
 
-export default function CheckoutPage() {
+type CheckoutProps = { stripePk?: string | null }
+
+export default function CheckoutPage({ stripePk }: CheckoutProps) {
   const { items, subtotal } = useCart()
   const [mounted, setMounted] = useState(false)
   const [zip, setZip] = useState('')
@@ -26,23 +30,22 @@ export default function CheckoutPage() {
 
   useEffect(() => setMounted(true), [])
 
-  // Load publishable key at runtime and initialize Stripe
+  // Initialize Stripe using server-provided pk when available (avoids API caching)
   useEffect(() => {
     if (!mounted) return
     let cancelled = false
     ;(async () => {
       try {
-        const r = await fetch('/api/config/stripe-pk')
-        const j = await r.json()
-        if (!r.ok) throw new Error(j?.error || 'Failed to load Stripe key')
-        const s = await loadStripe(j.publishableKey)
+    const key = stripePk || (await (await fetch('/api/config/stripe-pk')).json()).publishableKey
+    if (!key) throw new Error('Stripe key missing')
+    const s = await loadStripe(key)
         if (!cancelled) setStripe(s)
       } catch (e: any) {
         if (!cancelled) setError(e?.message || 'Stripe init failed')
       }
     })()
     return () => { cancelled = true }
-  }, [mounted])
+  }, [mounted, stripePk])
 
   const disabled = useMemo(() => {
     return !mounted || items.length === 0 || subtotal <= 0 || !name.trim() || !email.trim() || !address1.trim() || !city.trim() || !stateCode.trim() || !zip.trim()
@@ -357,4 +360,14 @@ export default function CheckoutPage() {
       </section>
     </main>
   )
+}
+
+export const getServerSideProps: GetServerSideProps<CheckoutProps> = async () => {
+  try {
+    const { key } = getPublishableKey()
+    return { props: { stripePk: key } }
+  } catch {
+    // Fallback to client-side fetch
+    return { props: { stripePk: null } }
+  }
 }
