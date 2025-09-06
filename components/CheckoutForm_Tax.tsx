@@ -1,6 +1,6 @@
 "use client";
 import { FormEvent, useState } from "react";
-import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { PaymentElement, LinkAuthenticationElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useCart } from "../lib/cartContext";
 
 type Address = {
@@ -27,6 +27,7 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [linkEmail, setLinkEmail] = useState<string | undefined>(undefined);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -35,14 +36,14 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
     setSubmitting(true);
     setError(null);
 
-    const { error } = await stripe.confirmPayment({
+  const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        receipt_email: email,
+    receipt_email: linkEmail || email,
         payment_method_data: {
           billing_details: {
-            name,
-            email,
+      name,
+      email: linkEmail || email,
             phone: address?.phone,
             address: address?.address1 || address?.address2 || address?.city || address?.state || address?.zip ? {
               line1: address?.address1,
@@ -86,7 +87,15 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
 
   return (
     <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
-      <PaymentElement />
+      {/* Link email capture for one-tap checkout */}
+      <LinkAuthenticationElement
+        onChange={(e: any) => {
+          try {
+            setLinkEmail(e?.value?.email || undefined)
+          } catch {}
+        }}
+      />
+      <PaymentElement options={{ layout: "tabs", paymentMethodOrder: ["link", "card", "apple_pay", "google_pay"] as any }} />
       
       {/* Payment verification info */}
       <div style={{ 

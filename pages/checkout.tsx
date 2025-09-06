@@ -357,7 +357,14 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
             </p>
           </div>
           
-          <Elements stripe={stripe} options={{ clientSecret, appearance }}>
+          <Elements 
+            stripe={stripe} 
+            options={{ 
+              clientSecret, 
+              appearance,
+              loader: 'always'
+            }}
+          >
             <CheckoutForm_Tax
               intentId={intentId as string}
               email={email}
