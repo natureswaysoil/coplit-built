@@ -1,6 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import Stripe from 'stripe'
-import { getSecretKey, STRIPE_API_VERSION } from '../../lib/stripeConfig'
+import {
+  getSecretKey,
+  STRIPE_API_VERSION,
+  redactKey,
+} from '../../lib/stripeConfig'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -30,6 +34,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json({ clientSecret: intent.client_secret })
   } catch (err: any) {
-    return res.status(500).json({ error: err?.message || 'Stripe error' })
+    const message = err?.message?.replace(secret, redactKey(secret))
+    console.error('Stripe error:', message)
+    return res.status(500).json({ error: 'Stripe error' })
   }
 }
