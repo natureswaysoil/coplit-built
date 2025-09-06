@@ -1,5 +1,5 @@
 "use client";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useCart } from "../lib/cartContext";
 
@@ -28,6 +28,16 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [paymentElementReady, setPaymentElementReady] = useState(false);
+
+  // Fallback: set ready after a short delay if onReady doesn't fire
+  useEffect(() => {
+    if (stripe && elements) {
+      const timer = setTimeout(() => {
+        setPaymentElementReady(true);
+      }, 2000); // 2 second fallback
+      return () => clearTimeout(timer);
+    }
+  }, [stripe, elements]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();

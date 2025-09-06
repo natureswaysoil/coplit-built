@@ -335,7 +335,7 @@ export default function CheckoutPage() {
             </p>
           </div>
           
-          <Elements stripe={stripe} options={elementsOptions}>
+          <Elements stripe={stripe} options={{ clientSecret }}>
             <CheckoutForm_Tax
               intentId={intentId as string}
               email={email}
