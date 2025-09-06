@@ -8,7 +8,7 @@ export default function VerifyPayment() {
   const [paymentDetails, setPaymentDetails] = useState<any>(null)
 
   useEffect(() => {
-    if (!router.isReady || !pi) return
+    if (!pi) return
 
     // Fetch payment status from our API
     fetch(`/api/verify-payment?pi=${pi}`)
@@ -24,7 +24,7 @@ export default function VerifyPayment() {
       .catch(() => {
         setPaymentStatus('Error checking payment')
       })
-  }, [pi, router.isReady])
+  }, [pi])
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -45,46 +45,6 @@ export default function VerifyPayment() {
       case 'canceled': return 'Payment was canceled'
       default: return status
     }
-  }
-
-  if (!router.isReady) {
-    return (
-      <main style={{ maxWidth: 600, margin: '2rem auto', padding: '0 1rem', fontFamily: 'system-ui' }}>
-        <h1>Payment Verification</h1>
-        <div style={{
-          background: '#f8f9fa',
-          border: '2px solid #6c757d',
-          borderRadius: '8px',
-          padding: '24px',
-          textAlign: 'center'
-        }}>
-          <h2 style={{ color: '#6c757d', margin: '0 0 16px 0' }}>
-            Loading...
-          </h2>
-          <p>Preparing payment verification...</p>
-        </div>
-      </main>
-    )
-  }
-
-  if (!pi) {
-    return (
-      <main style={{ maxWidth: 600, margin: '2rem auto', padding: '0 1rem', fontFamily: 'system-ui' }}>
-        <h1>Payment Verification</h1>
-        <div style={{
-          background: '#f8f9fa',
-          border: '2px solid #dc3545',
-          borderRadius: '8px',
-          padding: '24px',
-          textAlign: 'center'
-        }}>
-          <h2 style={{ color: '#dc3545', margin: '0 0 16px 0' }}>
-            Payment ID Missing
-          </h2>
-          <p>No payment ID was provided. Please check your payment confirmation email or contact support.</p>
-        </div>
-      </main>
-    )
   }
 
   return (

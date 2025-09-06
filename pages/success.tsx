@@ -23,9 +23,8 @@ export default function Success() {
         // Clear client cart (fulfillment should happen via webhook)
         clearCart?.()
 
-        // Check for different payment identifiers
+        // If coming from Stripe Checkout, we may have a session_id
         const sessionId = router.query.session_id as string | undefined
-        const paymentIntentId = router.query.pi as string | undefined
         if (sessionId) {
           try {
             const r = await fetch(`/api/stripe/session?session_id=${encodeURIComponent(sessionId)}`)
@@ -42,23 +41,6 @@ export default function Success() {
             // non-fatal; we’ll still show the thank-you
             console.warn('Could not fetch session details:', e)
           }
-        } else if (paymentIntentId) {
-          // Handle payment intent verification
-          try {
-            const r = await fetch(`/api/verify-payment?pi=${encodeURIComponent(paymentIntentId)}`)
-            if (r.ok) {
-              const data = await r.json()
-              setSummary({
-                amount: typeof data?.details?.amount === 'number' ? data.details.amount / 100 : undefined,
-                currency: data?.details?.currency ? String(data.details.currency).toUpperCase() : undefined,
-                email: data?.details?.receipt_email,
-                payment_status: data?.status,
-              })
-            }
-          } catch (e) {
-            // non-fatal; we'll still show the thank-you
-            console.warn('Could not fetch payment intent details:', e)
-          }
         }
 
         setStatus('done')
@@ -68,7 +50,7 @@ export default function Success() {
       }
     }
     if (router.isReady) run()
-  }, [router.isReady, clearCart, router.query.session_id, router.query.pi])
+  }, [router.isReady, clearCart, router.query.session_id])
 
   if (status === 'working') {
     return (
