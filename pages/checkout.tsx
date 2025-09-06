@@ -25,8 +25,10 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
   const [intentId, setIntentId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [stripeInitError, setStripeInitError] = useState<string | null>(null)
   const [breakdown, setBreakdown] = useState<{subtotal: number; tax: number; shipping: number; discount?: number; total: number} | null>(null)
   const [stripe, setStripe] = useState<Stripe | null>(null)
+  const [stripeRetry, setStripeRetry] = useState(0)
 
   useEffect(() => setMounted(true), [])
 
@@ -36,16 +38,17 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
     let cancelled = false
     ;(async () => {
       try {
+    setStripeInitError(null)
     const key = stripePk || (await (await fetch('/api/config/stripe-pk')).json()).publishableKey
-    if (!key) throw new Error('Stripe key missing')
+    if (!key) throw new Error('Stripe publishable key missing')
     const s = await loadStripe(key)
         if (!cancelled) setStripe(s)
       } catch (e: any) {
-        if (!cancelled) setError(e?.message || 'Stripe init failed')
+    if (!cancelled) setStripeInitError(e?.message || 'Stripe failed to initialize')
       }
     })()
     return () => { cancelled = true }
-  }, [mounted, stripePk])
+  }, [mounted, stripePk, stripeRetry])
 
   const disabled = useMemo(() => {
     return !mounted || items.length === 0 || subtotal <= 0 || !name.trim() || !email.trim() || !address1.trim() || !city.trim() || !stateCode.trim() || !zip.trim()
@@ -153,6 +156,29 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
   return (
     <main style={{ maxWidth: 900, margin: '2rem auto', fontFamily: 'system-ui', padding: '0 1rem' }}>
       <h1>Checkout</h1>
+
+      {/* Stripe initialization banner */}
+      {stripeInitError && (
+        <div style={{
+          background: '#fff3cd',
+          color: '#664d03',
+          border: '1px solid #ffecb5',
+          borderRadius: 6,
+          padding: '12px',
+          marginTop: 12
+        }}>
+          <div style={{ fontWeight: 600, marginBottom: 6 }}>Payment form unavailable</div>
+          <div style={{ fontSize: 14 }}>
+            Stripe couldn’t initialize: {stripeInitError}. Try again, or review diagnostics.
+            {' '}<a href="/api/config/stripe-pk" target="_blank" rel="noopener noreferrer" style={{ color: '#0c63e4', textDecoration: 'none' }}>View publishable key</a>
+            {' '}|{' '}
+            <a href="/api/config/diagnostics" target="_blank" rel="noopener noreferrer" style={{ color: '#0c63e4', textDecoration: 'none' }}>Diagnostics</a>
+          </div>
+          <button onClick={() => setStripeRetry(v => v + 1)} style={{ marginTop: 8, padding: '6px 10px', background: '#0d6efd', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}>
+            Retry loading Stripe
+          </button>
+        </div>
+      )}
 
       {/* Cart items */}
       <section style={{ display: 'grid', gap: 12, marginTop: 16 }}>
