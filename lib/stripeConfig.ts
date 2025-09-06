@@ -8,9 +8,10 @@ const PUB_CANDIDATES = [
   'STRIPE_PUBLIC_KEY',
 ];
 
+// Prefer STRIPE_API_KEY if both are set (often used by platforms/ops)
 const SEC_CANDIDATES = [
-  'STRIPE_SECRET_KEY',
   'STRIPE_API_KEY',
+  'STRIPE_SECRET_KEY',
   'STRIPE_PRIVATE_KEY',
 ];
 
@@ -38,13 +39,38 @@ export function getPublishableKey(): { key: string; source: string } {
 }
 
 export function getSecretKey(): { key: string; source: string } {
-  const hit = resolveEnv(SEC_CANDIDATES);
-  if (!hit) {
+  // 1) Explicit override of which env var to use
+  const override = (process.env.STRIPE_SECRET_KEY_SOURCE || '').trim();
+  if (override) {
+    const v = process.env[override];
+    if (v && v.trim()) return { key: v, source: override };
+  }
+
+  // 2) Collect all candidates present
+  const present = SEC_CANDIDATES
+    .map((name) => ({ name, value: (process.env[name] || '').trim() }))
+    .filter((e) => !!e.value);
+
+  if (present.length === 0) {
     throw new Error(
       `Stripe secret key not configured. Checked: ${SEC_CANDIDATES.join(', ')}`
     );
   }
-  return { key: hit.value, source: hit.name };
+
+  // 3) If we have a publishable key, prefer matching environment (live/test)
+  let desiredPrefix: 'sk_live' | 'sk_test' | null = null;
+  try {
+    const pk = getPublishableKey().key;
+    desiredPrefix = pk.startsWith('pk_live') ? 'sk_live' : pk.startsWith('pk_test') ? 'sk_test' : null;
+  } catch {}
+
+  if (desiredPrefix) {
+    const match = present.find((e) => e.value.startsWith(desiredPrefix!));
+    if (match) return { key: match.value, source: match.name };
+  }
+
+  // 4) Fallback: return the first in our preferred order (STRIPE_API_KEY, then STRIPE_SECRET_KEY, ...)
+  return { key: present[0].value, source: present[0].name };
 }
 
 export function getWebhookSecret(): { key: string; source: string } | null {
@@ -60,3 +86,11 @@ export function redactKey(k?: string | null, show = 6): string | null {
 }
 
 export const STRIPE_API_VERSION = process.env.STRIPE_API_VERSION || '2024-06-20';
+
+// Diagnostics helper: list all candidate env names found with redacted values
+export function listSecretKeyCandidates(): Array<{ source: string; redacted: string | null }> {
+  return SEC_CANDIDATES.map((name) => ({
+    source: name,
+    redacted: redactKey(process.env[name] || null),
+  }));
+}

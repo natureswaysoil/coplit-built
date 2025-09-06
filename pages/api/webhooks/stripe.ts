@@ -1,6 +1,7 @@
 // pages/api/stripe/webhook.ts
 import type { NextApiRequest, NextApiResponse } from 'next'
 import Stripe from 'stripe'
+import { getSecretKey, STRIPE_API_VERSION, getWebhookSecret } from '../../../lib/stripeConfig'
 import { createClient } from '@supabase/supabase-js'
 
 export const config = { api: { bodyParser: false } } // we need the raw body for signature verification
@@ -18,15 +19,16 @@ async function readBuffer(req: NextApiRequest): Promise<Buffer> {
 }
 
 // Instantiate Stripe with a safe cast for apiVersion to avoid literal-type TS errors
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: '2024-06-20',
+const stripe = new Stripe(getSecretKey().key, {
+  apiVersion: STRIPE_API_VERSION as any,
 } as any)
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end()
 
   const sig = req.headers['stripe-signature'] as string
-  const whSecret = process.env.STRIPE_WEBHOOK_SECRET as string
+  const wh = getWebhookSecret()
+  const whSecret = wh?.key as string
   if (!whSecret) return res.status(500).send('Missing STRIPE_WEBHOOK_SECRET')
 
   let event: Stripe.Event

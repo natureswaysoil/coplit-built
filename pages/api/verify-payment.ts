@@ -1,8 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import Stripe from 'stripe'
+import { getSecretKey, STRIPE_API_VERSION } from '../../lib/stripeConfig'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: '2024-06-20',
+const stripe = new Stripe(getSecretKey().key, {
+  apiVersion: STRIPE_API_VERSION as any,
 } as any)
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -17,9 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: 'Payment Intent ID required' })
   }
 
-  if (!process.env.STRIPE_SECRET_KEY) {
-    return res.status(500).json({ error: 'Stripe not configured' })
-  }
+  // Secret key resolved at module load; if missing, module would have thrown.
 
   try {
     // Retrieve the payment intent from Stripe

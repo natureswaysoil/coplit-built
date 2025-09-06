@@ -1,6 +1,7 @@
 // pages/api/create-payment-intent.ts
 import type { NextApiRequest, NextApiResponse } from 'next'
 import Stripe from 'stripe'
+import { getSecretKey, STRIPE_API_VERSION } from '../../lib/stripeConfig'
 import { NC_ZIP_TO_COUNTY, NC_CITY_TO_COUNTY } from '../../lib/nc_data'
 import { getCountyRate } from '../../lib/nc_tax'
 
@@ -124,9 +125,9 @@ function metaFrom(prefix: string, src?: Address): Record<string, string> {
   return m
 }
 
-// Instantiate Stripe with a safe cast for apiVersion to avoid literal-type TS errors
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: '2024-06-20',
+// Instantiate Stripe using centralized key resolution
+const stripe = new Stripe(getSecretKey().key, {
+  apiVersion: STRIPE_API_VERSION as any,
 } as any)
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -135,7 +136,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  if (!process.env.STRIPE_SECRET_KEY) return res.status(500).json({ error: 'Missing STRIPE_SECRET_KEY' })
+  // Secret key is resolved at module load via getSecretKey; if misconfigured, module would have thrown.
 
   let body: Body
   try {

@@ -1,9 +1,9 @@
 // pages/api/promo/suggest.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
+import { getSecretKey, STRIPE_API_VERSION } from "../../../lib/stripeConfig";
 
-const apiVersion = (process.env.STRIPE_API_VERSION as Stripe.LatestApiVersion | undefined) || "2024-06-20";
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, { apiVersion } as any);
+const stripe = new Stripe(getSecretKey().key, { apiVersion: STRIPE_API_VERSION as any });
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
