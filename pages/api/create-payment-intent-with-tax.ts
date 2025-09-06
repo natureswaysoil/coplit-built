@@ -1,11 +1,11 @@
 // pages/api/create-payment-intent-with-tax.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
+import { getSecretKey, STRIPE_API_VERSION } from "../../lib/stripeConfig";
 import { supabaseAdmin } from "../../lib/supabaseAdmin";
 import { loadSkuTaxCodeMap } from "../../lib/taxCodes";
 
-const apiVersion = process.env.STRIPE_API_VERSION || "2024-06-20";
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, { apiVersion } as any);
+const stripe = new Stripe(getSecretKey().key, { apiVersion: STRIPE_API_VERSION } as any);
 
 type CartItem = { id: string; title: string; image: string; sku: string; size: string; price: number; qty: number; };
 
