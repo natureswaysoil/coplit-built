@@ -3,6 +3,7 @@ import type { AppProps } from 'next/app'
 import Script from 'next/script'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 
 // Canonical cart context (aliased to avoid name collisions)
 import { CartProvider as CartCtxProvider, useCart } from '../lib/cartContext'
@@ -49,6 +50,27 @@ function TopNav() {
 }
 
 export default function App({ Component, pageProps }: AppProps) {
+  const router = useRouter()
+
+  // Fire TikTok page events on client-side route changes
+  useEffect(() => {
+    const handleRoute = () => {
+      try {
+        const w = window as any
+        if (w.ttq && typeof w.ttq.page === 'function') {
+          w.ttq.page()
+        }
+      } catch {}
+    }
+
+    router.events.on('routeChangeComplete', handleRoute)
+    router.events.on('hashChangeComplete', handleRoute)
+    return () => {
+      router.events.off('routeChangeComplete', handleRoute)
+      router.events.off('hashChangeComplete', handleRoute)
+    }
+  }, [router.events])
+
   return (
     <CartCtxProvider>
       <TopNav />
@@ -64,6 +86,21 @@ export default function App({ Component, pageProps }: AppProps) {
   ttq.load('D2TQD1JC77UEJOI3AVC0');
   ttq.page();
 }(window, document, 'ttq');
+        `}
+      </Script>
+      {/* Ensure TikTok receives page events on client-side navigation */}
+      <Script id="tiktok-route-events" strategy="afterInteractive">
+        {`
+          (function(){
+            if (typeof window === 'undefined') return;
+            var sendPage = function(){
+              if (window.ttq && typeof window.ttq.page === 'function') {
+                window.ttq.page();
+              }
+            };
+            // Initial page call handled by base snippet; this is a safety call
+            sendPage();
+          })();
         `}
       </Script>
     </CartCtxProvider>
