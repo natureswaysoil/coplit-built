@@ -1,5 +1,5 @@
 "use client";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useCart } from "../lib/cartContext";
 
@@ -27,109 +27,58 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [paymentElementReady, setPaymentElementReady] = useState(false);
-
-  // Debug logging
-  console.log('DEBUG: CheckoutForm_Tax render', { stripe: !!stripe, elements: !!elements, intentId });
-
-  // Fallback: set ready after a short delay if onReady doesn't fire
-  useEffect(() => {
-    console.log('DEBUG: useEffect for paymentElementReady', { stripe: !!stripe, elements: !!elements });
-    if (stripe && elements) {
-      const timer = setTimeout(() => {
-        console.log('DEBUG: Fallback timer fired, setting paymentElementReady');
-        setPaymentElementReady(true);
-      }, 2000); // 2 second fallback
-      return () => clearTimeout(timer);
-    }
-  }, [stripe, elements]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    
-    console.log('DEBUG: handleSubmit called', { stripe: !!stripe, elements: !!elements, paymentElementReady });
-    
-    if (!stripe || !elements) {
-      setError("Stripe not initialized");
-      return;
-    }
-
-    // Check if PaymentElement is mounted
-    if (!paymentElementReady) {
-      setError("Payment form is not ready. Please wait a moment and try again.");
-      return;
-    }
-
-    // Additional check for mounted elements
-    const paymentElement = elements.getElement('payment');
-    console.log('DEBUG: PaymentElement check', { paymentElement: !!paymentElement });
-    
-    if (!paymentElement) {
-      setError("Payment form elements are not properly loaded. Please refresh the page and try again.");
-      return;
-    }
+    if (!stripe || !elements) return;
 
     setSubmitting(true);
     setError(null);
 
-    try {
-      console.log("Starting payment confirmation...");
-
-      const { error } = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          receipt_email: email,
-          payment_method_data: {
-            billing_details: {
-              name,
-              email,
-              phone: address?.phone,
-              address: address?.address1 || address?.address2 || address?.city || address?.state || address?.zip ? {
-                line1: address?.address1,
-                line2: address?.address2,
-                city: address?.city,
-                state: address?.state,
-                postal_code: address?.zip,
-                country: 'US',
-              } : undefined,
-            },
-          },
-          shipping: address?.address1 ? {
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        receipt_email: email,
+        payment_method_data: {
+          billing_details: {
             name,
+            email,
             phone: address?.phone,
-            address: {
+            address: address?.address1 || address?.address2 || address?.city || address?.state || address?.zip ? {
               line1: address?.address1,
               line2: address?.address2,
               city: address?.city,
               state: address?.state,
               postal_code: address?.zip,
               country: 'US',
-            },
-          } : undefined,
-          return_url: `${window.location.origin}/success?pi=${intentId}`,
+            } : undefined,
+          },
         },
-        redirect: "if_required", // Only redirect if required, handle success/failure in code
-      });
+        shipping: address?.address1 ? {
+          name,
+          phone: address?.phone,
+          address: {
+            line1: address?.address1,
+            line2: address?.address2,
+            city: address?.city,
+            state: address?.state,
+            postal_code: address?.zip,
+            country: 'US',
+          },
+        } : undefined,
+        return_url: `${window.location.origin}/success?pi=${intentId}`,
+      },
+      redirect: "always", // Always redirect for better customer experience
+    });
 
-      console.log("Payment confirmation result:", error ? "Error" : "Success");
+    setSubmitting(false);
 
-      // Handle the result immediately
-      if (error) {
-        console.error("Payment error:", error);
-        setError(error.message || "Payment failed");
-        setSubmitting(false);
-        return;
-      }
-
-      // If no error and no redirect needed, payment succeeded
-      console.log("Payment successful, calling onPaid callback");
-      setSubmitting(false);
-      onPaid?.(intentId);
-    } catch (err: any) {
-      console.error("Unexpected payment error:", err);
-      setError(err?.message || "An unexpected error occurred");
-      setSubmitting(false);
+    if (error) {
+      setError(error.message || "Payment failed");
+      return;
     }
+    // If no redirect happens, call success callback
+    onPaid?.(intentId);
   }
 
   // Verify payment link for customers who want to check status
@@ -137,33 +86,7 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
 
   return (
     <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
-      <PaymentElement 
-        options={{
-          layout: 'tabs',
-          paymentMethodOrder: ['card', 'link'],
-          defaultValues: {
-            billingDetails: {
-              name,
-              email,
-            }
-          }
-        }}
-        onReady={() => { setPaymentElementReady(true); console.log('DEBUG: PaymentElement onReady fired') }}
-      />
-      
-      {/* Loading indicator for PaymentElement */}
-      {(!stripe || !elements || !paymentElementReady) && (
-        <div style={{ 
-          background: '#fff3cd', 
-          color: '#856404',
-          padding: '8px 12px', 
-          borderRadius: '4px',
-          fontSize: '14px',
-          border: '1px solid #ffeaa7'
-        }}>
-          🔄 Preparing secure payment form...
-        </div>
-      )}
+      <PaymentElement />
       
       {/* Payment verification info */}
       <div style={{ 
@@ -189,7 +112,7 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
 
       <button
         type="submit"
-        disabled={!stripe || !elements || !paymentElementReady || submitting || items.length === 0}
+        disabled={!stripe || !elements || submitting || items.length === 0}
         style={{ 
           padding: "0.8rem 1.5rem", 
           fontWeight: 700, 

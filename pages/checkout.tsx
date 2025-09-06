@@ -116,8 +116,6 @@ export default function CheckoutPage() {
       const data = await resp.json()
       if (!resp.ok) throw new Error(data?.error || 'Failed to create/update PaymentIntent')
       setClientSecret(data.clientSecret || null)
-      // Diagnostic log: confirm we received a clientSecret (safe to log in test/staging)
-      if (data.clientSecret) console.log('DEBUG: received clientSecret for Stripe Elements', data.clientSecret.substring(0, 10) + '...')
       setIntentId(data.intentId || null)
       setBreakdown(data.breakdown || null)
     } catch (e: any) {
@@ -139,28 +137,7 @@ export default function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items.map(i => `${i.sku}:${i.qty}:${i.price}`).join('|')])
 
-  const appearance = { 
-    theme: 'stripe' as const,
-    variables: {
-      colorPrimary: '#0066cc',
-    }
-  }
-
-  const elementsOptions = {
-    clientSecret,
-    appearance,
-    fonts: [
-      {
-        cssSrc: 'https://fonts.googleapis.com/css?family=Inter:400,500,600',
-      },
-    ],
-  }
-
-  useEffect(() => {
-    if (clientSecret && stripe) {
-      console.log('DEBUG: About to render Elements', { clientSecret: clientSecret.substring(0, 10) + '...', stripe: !!stripe });
-    }
-  }, [clientSecret, stripe]);
+  const appearance = { theme: 'stripe' as const }
 
   return (
     <main style={{ maxWidth: 900, margin: '2rem auto', fontFamily: 'system-ui', padding: '0 1rem' }}>
@@ -339,11 +316,11 @@ export default function CheckoutPage() {
           }}>
             <h3 style={{ margin: '0 0 8px 0', color: '#0066cc' }}>Complete Your Transaction</h3>
             <p style={{ margin: 0, fontSize: '14px' }}>
-              Choose your payment method below. Use <strong>Link</strong> for faster checkout with saved payment methods, or enter card details manually.
+              Fill out your payment information below and click "Pay Now" to complete your purchase securely.
             </p>
           </div>
           
-          <Elements stripe={stripe} options={{ clientSecret, appearance, fonts: [{ cssSrc: 'https://fonts.googleapis.com/css?family=Inter:400,500,600' }] }}>
+          <Elements stripe={stripe} options={{ clientSecret, appearance }}>
             <CheckoutForm_Tax
               intentId={intentId as string}
               email={email}
@@ -367,7 +344,6 @@ export default function CheckoutPage() {
         <h4 style={{ margin: '0 0 12px 0' }}>Need Help?</h4>
         <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>
           • Your payment is secured by Stripe encryption<br />
-          • Use <strong>Link</strong> for one-click payments with saved cards<br />
           • You'll receive an email confirmation after payment<br />
           • Contact us if you have any questions: support@natureswaysoil.com
         </p>
