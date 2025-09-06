@@ -1,14 +1,21 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import Stripe from 'stripe'
+import { getSecretKey, STRIPE_API_VERSION } from '../../lib/stripeConfig'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
 
-  const secret = process.env.STRIPE_SECRET_KEY
-  if (!secret) return res.status(500).json({ error: 'Missing STRIPE_SECRET_KEY' })
+  let secret: string
+  try {
+    secret = getSecretKey().key
+  } catch {
+    return res.status(500).json({ error: 'Missing STRIPE_SECRET_KEY' })
+  }
 
   try {
-    const stripe = new Stripe(secret, { apiVersion: '2024-04-10' })
+    const stripe = new Stripe(secret, { apiVersion: STRIPE_API_VERSION } as any)
     const { amount, currency = 'usd' } = req.body || {}
 
     if (typeof amount !== 'number' || amount <= 0) {
@@ -25,3 +32,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } catch (err: any) {
     return res.status(500).json({ error: err?.message || 'Stripe error' })
   }
+}
