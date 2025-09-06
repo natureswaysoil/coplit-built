@@ -27,6 +27,7 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [paymentElementReady, setPaymentElementReady] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -36,8 +37,7 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
     }
 
     // Check if PaymentElement is mounted
-    const paymentElement = elements.getElement('payment');
-    if (!paymentElement) {
+    if (!paymentElementReady) {
       setError("Payment form is not ready. Please wait a moment and try again.");
       return;
     }
@@ -121,10 +121,11 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
             }
           }
         }}
+        onReady={() => setPaymentElementReady(true)}
       />
       
       {/* Loading indicator for PaymentElement */}
-      {(!stripe || !elements || !elements.getElement('payment')) && (
+      {(!stripe || !elements || !paymentElementReady) && (
         <div style={{ 
           background: '#fff3cd', 
           color: '#856404',
@@ -161,7 +162,7 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
 
       <button
         type="submit"
-        disabled={!stripe || !elements || !elements.getElement('payment') || submitting || items.length === 0}
+        disabled={!stripe || !elements || !paymentElementReady || submitting || items.length === 0}
         style={{ 
           padding: "0.8rem 1.5rem", 
           fontWeight: 700, 
