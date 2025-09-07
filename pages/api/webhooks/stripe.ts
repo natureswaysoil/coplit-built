@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import Stripe from 'stripe'
 import { getSecretKey, STRIPE_API_VERSION, getWebhookSecret } from '../../../lib/stripeConfig'
 import { createClient } from '@supabase/supabase-js'
+import { simpleOrderConfirmationHTML } from '../../../lib/emailTemplates'
 
 export const config = { api: { bodyParser: false } } // we need the raw body for signature verification
 
@@ -79,9 +80,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           await supabase.from('orders').insert(payload)
         }
 
-        // (Optional) Send confirmation email via Resend
+        // Send confirmation email via Resend (HTML + text fallback)
         if (process.env.RESEND_API_KEY && meta.email) {
           try {
+            const shippingAddr = {
+              address1: meta.shipping_address1,
+              address2: meta.shipping_address2,
+              city: meta.shipping_city,
+              state: meta.shipping_state,
+              zip: meta.shipping_zip,
+              county: meta.shipping_county,
+            }
+            const html = simpleOrderConfirmationHTML({
+              orderId: pi.id,
+              name: meta.name || meta.shipping_name || '',
+              email: meta.email || undefined,
+              subtotal: meta.subtotal ? Number(meta.subtotal) : undefined,
+              tax: meta.tax ? Number(meta.tax) : undefined,
+              total: pi.amount_received ? Number((pi.amount_received / 100).toFixed(2)) : undefined,
+              shipping: shippingAddr,
+            })
             await fetch('https://api.resend.com/emails', {
               method: 'POST',
               headers: {
@@ -93,6 +111,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 to: [meta.email],
                 subject: `Thanks for your order ${pi.id}`,
                 text: `Hi ${meta.name || ''},\n\nWe received your payment of $${(pi.amount_received/100).toFixed(2)}.\nOrder: ${pi.id}\n\n— Nature's Way Soil`,
+                html,
               }),
             })
           } catch (e) {

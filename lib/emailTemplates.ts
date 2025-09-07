@@ -88,6 +88,50 @@ export function contactHTML(params: { name: string; email: string; message: stri
   </body></html>`;
 }
 
+export function simpleOrderConfirmationHTML(params: {
+  orderId: string;
+  name?: string;
+  email?: string;
+  subtotal?: number; // dollars
+  tax?: number; // dollars
+  total?: number; // dollars
+  shipping?: { address1?: string; address2?: string; city?: string; state?: string; zip?: string; county?: string };
+}) {
+  const { orderId } = params;
+  const name = params.name || 'Customer';
+  const subtotal = Number(params.subtotal ?? 0);
+  const tax = Number(params.tax ?? 0);
+  const total = Number(params.total ?? subtotal + tax);
+  const s = params.shipping || {};
+  return `<!doctype html>
+  <html><head><meta charSet="utf-8"/><style>${baseStyles}</style></head>
+  <body>
+    <div class="container">
+      <h1 class="brand">Nature's Way Soil</h1>
+      <div class="card">
+        <h2>Thanks for your order, ${escapeHtml(name)}!</h2>
+        <p><b>Order ID:</b> ${escapeHtml(orderId)}</p>
+        <table>
+          <tbody>
+            <tr><td><b>Subtotal</b></td><td style="text-align:right">$${subtotal.toFixed(2)}</td></tr>
+            <tr><td>Sales Tax</td><td style="text-align:right">$${tax.toFixed(2)}</td></tr>
+            <tr><td><b>Total</b></td><td style="text-align:right"><b>$${total.toFixed(2)}</b></td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:12px" class="muted">
+          <div><b>Ship To:</b></div>
+          <div>${escapeHtml(s.address1 || '')} ${escapeHtml(s.address2 || '')}</div>
+          <div>${escapeHtml(s.city || '')}${s.city ? ',' : ''} ${escapeHtml(s.state || '')} ${escapeHtml(s.zip || '')}</div>
+          ${s.county ? `<div>${escapeHtml(s.county)} County</div>` : ''}
+        </div>
+        <p class="muted">If you have any questions, just reply to this email.</p>
+        <a class="btn" href="https://natureswaysoil.com/" target="_blank" rel="noopener noreferrer">Visit our store</a>
+      </div>
+      <p class="muted">© ${new Date().getFullYear()} Nature's Way Soil</p>
+    </div>
+  </body></html>`;
+}
+
 function escapeHtml(s: string) {
   return String(s)
     .replace(/&/g, '&amp;')
