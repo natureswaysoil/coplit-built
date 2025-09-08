@@ -9,6 +9,18 @@ const nextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      // Safety net: if Stripe is configured to POST to the site root, route it to the webhook handler
+      {
+        source: '/',
+        has: [
+          { type: 'header', key: 'stripe-signature' },
+        ],
+        destination: '/api/webhooks/stripe',
+      },
+    ]
+  },
 };
 
 module.exports = nextConfig;
