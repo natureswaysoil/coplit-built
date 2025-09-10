@@ -95,7 +95,15 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
           } catch {}
         }}
       />
-      <PaymentElement options={{ layout: "tabs", paymentMethodOrder: ["link", "card", "apple_pay", "google_pay"] as any }} />
+      {/* Keep PaymentElement options minimal and valid to avoid render issues */}
+      <PaymentElement 
+        options={{ 
+          layout: "tabs",
+          // Only include supported method identifiers here. Wallets like Apple Pay/Google Pay
+          // are surfaced automatically via Card/Payment Request Button when eligible.
+          // paymentMethodOrder: ["link", "card"]
+        }} 
+      />
       
       {/* Payment verification info */}
       <div style={{ 
