@@ -107,3 +107,11 @@ export function listSecretKeyCandidates(): Array<{ source: string; redacted: str
     redacted: redactKey(process.env[name] || null),
   }));
 }
+
+// Diagnostics helper: list publishable key env names with redacted values
+export function listPublishableKeyCandidates(): Array<{ source: string; redacted: string | null }> {
+  return PUB_CANDIDATES.map((name) => ({
+    source: name,
+    redacted: redactKey(process.env[name] || null),
+  }));
+}
