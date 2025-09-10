@@ -23,9 +23,22 @@ const WH_CANDIDATES = [
 export function resolveEnv(nameList: string[]): { name: string; value: string } | null {
   for (const name of nameList) {
     const v = process.env[name];
-    if (v && v.trim()) return { name, value: v };
+    // Skip placeholder/dummy keys for security
+    if (v && v.trim() && !isPlaceholderKey(v)) return { name, value: v };
   }
   return null;
+}
+
+function isPlaceholderKey(key: string): boolean {
+  const placeholders = [
+    'your_actual_publishable_key_here',
+    'your_actual_secret_key_here',
+    'your_actual_webhook_secret_here',
+    'pk_test_your_actual',
+    'sk_test_your_actual',
+    'whsec_your_actual'
+  ];
+  return placeholders.some(placeholder => key.includes(placeholder));
 }
 
 export function getPublishableKey(): { key: string; source: string } {
