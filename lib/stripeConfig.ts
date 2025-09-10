@@ -6,6 +6,12 @@ const PUB_CANDIDATES = [
   'STRIPE_PUBLISHABLE_KEY',
   'NEXT_PUBLIC_STRIPE_PUBLIC_KEY',
   'STRIPE_PUBLIC_KEY',
+  // Additional common variations
+  'NEXT_PUBLIC_STRIPE_KEY',
+  'NEXT_PUBLIC_STRIPE',
+  'STRIPE_KEY',
+  'STRIPE_PK',
+  'NEXT_PUBLIC_STRIPE_PK',
 ];
 
 // Prefer STRIPE_API_KEY if both are set (often used by platforms/ops)
@@ -13,11 +19,19 @@ const SEC_CANDIDATES = [
   'STRIPE_API_KEY',
   'STRIPE_SECRET_KEY',
   'STRIPE_PRIVATE_KEY',
+  // Additional common variations
+  'STRIPE_SECRET',
+  'STRIPE_KEY',
+  'STRIPE_TOKEN',
+  'STRIPE_SECRET_TOKEN',
 ];
 
 const WH_CANDIDATES = [
   'STRIPE_WEBHOOK_SECRET',
   'STRIPE_WEBHOOK_SIGNING_SECRET',
+  // Additional common variations
+  'STRIPE_SIGNING_SECRET',
+  'STRIPE_WEBHOOK_SECRET_LIVE',
 ];
 
 export function resolveEnv(nameList: string[]): { name: string; value: string } | null {
