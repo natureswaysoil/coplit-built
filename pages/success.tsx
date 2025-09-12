@@ -43,6 +43,25 @@ export default function Success() {
           }
         }
 
+        // If redirected from Payment Element, we have a Payment Intent ID
+        const piId = router.query.pi as string | undefined
+        if (piId) {
+          try {
+            const r = await fetch(`/api/verify-payment?pi=${encodeURIComponent(piId)}`)
+            if (r.ok) {
+              const info = await r.json()
+              setSummary({
+                amount: typeof info?.details?.amount === 'number' ? info.details.amount / 100 : undefined,
+                currency: info?.details?.currency ? String(info.details.currency).toUpperCase() : undefined,
+                email: info?.details?.receipt_email,
+                payment_status: info?.status,
+              })
+            }
+          } catch (e) {
+            console.warn('Could not verify payment intent:', e)
+          }
+        }
+
         setStatus('done')
       } catch (e) {
         console.error(e)
@@ -50,7 +69,7 @@ export default function Success() {
       }
     }
     if (router.isReady) run()
-  }, [router.isReady, clearCart, router.query.session_id])
+  }, [router.isReady, clearCart, router.query.session_id, router.query.pi])
 
   if (status === 'working') {
     return (
@@ -65,7 +84,10 @@ export default function Success() {
     return (
       <main style={{ padding: 24 }}>
         <h1>Payment received.</h1>
-        <p>We couldn’t display the order summary automatically. If you don’t see a confirmation email shortly, contact support.</p>
+        <p>
+          We couldn’t display the order summary automatically. If you don’t see
+          a confirmation email shortly, contact support.
+        </p>
       </main>
     )
   }
@@ -86,7 +108,8 @@ export default function Success() {
       )}
 
       <p style={{ marginTop: 16 }}>
-        A confirmation email will arrive shortly. If you need help, email <a href="mailto:support@natureswaysoil.com">support@natureswaysoil.com</a>.
+        A confirmation email will arrive shortly. If you need help, email{' '}
+        <a href="mailto:support@natureswaysoil.com">support@natureswaysoil.com</a>.
       </p>
 
       <a href="/products" style={{ display: 'inline-block', marginTop: 16, padding: '10px 16px', background: '#174F2E', color: 'white', borderRadius: 6, fontWeight: 700 }}>
