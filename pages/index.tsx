@@ -169,9 +169,9 @@ export default function Home() {
                   const sku = selected[p.id] || p.variations[0]?.sku;
                   const variant = p.variations.find(v => v.sku === sku) || p.variations[0]!;
                   addItem({
-                    id: p.id,
+                    id: String(p.id),
                     title: p.title,
-                    image: p.image,
+                    image: p.image || '',
                     sku: variant.sku,
                     size: variant.size,
                     price: variant.price,

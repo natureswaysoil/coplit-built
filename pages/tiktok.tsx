@@ -14,14 +14,13 @@ type Product = {
   price: number;
   image_url: string;
   slug: string;
-  asin: string;
   rating: number;
 };
 
 async function getProducts(): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
-    .select('id, title, price, image_url, slug, asin, rating')
+  .select('id, title, price, image_url, slug, rating')
     .eq('active', true);
 
   if (error) {

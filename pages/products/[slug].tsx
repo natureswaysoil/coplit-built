@@ -59,18 +59,33 @@ export default function ProductPage(props: ProductPageProps) {
 }
 
 export async function getStaticPaths() {
-  // Prebuild static product ids as slugs to keep fallback robust
-  return { paths: staticProducts.map(p => ({ params: { slug: p.id } })), fallback: true }
+  // Prebuild static product slugs (prefer slug, fallback to id)
+  return {
+    paths: staticProducts.map(p => ({ params: { slug: p.slug || String(p.id) } })),
+    fallback: true
+  }
 }
 
 export async function getStaticProps({ params }: { params: { slug: string } }) {
   const slug = params.slug
   let product = await fetchProductWithVariationsBySlug(slug)
   if (!product) {
-    const staticMatch = staticProducts.find(p => p.id === slug)
-    if (staticMatch) product = normalizeFromStatic(staticMatch as any)
+    // Try static fallback by slug or id
+    const staticMatch = staticProducts.find(p => p.slug === slug || String(p.id) === slug)
+    if (staticMatch) product = normalizeFromStatic(staticMatch)
   }
   if (!product) return { notFound: true }
+  // Redirect numeric id path to canonical slug if needed
+  if (product.slug && slug !== product.slug) {
+    return {
+      redirect: {
+        destination: `/products/${product.slug}`,
+        permanent: true
+      }
+    }
+  }
   return { props: { product }, revalidate: 120 }
 }
+
+
 

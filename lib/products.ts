@@ -1,22 +1,14 @@
-export type ProductVariation = {
-  size: string;
-  price: number;
-  sku: string;
-};
+import { Product } from '@/types/Product'
 
-export type Product = {
-  id: string;
-  title: string;
-  image: string;
-  // Canonical keyword to show on image badges and for search/filtering
-  keyword?: string;
-  details: string;
-  variations: ProductVariation[];
-};
-
+// Static seed products used when DB is empty/offline. Slugs must stay in sync
+// with any initial Supabase seed migration so that pre-rendered pages resolve.
 export const products: Product[] = [
   {
     id: '1',
+    // Stable slug to align with DB seed value
+    // NOTE: Keep in sync with migration seed slug values
+    // Used for pre-rendered static paths and canonical product URLs
+    slug: 'hay-fertilizer',
     title: "Nature's Way Soil Horse Safe Hay, Pasture & Lawn Fertilizer - Organic Microbial Nitrogen Blend for Greener Grass & Improved Soil",
     image: 'https://m.media-amazon.com/images/I/61ll2EiLAJL._AC_UL320_.jpg',
     keyword: 'HAY FERTILIZER',
@@ -28,6 +20,7 @@ export const products: Product[] = [
   },
   {
     id: '2',
+    slug: 'humic-fulvic-kelp',
     title: "Nature's Way Soil Liquid Humic & Fulvic Acid with Kelp - Organic Soil Conditioner for Enhanced Nutrient Uptake",
     image: 'https://m.media-amazon.com/images/I/615mJs9XccL._AC_UL320_.jpg',
     keyword: 'HUMIC FULVIC',
@@ -40,6 +33,7 @@ export const products: Product[] = [
   },
   {
     id: '3',
+    slug: 'liquid-biochar',
     title: "Nature's Way Soil Liquid Biochar with Kelp, Humic & Fulvic Acids - Premium Soil Amendment for Water Retention",
     image: 'https://m.media-amazon.com/images/I/510ui3CBLbL._AC_UL320_.jpg',
     keyword: 'BIOCHAR SOIL',
@@ -51,6 +45,7 @@ export const products: Product[] = [
   },
   {
     id: '4',
+    slug: 'organic-hydroponic',
     title: "Nature's Way Soil Organic Hydroponic Fertilizer - Complete Liquid Plant Food for Hydroponic & Aquaponic Systems",
     image: 'https://m.media-amazon.com/images/I/61qsUDP+WuL._AC_UL320_.jpg',
     keyword: 'HYDROPONIC ORGANIC',
@@ -62,6 +57,7 @@ export const products: Product[] = [
   },
   {
     id: '5',
+    slug: 'living-compost',
     title: "Nature's Way Soil Enhanced Living Compost - Premium Blend with Worm Castings, Biochar & Duckweed Extract",
     image: 'https://m.media-amazon.com/images/I/718tWBNNfkL._AC_UL320_.jpg',
     keyword: 'LIVING COMPOST',
@@ -72,6 +68,7 @@ export const products: Product[] = [
   },
   {
     id: '6',
+    slug: 'liquid-kelp',
     title: "Nature's Way Soil Liquid Kelp Fertilizer - Organic Seaweed Extract for Root Development & Plant Vigor",
     image: 'https://m.media-amazon.com/images/I/71PYCZfZ2BL._AC_UL320_.jpg',
     keyword: 'KELP SEAWEED',
@@ -84,6 +81,7 @@ export const products: Product[] = [
   },
   {
     id: '7',
+    slug: 'liquid-bone-meal',
     title: "Nature's Way Soil Liquid Bone Meal Fertilizer - Fast-Absorbing Phosphorus & Calcium for Root Development",
     image: 'https://m.media-amazon.com/images/I/7151rsGhpkL._AC_UL320_.jpg',
     keyword: 'BONE MEAL LIQUID',
@@ -95,6 +93,7 @@ export const products: Product[] = [
   },
   {
     id: '8',
+    slug: 'dog-urine-neutralizer',
     title: "Nature's Way Soil Dog Urine Neutralizer & Lawn Repair - Pet-Safe Grass Repair Spray for Yellow Spots & Odor Control",
     image: 'https://m.media-amazon.com/images/I/61jHzXvOJjL._AC_UL320_.jpg',
     keyword: 'DOG URINE LAWN',
@@ -106,6 +105,7 @@ export const products: Product[] = [
   },
   {
     id: '9',
+    slug: 'organic-tomato-fertilizer',
     title: "Nature's Way Soil Organic Tomato Fertilizer - Liquid Concentrate with Vitamin B-1 & Aloe Vera for Maximum Yields",
     image: 'https://m.media-amazon.com/images/I/71K9tXvL8pL._AC_UL320_.jpg',
     keyword: 'TOMATO ORGANIC FERTILIZER',
