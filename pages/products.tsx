@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
 import { Product } from '@/types/Product';
 import { normalizeProducts, logProductAnomalies, NormalizedProduct } from '@/lib/productNormalizer'
+import { products as staticProducts } from '@/lib/products'
 
 interface ProductsPageProps { products: NormalizedProduct[] }
 
@@ -57,13 +58,14 @@ export default function ProductsPage({ products }: ProductsPageProps) {
 }
 
 export async function getStaticProps() {
-  const { data, error } = await supabase
-    .from('products')
-    .select('*');
-
-  if (error) throw new Error(error.message);
-
-  const normalized = normalizeProducts(data as any)
+  let data: any[] | null = null
+  try {
+    const { data: rows, error } = await supabase.from('products').select('*')
+    if (!error) data = rows || null
+  } catch (e) {
+    // swallow error; fallback below
+  }
+  const normalized = normalizeProducts(data, true)
   logProductAnomalies(normalized)
-  return { props: { products: normalized }, revalidate: 60 }
+  return { props: { products: normalized }, revalidate: 120 }
 }
