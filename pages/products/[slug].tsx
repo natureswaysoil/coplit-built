@@ -31,11 +31,13 @@ export default function ProductPage({ product }: ProductPageProps) {
 }
 
 export async function getStaticPaths() {
-  const slugs = await getAllProductSlugs();
-  return {
-    paths: slugs.map((slug) => ({ params: { slug } })),
-    fallback: true,
-  };
+  try {
+    const slugs = await getAllProductSlugs();
+    return { paths: slugs.map((slug: string) => ({ params: { slug } })), fallback: true }
+  } catch {
+    // Fallback: use static product ids as slug values
+    return { paths: staticProducts.map(p => ({ params: { slug: p.id } })), fallback: true }
+  }
 }
 
 export async function getStaticProps({ params }: { params: { slug: string } }) {
