@@ -47,3 +47,13 @@
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
 }
+"compilerOptions": {
+  "baseUrl": ".",
+  "paths": {
+    "@/lib/*": ["lib/*"],
+    "@/components/*": ["components/*"],
+    "@/types/*": ["types/*"]
+  }
+}
+
+
