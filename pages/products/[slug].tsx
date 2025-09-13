@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import { getProductBySlug, getAllProductSlugs } from '@/lib/api';
+import { products as staticProducts } from '@/lib/products';
 import Head from 'next/head';
 import { Product } from '@/types/Product';
 
@@ -38,10 +39,14 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }: { params: { slug: string } }) {
-  const product = await getProductBySlug(params.slug);
-  return {
-    props: { product },
-    revalidate: 60,
-  };
+  let product: any = null
+  try {
+    product = await getProductBySlug(params.slug)
+  } catch (e: any) {
+    // Fallback to static list if table not present / error in build
+  product = staticProducts.find(p => p.id === params.slug) || null
+  }
+  if (!product) return { notFound: true }
+  return { props: { product }, revalidate: 120 }
 }
 
