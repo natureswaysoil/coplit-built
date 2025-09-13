@@ -1,9 +1,13 @@
-// pages/products/[slug].tsx
 import { useRouter } from 'next/router';
 import { getProductBySlug, getAllProductSlugs } from '@/lib/api';
 import Head from 'next/head';
+import { Product } from '@/types/Product';
 
-export default function ProductPage({ product }) {
+interface ProductPageProps {
+  product: Product;
+}
+
+export default function ProductPage({ product }: ProductPageProps) {
   const router = useRouter();
   if (router.isFallback) return <div>Loading...</div>;
 
@@ -34,10 +38,11 @@ export async function getStaticPaths() {
   };
 }
 
-export async function getStaticProps({ params }) {
+export async function getStaticProps({ params }: { params: { slug: string } }) {
   const product = await getProductBySlug(params.slug);
   return {
     props: { product },
-    revalidate: 60, // Rebuild page every 60 seconds
+    revalidate: 60,
   };
 }
+
