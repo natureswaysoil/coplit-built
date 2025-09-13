@@ -21,3 +21,4 @@ export async function getAllProductSlugs() {
   return data.map((p: any) => p.slug);
 }
 
+
