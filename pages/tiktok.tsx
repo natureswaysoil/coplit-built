@@ -14,13 +14,14 @@ type Product = {
   price: number;
   image_url: string;
   slug: string;
-  rating: number;
+  // rating removed from DB, keeping optional fallback for future
+  rating?: number;
 };
 
 async function getProducts(): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
-  .select('id, title, price, image_url, slug, rating')
+  .select('id, title, price, image_url, slug')
     .eq('active', true);
 
   if (error) {
@@ -63,10 +64,12 @@ export default async function TikTokLanding() {
             />
             <h3>{product.title}</h3>
             <p><strong>${product.price.toFixed(2)}</strong></p>
-            <div style={styles.rating}>
-              {renderStars(product.rating)}
-              <span style={styles.ratingText}>Rated {product.rating.toFixed(1)}/5 on Amazon</span>
-            </div>
+            {product.rating !== undefined && (
+              <div style={styles.rating}>
+                {renderStars(product.rating)}
+                <span style={styles.ratingText}>Rated {product.rating.toFixed(1)}/5 on Amazon</span>
+              </div>
+            )}
             <a
               href={`https://natureswaysoil.com/product/${product.slug}`}
               style={styles.shopLink}
