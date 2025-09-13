@@ -2,7 +2,7 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
-import { Product } from '@/types/Product';
+import { Product, resolveDisplayImage } from '@/types/Product';
 
 interface ProductsPageProps {
   products: Product[];
@@ -32,7 +32,7 @@ export default function ProductsPage({ products }: ProductsPageProps) {
               className="block border rounded-2xl shadow-md hover:shadow-lg transition p-4 bg-white"
             >
               <img
-                src={product.image_url}
+                src={resolveDisplayImage(product)}
                 alt={product.title}
                 className="w-full h-56 object-cover rounded-lg mb-4"
               />
@@ -43,7 +43,11 @@ export default function ProductsPage({ products }: ProductsPageProps) {
                 {product.short_description}
               </p>
               <p className="text-lg font-bold text-green-700">
-                ${product.price}
+                {product.price !== undefined
+                  ? `$${product.price}`
+                  : product.variations && product.variations.length > 0
+                    ? `$${product.variations[0].price}`
+                    : ''}
               </p>
             </Link>
           ))}
@@ -55,13 +59,13 @@ export default function ProductsPage({ products }: ProductsPageProps) {
 
 export async function getStaticProps() {
   const { data, error } = await supabase
-    .from<Product>('products')
+    .from('products')
     .select('*');
 
   if (error) throw new Error(error.message);
 
   return {
-    props: { products: data },
+  props: { products: (data || []) as any as Product[] },
     revalidate: 60, // ISR
   };
 }
