@@ -12,6 +12,8 @@ export interface NormalizedProduct {
   image: string
   price?: number
   variations?: { size: string; price: number; sku: string }[]
+  inventory?: number | null
+  available: boolean
   source: 'db' | 'static'
 }
 
@@ -20,6 +22,8 @@ function coerceId(id: any): string {
 }
 
 export function normalizeFromRow(row: ProductsRow): NormalizedProduct {
+  const inventory = (row as any).inventory ?? null
+  const isActive = (row as any).is_active ?? true
   return {
     id: coerceId(row.id),
     slug: row.slug || coerceId(row.id),
@@ -30,6 +34,8 @@ export function normalizeFromRow(row: ProductsRow): NormalizedProduct {
     image: row.image_url || '/screenshots/logo-with-tagline.png',
     price: row.price || undefined,
     variations: undefined,
+    inventory,
+    available: isActive && (inventory === null || inventory > 0),
     source: 'db'
   }
 }
@@ -46,6 +52,8 @@ export function normalizeFromStatic(p: Product): NormalizedProduct {
     image: p.image_url || (p as any).image || '/screenshots/logo-with-tagline.png',
     price: basePrice,
     variations: p.variations,
+    inventory: null,
+    available: true,
     source: 'static'
   }
 }
