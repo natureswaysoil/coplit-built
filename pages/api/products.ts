@@ -8,6 +8,8 @@ export const config = { runtime: 'edge' }
 export default async function handler(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const source = searchParams.get('source') // 'db' | 'static' | null
+  const search = searchParams.get('search')?.trim() || ''
+  const includeInactive = searchParams.get('include') === 'inactive' || searchParams.get('include_inactive') === 'true'
   const limitParam = searchParams.get('limit')
   const limit = limitParam ? Math.min(100, Math.max(1, parseInt(limitParam, 10) || 20)) : 50
 
@@ -17,7 +19,13 @@ export default async function handler(req: NextRequest) {
 
   if (source !== 'static') {
     try {
-      const { data, error: dbError } = await supabase.from('products').select('*').limit(limit)
+      let query = supabase.from('products').select('*').limit(limit)
+      if (!includeInactive) query = query.eq('is_active', true)
+      if (search) {
+        // Simple ILIKE filter; for better relevance combine fields
+        query = query.or(`title.ilike.%${search}%,keyword.ilike.%${search}%`)
+      }
+      const { data, error: dbError } = await query
       if (dbError) {
         error = dbError.message
       } else if (data && data.length) {
