@@ -24,38 +24,41 @@ function coerceId(id: any): string {
 export function normalizeFromRow(row: ProductsRow): NormalizedProduct {
   const inventory = (row as any).inventory ?? null
   const isActive = (row as any).is_active ?? true
-  return {
+  const obj: any = {
     id: coerceId(row.id),
     slug: row.slug || coerceId(row.id),
     title: row.title,
     description: row.details || row.short_description || row.title,
-    shortDescription: row.short_description || undefined,
     keyword: row.keyword || undefined,
     image: row.image_url || '/screenshots/logo-with-tagline.png',
-    price: row.price || undefined,
-    variations: undefined,
+    // price only if value present
+    ...(row.price !== undefined && row.price !== null ? { price: row.price } : {}),
     inventory,
     available: isActive && (inventory === null || inventory > 0),
     source: 'db'
   }
+  if (row.short_description) obj.shortDescription = row.short_description
+  // variations placeholder omitted unless future support added
+  return obj as NormalizedProduct
 }
 
 export function normalizeFromStatic(p: Product): NormalizedProduct {
   const basePrice = p.price !== undefined ? p.price : p.variations?.[0]?.price
-  return {
+  const obj: any = {
     id: coerceId(p.id),
     slug: p.slug || coerceId(p.id),
     title: p.title,
     description: p.details || p.short_description || p.title,
-    shortDescription: p.short_description,
     keyword: p.keyword,
     image: p.image_url || (p as any).image || '/screenshots/logo-with-tagline.png',
-    price: basePrice,
-    variations: p.variations,
+    ...(basePrice !== undefined ? { price: basePrice } : {}),
+    ...(p.variations?.length ? { variations: p.variations } : {}),
     inventory: null,
     available: true,
     source: 'static'
   }
+  if ((p as any).short_description) obj.shortDescription = (p as any).short_description
+  return obj as NormalizedProduct
 }
 
 export function normalizeProducts(rows: ProductsRow[] | null, fallbackStatic = true): NormalizedProduct[] {

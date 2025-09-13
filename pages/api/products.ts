@@ -8,7 +8,7 @@ export const config = { runtime: 'edge' }
 export default async function handler(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const source = searchParams.get('source') // 'db' | 'static' | null
-  const search = searchParams.get('search')?.trim() || ''
+  const search = (searchParams.get('search') || searchParams.get('q') || '').trim()
   const includeInactive = searchParams.get('include') === 'inactive' || searchParams.get('include_inactive') === 'true'
   const limitParam = searchParams.get('limit')
   const limit = limitParam ? Math.min(100, Math.max(1, parseInt(limitParam, 10) || 20)) : 50
