@@ -118,8 +118,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
   const subtotal = lines.reduce((sum, line) => sum + (line.amount * line.quantity), 0);
-    const tax = calc.tax_amount_exclusive;
-    const total = calc.amount_total;
+  const tax = calc.tax_amount_exclusive;
+  const total = calc.amount_total;
+  const effectiveRate = subtotal > 0 ? (tax / subtotal) : 0;
     const shippingAmount = shipping?.amount ? Math.round(shipping.amount) : 0;
 
     const pi = await stripe.paymentIntents.create({
@@ -129,7 +130,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       automatic_payment_methods: { enabled: true },
       receipt_email: customer?.email,
       shipping: { name: customer?.name ?? "", address },
-      metadata: { tax_calculation: calc.id, promo_code: promoCode || "", discount_cents: String(discountCents) },
+      metadata: {
+        tax_calculation: calc.id,
+        promo_code: promoCode || "",
+        discount_cents: String(discountCents),
+        tax_rate_percent: (effectiveRate * 100).toFixed(4),
+        tax_subtotal_cents: String(subtotal),
+        tax_amount_cents: String(tax)
+      },
     });
 
     await supabaseAdmin.from(ordersTable).insert({
@@ -155,7 +163,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         discount: discountCents || 0,
         tax: tax || 0,
         shipping: shippingAmount || 0,
-        total: total || 0
+        total: total || 0,
+        taxRatePercent: Number((effectiveRate * 100).toFixed(4))
       }
     });
   } catch (err: any) {

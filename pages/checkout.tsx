@@ -215,8 +215,16 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
                   <strong>-${(breakdown.discount / 100).toFixed(2)}</strong>
                 </div>
               )}
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
-                <span>Sales Tax {typeof (breakdown as any).taxRatePercent === 'number' && (breakdown as any).taxRatePercent > 0 ? <span style={{ color: '#555', fontSize: 12 }}>({(breakdown as any).taxRatePercent.toFixed(2)}%)</span> : null}</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, alignItems: 'center', gap: 8 }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  Sales Tax {typeof (breakdown as any).taxRatePercent === 'number' && (breakdown as any).taxRatePercent > 0 ? <span style={{ color: '#555', fontSize: 12 }}>({(breakdown as any).taxRatePercent.toFixed(2)}%)</span> : null}
+                  <span
+                    title={
+                      (breakdown as any).taxRatePercent ? `Effective tax rate applied to taxable items${(breakdown as any).taxRatePercent ? `: ${(breakdown as any).taxRatePercent.toFixed(4)}%` : ''}. Rates derived from NC base + county data. Shipping may be taxable depending on configuration.` : 'Sales tax applied to taxable items.'
+                    }
+                    style={{ cursor: 'help', background: '#eef2ff', color: '#3730a3', borderRadius: '50%', width: 16, height: 16, fontSize: 11, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+                  >i</span>
+                </span>
                 <strong>${(breakdown.tax / 100).toFixed(2)}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
