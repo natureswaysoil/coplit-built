@@ -12,13 +12,15 @@ export default function CategoryPage({ products }: CategoryPageProps) {
   return (
     <main style={{ padding: 20 }}>
       <h1>Category: {category}</h1>
-      {products.map(prod => (
-        <div key={prod.slug}>
-          <Link href={`/products/${prod.slug}`}>
-            <h3>{prod.title}</h3>
-          </Link>
-        </div>
-      ))}
+            {(products || []).map(prod => (
+              <div key={prod.slug || String(Math.random())}>
+                {prod.slug ? (
+                  <Link href={`/products/${prod.slug}`}>
+                    <h3>{prod.title || 'Untitled'}</h3>
+                  </Link>
+                ) : <h3>{prod.title || 'Untitled'}</h3>}
+              </div>
+            ))}
     </main>
   );
 }
@@ -40,5 +42,5 @@ export async function getStaticProps({ params }: { params: { category: string } 
   } catch {
     products = []
   }
-  return { props: { products }, revalidate: 300 }
+  return { props: { products: products || [] }, revalidate: 300 }
 }
