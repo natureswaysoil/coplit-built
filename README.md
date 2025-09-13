@@ -8,12 +8,6 @@
 - Stripe-ready Payment Element integration
 - ISR revalidation endpoint for catalog freshness
 
-## Getting Started
-1. Clone the repo
-2. Install dependencies
-3. Set up Supabase & Stripe environment variables
-4. Run `npm run dev`
-
 ## Environment Variables (excerpt)
 Provide at minimum:
 - `NEXT_PUBLIC_SUPABASE_URL`
@@ -29,6 +23,76 @@ Endpoint: `/api/revalidate-products`
 Env var:
 ```
 REVALIDATE_SECRET=some-long-random-string
+
+## Row Level Security (RLS) Policies
+
+The schema enables Row Level Security on core tables. Baseline policies only grant full access to the `service_role`. If you query from the browser using the public *anon* key and get an empty array plus a dashboard notice like:
+
+"Policies are required to query data"
+
+…you need read policies that allow the `anon` role to `SELECT` rows.
+
+### Recommended Public Read Policies
+
+`supabase/migrations/008_public_read_policies.sql` adds safe read-only access:
+
+1. Active products only:
+```sql
+CREATE POLICY "Public read active products" ON public.products
+	FOR SELECT USING (is_active IS TRUE);
+```
+2. Variations of active products:
+```sql
+CREATE POLICY "Public read product variations" ON public.product_variations
+	FOR SELECT USING (EXISTS (
+		SELECT 1 FROM public.products p
+		WHERE p.id = product_variations.product_id AND p.is_active IS TRUE
+	));
+```
+3. (Optional) Public promo code discovery (remove if codes should stay hidden):
+```sql
+CREATE POLICY "Public read active promo codes" ON public.promo_codes
+	FOR SELECT USING (
+		is_active IS TRUE
+		AND (starts_at IS NULL OR starts_at <= timezone('utc', now()))
+		AND (ends_at IS NULL OR ends_at >= timezone('utc', now()))
+	);
+```
+
+### Write / Mutation Policies
+
+No `INSERT`, `UPDATE`, or `DELETE` permissions are granted to `anon`. All writes flow through server-side API routes using the `service_role` key (which bypasses RLS) ensuring inventory, pricing, and order integrity.
+
+### Customizing Further
+
+- Add customer-specific policies (e.g. a user can read their own orders) once auth is integrated:
+```sql
+CREATE POLICY "User read own orders" ON public.orders
+	FOR SELECT USING ( auth.uid() IS NOT NULL AND customer_id = auth.uid() );
+```
+- Introduce soft-deletion: add `deleted_at` column and extend `USING` clauses with `deleted_at IS NULL`.
+- Rate limiting / abuse controls remain application-level concerns; RLS only governs row visibility and mutation.
+
+### Troubleshooting Empty Results
+
+Checklist when queries return empty arrays:
+1. Confirm table has data (`SELECT count(*) FROM public.products;`).
+2. Verify RLS enabled (`SELECT relrowsecurity FROM pg_class WHERE relname='products';`).
+3. List policies: `SELECT * FROM pg_policies WHERE tablename='products';`.
+4. Ensure the policy predicate actually evaluates to TRUE for at least one row.
+5. Re-run migration if the new policy file was added after initial deploy.
+
+If policies exist but still no data, log `auth.role()` via a quick function:
+```sql
+CREATE OR REPLACE FUNCTION debug_role() RETURNS text LANGUAGE sql AS $$ SELECT auth.role(); $$;
+SELECT debug_role();
+```
+The browser should show `anon`.
+
+### Idempotency
+
+All policy migrations use conditional creation (`IF NOT EXISTS`) or a DO block checking `pg_policies` so re-running migrations is safe on fresh environments.
+
 ```
 
 Examples:
