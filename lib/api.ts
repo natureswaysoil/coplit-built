@@ -1,9 +1,9 @@
-// lib/api.ts
 import { supabase } from './supabaseClient';
+import { Product } from '@/types/Product';
 
-export async function getProductBySlug(slug: string) {
+export async function getProductBySlug(slug: string): Promise<Product> {
   const { data, error } = await supabase
-    .from('products')
+    .from<Product>('products')
     .select('*')
     .eq('slug', slug)
     .single();
@@ -12,13 +12,11 @@ export async function getProductBySlug(slug: string) {
   return data;
 }
 
-export async function getAllProductSlugs() {
+export async function getAllProductSlugs(): Promise<string[]> {
   const { data, error } = await supabase
-    .from('products')
+    .from<Product>('products')
     .select('slug');
 
   if (error) throw new Error(error.message);
-  return data.map((p: any) => p.slug);
+  return data.map((p) => p.slug);
 }
-
-
