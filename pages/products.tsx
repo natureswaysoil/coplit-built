@@ -2,11 +2,10 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
-import { Product, resolveDisplayImage } from '@/types/Product';
+import { Product } from '@/types/Product';
+import { normalizeProducts, logProductAnomalies, NormalizedProduct } from '@/lib/productNormalizer'
 
-interface ProductsPageProps {
-  products: Product[];
-}
+interface ProductsPageProps { products: NormalizedProduct[] }
 
 export default function ProductsPage({ products }: ProductsPageProps) {
   return (
@@ -32,7 +31,7 @@ export default function ProductsPage({ products }: ProductsPageProps) {
               className="block border rounded-2xl shadow-md hover:shadow-lg transition p-4 bg-white"
             >
               <img
-                src={resolveDisplayImage(product)}
+                src={product.image}
                 alt={product.title}
                 className="w-full h-56 object-cover rounded-lg mb-4"
               />
@@ -40,7 +39,7 @@ export default function ProductsPage({ products }: ProductsPageProps) {
                 {product.title}
               </h2>
               <p className="text-gray-600 text-sm mb-3">
-                {product.short_description}
+                {product.shortDescription}
               </p>
               <p className="text-lg font-bold text-green-700">
                 {product.price !== undefined
@@ -64,8 +63,7 @@ export async function getStaticProps() {
 
   if (error) throw new Error(error.message);
 
-  return {
-  props: { products: (data || []) as any as Product[] },
-    revalidate: 60, // ISR
-  };
+  const normalized = normalizeProducts(data as any)
+  logProductAnomalies(normalized)
+  return { props: { products: normalized }, revalidate: 60 }
 }

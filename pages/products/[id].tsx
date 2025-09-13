@@ -1,17 +1,17 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
-import { products, type Product } from '../../lib/products';
+import { products as staticProducts } from '../../lib/products';
+import { supabase } from '@/lib/supabaseClient';
+import { normalizeProducts, findProductBySlug, NormalizedProduct, normalizeFromStatic } from '@/lib/productNormalizer';
 import { useCart } from '../../lib/cartContext';
 import { useState } from 'react';
 
-type Props = {
-  product: Product;
-};
+type Props = { product: NormalizedProduct };
 
 export default function ProductDetail({ product }: Props) {
   const { addItem } = useCart();
   const [sku, setSku] = useState<string>(product.variations?.[0]?.sku || '');
   const hasVariants = !!(product.variations && product.variations.length);
-  const variant = hasVariants ? (product.variations.find(v => v.sku === sku) || product.variations[0]!) : undefined;
+  const variant = hasVariants ? (product.variations!.find(v => v.sku === sku) || product.variations![0]!) : undefined;
 
   return (
     <main style={{ maxWidth: 900, margin: '0 auto', padding: '2rem' }}>
@@ -34,7 +34,7 @@ export default function ProductDetail({ product }: Props) {
         </div>
         <div style={{ flex: '1 1 360px' }}>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 'bold', marginBottom: '0.75rem' }}>{product.title}</h1>
-          <p style={{ marginBottom: '1rem', lineHeight: 1.5 }}>{product.details}</p>
+          <p style={{ marginBottom: '1rem', lineHeight: 1.5 }}>{product.description}</p>
 
           <div style={{ marginBottom: '0.75rem' }}>
             <label htmlFor="size" style={{ display: 'block', fontWeight: 'bold', marginBottom: 6 }}>Choose size</label>
@@ -87,18 +87,29 @@ export default function ProductDetail({ product }: Props) {
 
 export const getStaticPaths: GetStaticPaths = async () => {
   return {
-    paths: products.map(p => ({ params: { id: p.id } })),
+  paths: staticProducts.map(p => ({ params: { id: p.id } })),
     fallback: false,
   };
 };
 
 export const getStaticProps: GetStaticProps<Props> = async (ctx) => {
   const id = ctx.params?.id as string | undefined;
-  const product = products.find(p => p.id === id);
-  if (!product) {
-    return { notFound: true };
+  if (!id) return { notFound: true };
+
+  // Try DB first
+  const { data, error } = await supabase.from('products').select('*').eq('id', id).limit(1);
+  if (error) {
+    console.warn('[product-detail] DB fetch error', error.message);
   }
-  return {
-    props: { product },
-  };
+  let product: NormalizedProduct | null = null;
+  if (data && data.length) {
+    const normalized = normalizeProducts(data as any, false);
+    product = normalized[0] || null;
+  }
+  if (!product) {
+    const staticMatch = staticProducts.find(p => p.id === id);
+    if (staticMatch) product = normalizeFromStatic(staticMatch);
+  }
+  if (!product) return { notFound: true };
+  return { props: { product }, revalidate: 120 };
 };
