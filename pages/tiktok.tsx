@@ -94,12 +94,12 @@ function renderStars(rating: number) {
   return <>{stars}</>;
 }
 
-const styles = {
+const styles: { [k: string]: React.CSSProperties } = {
   header: {
     backgroundColor: '#5e9441',
     color: 'white',
     padding: '30px 20px',
-    textAlign: 'center',
+    textAlign: 'center' as const,
   },
   productsSection: {
     maxWidth: '640px',
