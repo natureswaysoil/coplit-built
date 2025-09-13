@@ -1,6 +1,6 @@
 // pages/products/[slug].tsx
 import { useRouter } from 'next/router';
-import { getProductBySlug, getAllProductSlugs } from '../../lib/api';
+import { getProductBySlug, getAllProductSlugs } from '@/lib/api';
 import Head from 'next/head';
 
 export default function ProductPage({ product }) {
