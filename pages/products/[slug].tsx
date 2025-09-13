@@ -1,4 +1,3 @@
-
 // pages/products/[slug].tsx
 import { useRouter } from 'next/router';
 import { getProductBySlug, getAllProductSlugs } from '../../lib/api';
@@ -39,6 +38,6 @@ export async function getStaticProps({ params }) {
   const product = await getProductBySlug(params.slug);
   return {
     props: { product },
-    revalidate: 60,
+    revalidate: 60, // Rebuild page every 60 seconds
   };
 }
