@@ -1,3 +1,4 @@
+// pages/tiktok-static.tsx
 import Image from 'next/image';
 import Head from 'next/head';
 
@@ -21,7 +22,13 @@ export default function TikTokLanding() {
       </header>
 
       <div style={styles.videoEmbed}>
-        <iframe src="https://www.youtube.com/embed/VIDEO_ID" title="TikTok Highlight Video" frameBorder="0" allowFullScreen style={styles.iframe}></iframe>
+        <iframe
+          src="https://www.youtube.com/embed/VIDEO_ID"
+          title="TikTok Highlight Video"
+          frameBorder="0"
+          allowFullScreen
+          style={styles.iframe}
+        ></iframe>
       </div>
 
       <section id="lawn" style={styles.product}>
@@ -69,12 +76,12 @@ const styles = {
     backgroundColor: '#5e9441',
     color: 'white',
     padding: '30px 20px',
-    textAlign: 'center',
+    textAlign: 'center' as const,
   },
   ctaButtons: {
     display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
+    flexWrap: 'wrap' as const,
+    justifyContent: 'center' as const,
     marginTop: '20px',
     gap: '10px',
   },
@@ -84,12 +91,12 @@ const styles = {
     padding: '15px 20px',
     borderRadius: '8px',
     fontWeight: 'bold',
-    textAlign: 'center',
+    textAlign: 'center' as const,
     flex: 1,
-    textDecoration: 'none',
+    textDecoration: 'none' as const,
   },
   videoEmbed: {
-    textAlign: 'center',
+    textAlign: 'center' as const,
     margin: '30px auto',
     maxWidth: '600px',
   },
@@ -114,7 +121,7 @@ const styles = {
     margin: '30px auto',
     padding: '20px',
     maxWidth: '600px',
-    textAlign: 'center',
+    textAlign: 'center' as const,
     borderRadius: '10px',
     boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
   },
@@ -136,7 +143,7 @@ const styles = {
     cursor: 'pointer',
   },
   footer: {
-    textAlign: 'center',
+    textAlign: 'center' as const,
     padding: '20px',
     fontSize: '0.85rem',
     color: '#777',
