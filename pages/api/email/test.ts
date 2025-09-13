@@ -1,9 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
+// Sends a simple test email through Resend to verify configuration.
+// Secured by X-ADMIN-TOKEN to prevent abuse.
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST')
     return res.status(405).json({ error: 'Method not allowed' })
+  }
+
+  if (req.headers['x-admin-token'] !== process.env.ADMIN_API_TOKEN) {
+    return res.status(401).json({ error: 'Unauthorized' })
   }
 
   const apiKey = process.env.RESEND_API_KEY

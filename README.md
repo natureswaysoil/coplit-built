@@ -7,6 +7,12 @@
 - Privacy & Refund policy pages (Markdown -> rendered)
 - Stripe-ready Payment Element integration
 - ISR revalidation endpoint for catalog freshness
+- Admin dashboard (products, variations, promo codes, alerts, analytics)
+- Inline product & variation editing + low inventory highlighting
+- Inventory alert subscriptions (email + optional product/threshold)
+- Promo code CRUD (amount / percent, expirations, max redemptions)
+- Analytics summary (events by type, top products)
+- CSV export (products, variations, promos)
 
 ## Environment Variables (excerpt)
 Provide at minimum:
@@ -18,7 +24,19 @@ Provide at minimum:
 - `REVALIDATE_SECRET`
 
 ## ISR Revalidation Endpoint
-Endpoint: `/api/revalidate-products`
+Endpoints:
+- `/api/revalidate-products` (legacy)
+- `/api/revalidate` (unified; used by dashboard button)
+
+`/api/revalidate` accepts POST JSON body:
+```json
+{ "slug": "kelp-meal" }
+{ "all": true }
+{ "all": true, "skipIndex": true }
+```
+Auth:
+- Provide `X-ADMIN-TOKEN: <ADMIN_API_TOKEN>` header OR
+- Provide `x-revalidate-secret: <REVALIDATE_SECRET>` header (or `?secret=` query)
 
 Env var:
 ```
@@ -133,7 +151,66 @@ npx supabase gen types typescript --project-id <PROJECT_REF> --schema public > t
 ## Development Notes
 - Normalizer provides graceful fallback when DB rows unavailable.
 - Variation pricing picks lowest variation if base price null.
-- Admin endpoints secured via custom header token (consider hardening with JWT / RLS policies per role).
+- Admin endpoints secured via custom header token (`X-ADMIN-TOKEN`).
+- Revalidation button hits `/api/revalidate` (ensure an API route exists that validates `x-admin-token` or `x-revalidate-secret`).
+- Alerts tab uses `/api/alerts/*` endpoints with service role behind API.
+- Analytics tab consumes `/api/analytics/summary`.
+- CSV export is client-side only; adjust fields if you add columns.
+- Inventory alert emails: triggered when product or variation inventory is updated (if new inventory <= subscriber threshold). Extend `sendEmail` in `lib/alertEmails.ts` to integrate a provider (Resend, SES, Postmark).
+- Alert email cooldown: set `ALERT_COOLDOWN_MINUTES` (default 180) to avoid sending repeated low-inventory emails too frequently to the same subscription.
+- Unsubscribe links: signed with `ALERT_UNSUBSCRIBE_SECRET` (fallback `REVALIDATE_SECRET`); `/api/alerts/unsubscribe?token=...` deactivates a subscription.
+- Resend integration: set `RESEND_API_KEY` (+ optional `RESEND_FROM`) for real email delivery; fallback logs to console.
+- Batch revalidation: `/api/revalidate-batch` supports `{ page, size, includeIndex }` for chunked regeneration.
+
+## Email / Resend Diagnostics
+
+Endpoints (admin token required):
+
+1. `GET /api/email/health` – configuration & connectivity status
+2. `POST /api/email/test` – sends a simple test message
+
+Environment variables:
+- `RESEND_API_KEY` – required for real sends
+- `RESEND_FROM` – optional, e.g. `"Nature's Way Soil <no-reply@natureswaysoil.com>"`
+- `ADMIN_API_TOKEN` – used to authorize these endpoints
+
+Health response example:
+```json
+{
+	"ok": true,
+	"provider": "resend",
+	"configured": true,
+	"reachable": true,
+	"from": "Nature's Way Soil <no-reply@natureswaysoil.com>",
+	"fromDomain": "natureswaysoil.com",
+	"fromDomainStatus": "verified",
+	"domains": [ { "id": "dom_123", "name": "natureswaysoil.com", "status": "verified" } ]
+}
+```
+
+Test send (replace values accordingly):
+```bash
+curl -X GET \
+	-H "X-ADMIN-TOKEN: $ADMIN_API_TOKEN" \
+	https://your-domain/api/email/health
+
+curl -X POST \
+	-H "Content-Type: application/json" \
+	-H "X-ADMIN-TOKEN: $ADMIN_API_TOKEN" \
+	-d '{"to":"you@example.com"}' \
+	https://your-domain/api/email/test
+```
+
+If `configured` is false the application will still function; emails fall back to console logs for development. Avoid exposing these endpoints without auth; they can otherwise be abused to probe provider status or send unauthorized messages. For higher security consider adding rate limiting (e.g. via middleware or an edge function) and logging admin usage.
+
+### Security Considerations
+
+- Always require `X-ADMIN-TOKEN` for operational endpoints (`/api/email/*`, `/api/revalidate*`, promo/admin routes).
+- Do not leak provider secrets or raw error bodies—surface only coarse error identifiers.
+- Consider adding a simple in-memory or KV-based rate limiter (sliding window) for test/health endpoints.
+- Log administrative actions (who triggered test send, when) for observability; integrate with your existing analytics/events pipeline.
+- Rotate `RESEND_API_KEY` and `ADMIN_API_TOKEN` periodically; store them only in secure environment variable stores (Vercel / Docker secrets / HashiCorp Vault).
+
 
 ## Legal Pages
 - [Privacy Policy](pages/privacy-policy.md)
@@ -147,7 +224,8 @@ npx supabase gen types typescript --project-id <PROJECT_REF> --schema public > t
 - Public promo code validation endpoint (currently only DB function)
 - Analytics ingestion endpoint batching & retention pruning
 - Rate limiting on public search endpoint
-- Admin UI for inventory & variation management
+- Automated low inventory email sender / cron
+- Soft-delete support & audit logging
 
 ---
 This README reflects the bigint-first migration strategy. Adjust or prune legacy files before first production migration.
