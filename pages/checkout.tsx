@@ -216,7 +216,7 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
                 </div>
               )}
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
-                <span>Sales Tax</span>
+                <span>Sales Tax {typeof (breakdown as any).taxRatePercent === 'number' && (breakdown as any).taxRatePercent > 0 ? <span style={{ color: '#555', fontSize: 12 }}>({(breakdown as any).taxRatePercent.toFixed(2)}%)</span> : null}</span>
                 <strong>${(breakdown.tax / 100).toFixed(2)}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>

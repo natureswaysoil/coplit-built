@@ -66,9 +66,18 @@ export function getCountyRate(county?: string): number {
   // Support either county add-on (e.g., 0.0225) or total combined (e.g., 0.07)
   // If it looks like a combined total, convert to add-on by subtracting base.
   const baseNc = Number(process.env.NEXT_PUBLIC_NC_TAX_RATE ?? 0.0475) || 0.0475
-  if (v > 0.04 && v < 0.12) {
+  // Heuristic: If value >= base and <= 0.12 treat as combined unless (v - base) is ~0 or negative.
+  // But if value < 0.04 we treat as pure add-on.
+  if (v >= baseNc && v < 0.12) {
     const addon = v - baseNc
-    return addon > 0 ? addon : 0
+    // Guard: if addon is unreasonably high (> 0.05) or negative, assume v was already an add-on.
+    if (addon <= 0 || addon > 0.05) return v // treat provided as add-on
+    return addon
   }
   return v
+}
+
+export function combinedRate(county?: string): number {
+  const baseNc = Number(process.env.NEXT_PUBLIC_NC_TAX_RATE ?? 0.0475) || 0.0475
+  return baseNc + getCountyRate(county)
 }
