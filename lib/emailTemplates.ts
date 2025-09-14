@@ -7,7 +7,22 @@ const baseStyles = `
   .muted{color:#64748b;font-size:12px}
   table{width:100%;border-collapse:collapse}
   th,td{text-align:left;padding:8px;border-bottom:1px solid #e2e8f0}
+  .logo{max-width:180px;height:auto;display:block;margin-bottom:12px}
 `;
+
+export function renderBrandedShell(opts: { title?: string; bodyHtml: string; footerHtml?: string }) {
+  const host = process.env.PUBLIC_SITE_URL || 'https://natureswaysoil.com'
+  const logoUrl = host + '/screenshots/logo-with-tagline.png'
+  const year = new Date().getFullYear()
+  const title = escapeHtml(opts.title || "Nature's Way Soil")
+  const footer = opts.footerHtml || `<p class="muted">© ${year} Nature's Way Soil</p>`
+  return `<!doctype html><html><head><meta charSet='utf-8'/><style>${baseStyles}</style></head><body><div class="container">
+    <img src="${logoUrl}" alt="Nature's Way Soil" class="logo"/>
+    <h1 class="brand" style="margin:0 0 4px">${title}</h1>
+    <div class="card">${opts.bodyHtml}</div>
+    ${footer}
+  </div></body></html>`
+}
 
 export function orderConfirmationHTML(params: {
   orderId: string;
@@ -35,6 +50,7 @@ export function orderConfirmationHTML(params: {
   <html><head><meta charSet="utf-8"/><style>${baseStyles}</style></head>
   <body>
     <div class="container">
+      <img src="${process.env.PUBLIC_SITE_URL || 'https://natureswaysoil.com'}/screenshots/logo-with-tagline.png" alt="Logo" class="logo"/>
       <h1 class="brand">Nature's Way Soil</h1>
       <div class="card">
         <h2>Thanks for your order, ${escapeHtml(name)}!</h2>
@@ -107,6 +123,7 @@ export function simpleOrderConfirmationHTML(params: {
   <html><head><meta charSet="utf-8"/><style>${baseStyles}</style></head>
   <body>
     <div class="container">
+      <img src="${process.env.PUBLIC_SITE_URL || 'https://natureswaysoil.com'}/screenshots/logo-with-tagline.png" alt="Logo" class="logo"/>
       <h1 class="brand">Nature's Way Soil</h1>
       <div class="card">
         <h2>Thanks for your order, ${escapeHtml(name)}!</h2>

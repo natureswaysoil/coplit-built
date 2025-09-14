@@ -166,12 +166,13 @@ npx supabase gen types typescript --project-id <PROJECT_REF> --schema public > t
 
 Endpoints (admin token required):
 
-1. `GET /api/email/health` – configuration & connectivity status
-2. `POST /api/email/test` – sends a simple test message
+1. `GET /api/email/health` – configuration & connectivity status (domain verification insight)
+2. `POST /api/email/test` – sends a branded test message (now via unified Resend SDK wrapper)
 
 Environment variables:
-- `RESEND_API_KEY` – required for real sends
+- `RESEND_API_KEY` – required for real sends (if absent, emails log in mock mode)
 - `RESEND_FROM` – optional, e.g. `"Nature's Way Soil <no-reply@natureswaysoil.com>"`
+- `PUBLIC_SITE_URL` – used to build absolute logo URL in templates
 - `ADMIN_API_TOKEN` – used to authorize these endpoints
 
 Health response example:
@@ -202,6 +203,44 @@ curl -X POST \
 ```
 
 If `configured` is false the application will still function; emails fall back to console logs for development. Avoid exposing these endpoints without auth; they can otherwise be abused to probe provider status or send unauthorized messages. For higher security consider adding rate limiting (e.g. via middleware or an edge function) and logging admin usage.
+
+### Resend SDK Wrapper & Branded Templates
+
+Centralized helpers live in `lib/resendClient.ts`:
+
+```ts
+import { sendBasicEmail } from '@/lib/resendClient'
+import { renderBrandedShell } from '@/lib/emailTemplates'
+
+// Build inner body content
+const bodyHtml = `<p>Hello world.</p>`
+// Wrap with consistent branding (logo, typography, footer)
+const html = renderBrandedShell({ title: 'Greetings', bodyHtml })
+
+await sendBasicEmail({
+	to: 'user@example.com',
+	subject: 'Sample',
+	html,
+})
+```
+
+Behavior:
+- If `RESEND_API_KEY` missing, `sendBasicEmail` logs `{ to, subject, bytes }` and returns `{ id: 'mock' }` without throwing.
+- In live mode, errors from the Resend API throw an exception with a concise message.
+
+Logo & Branding:
+- The branded shell references `${PUBLIC_SITE_URL}/screenshots/logo-with-tagline.png`.
+- Override the image or styles by editing `renderBrandedShell` in `lib/emailTemplates.ts`.
+- All functional emails (alerts, test, order confirmations) should migrate to the shell for consistent look & accessibility.
+
+Extending / Future:
+- Add richer components (buttons, dividers) inside the shell; keep base CSS minimal.
+- Implement domain verification management via `listDomains()` + `createDomain()` helpers already exposed.
+- Add retry / circuit breaker if provider outages surface (planned future phase).
+
+Migration Notes:
+- Previous direct `fetch` calls to `https://api.resend.com/emails` should be replaced with `sendBasicEmail` for uniform logging and error handling.
+- Inventory alert emails already migrated (`lib/alertEmails.ts`).
 
 ### Security Considerations
 

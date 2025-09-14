@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import crypto from 'crypto'
+import { sendBasicEmail, isEmailConfigured } from './resendClient'
+import { renderBrandedShell } from './emailTemplates'
 
 // Very lightweight email sender placeholder. In production integrate a provider (Resend, Postmark, SES, etc.)
 // This just logs to console unless MAIL_PROVIDER_WEBHOOK or RESEND_API_KEY is present (extend as needed).
@@ -15,33 +17,23 @@ export function buildLowInventoryEmail(sub: { email: string; threshold: number; 
   const host = process.env.PUBLIC_SITE_URL || 'https://natureswaysoil.com'
   const unsubscribe = sub.token ? `${host}/api/alerts/unsubscribe?token=${encodeURIComponent(sub.token)}` : ''
   const subject = `Low inventory: ${ctx.product_title}`
-  const html = `<!doctype html><html><body style="font-family:Arial,sans-serif;">
-    <h2 style="color:#174F2E;margin:0 0 12px;">Inventory Alert</h2>
+  const bodyHtml = `
+    <h2 style="margin:0 0 12px;color:#174F2E">Inventory Alert</h2>
     <p>The product <b>${escape(ctx.product_title)}</b> is at <b>${ctx.current_inventory ?? 'unknown'}</b> units (threshold ${sub.threshold}).</p>
     <p style="font-size:12px;color:#555">Subscription threshold: ${sub.threshold}</p>
-    <p><a href="https://natureswaysoil.com/products/${ctx.product_id}" style="background:#174F2E;color:#fff;padding:8px 12px;border-radius:6px;text-decoration:none;font-size:14px;display:inline-block">View Product</a></p>
-    <p style="font-size:12px;color:#64748b;">You receive this email because you subscribed to low inventory alerts.${unsubscribe ? ` <a href='${unsubscribe}' style='color:#174F2E'>Unsubscribe</a>` : ''}</p>
-  </body></html>`
+    <p><a href="${host}/products/${ctx.product_id}" class="btn" style="background:#174F2E;color:#fff;padding:8px 12px;border-radius:6px;text-decoration:none;font-size:14px;display:inline-block">View Product</a></p>
+    <p class="muted" style="font-size:12px;color:#64748b">You receive this email because you subscribed to low inventory alerts.${unsubscribe ? ` <a href='${unsubscribe}' style='color:#174F2E'>Unsubscribe</a>` : ''}</p>`
+  const html = renderBrandedShell({ title: "Inventory Alert", bodyHtml })
   return { subject, html }
 }
 
 export async function sendEmail(to: string, subject: string, html: string) {
-  const apiKey = process.env.RESEND_API_KEY
-  if (!apiKey) {
-    console.log('[email:mock] to=%s subject=%s bytes=%d', to, subject, html.length)
-    return { id: 'mock-id' }
+  try {
+    return await sendBasicEmail({ to, subject, html })
+  } catch (e: any) {
+    console.error('sendEmail error', e?.message || e)
+    throw e
   }
-  const resp = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify({ from: process.env.RESEND_FROM || 'alerts@natureswaysoil.com', to: [to], subject, html })
-  })
-  if (!resp.ok) {
-    const text = await resp.text()
-    console.error('Resend error', resp.status, text)
-    throw new Error('Email send failed')
-  }
-  return resp.json()
 }
 
 function escape(s: string) {
