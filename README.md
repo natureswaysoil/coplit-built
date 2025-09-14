@@ -241,6 +241,21 @@ Extending / Future:
 Migration Notes:
 - Previous direct `fetch` calls to `https://api.resend.com/emails` should be replaced with `sendBasicEmail` for uniform logging and error handling.
 - Inventory alert emails already migrated (`lib/alertEmails.ts`).
+ - Order confirmation (full + simple) and contact templates now all use `renderBrandedShell` (no duplicate inline style blocks).
+
+Retry Logic:
+- `sendBasicEmail` performs up to 3 attempts on transient failures (network resets, timeouts, 429, 5xx).
+- Backoff: 150ms, 300ms, then ~600ms (plus small jitter) capped at 2s.
+- Non-transient errors (4xx other than 429) fail fast without further retries.
+- Logs:
+	- `[email:retry] attempt X failed ...` before scheduling next attempt.
+	- `[email:retry] success on attempt X` upon recovery.
+	- `[email:error]` when all attempts exhausted.
+
+Operational Guidance:
+- Monitor logs for elevated retry frequency to detect provider instability.
+- Consider promoting metrics (attempt counts, error types) to an analytics table if reliability becomes critical.
+- Future enhancement: circuit breaker (temporarily short‑circuit sends after sustained failures) + fallback provider abstraction.
 
 ### Security Considerations
 
