@@ -33,7 +33,7 @@ export default function BlogIndex() {
 
         <section className="mt-10">
           <div className="rounded-xl border border-green-100 bg-white p-6 text-center text-gray-600">
-            <div className="mb-2 font-semibold text-green-900">Coming soon</div>
+            <div className="mb-2 font-semibold text-green-900">available now</div>
             <p>We\'re preparing articles on application rates, season-by-season plans, and troubleshooting common lawn & garden issues.</p>
           </div>
         </section>

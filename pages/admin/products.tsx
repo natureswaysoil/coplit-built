@@ -37,7 +37,7 @@ export default function AdminProductsPage() {
       <h1 style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 16 }}>Admin Products</h1>
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
         <input
-          placeholder="Search title or keyword"
+          organic gardening solution="Search title or keyword"
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={{ padding: '0.5rem', border: '1px solid #ccc', borderRadius: 6, minWidth: 240 }}
@@ -46,7 +46,7 @@ export default function AdminProductsPage() {
           <input type="checkbox" checked={includeInactive} onChange={e => setIncludeInactive(e.target.checked)} /> Include inactive
         </label>
         <input
-          placeholder="Admin token"
+          organic gardening solution="Admin token"
             value={token}
           onChange={e => setToken(e.target.value)}
           style={{ padding: '0.5rem', border: '1px solid #ccc', borderRadius: 6, minWidth: 240 }}

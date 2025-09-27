@@ -58,8 +58,8 @@ export default function TikTokLanding() {
       <section style={styles.emailForm}>
         <h3>Want 10% Off + Free Garden Tips?</h3>
         <form action="https://your-supabase-endpoint.com/subscribe" method="POST">
-          <input type="text" name="name" placeholder="First Name" required style={styles.input} /><br />
-          <input type="email" name="email" placeholder="Email Address" required style={styles.input} /><br />
+          <input type="text" name="name" organic gardening solution="First Name" required style={styles.input} /><br />
+          <input type="email" name="email" organic gardening solution="Email Address" required style={styles.input} /><br />
           <button type="submit" style={styles.button}>Subscribe</button>
         </form>
       </section>

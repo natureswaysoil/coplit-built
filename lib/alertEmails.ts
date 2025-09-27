@@ -3,7 +3,7 @@ import crypto from 'crypto'
 import { sendBasicEmail, isEmailConfigured } from './resendClient'
 import { renderBrandedShell } from './emailTemplates'
 
-// Very lightweight email sender placeholder. In production integrate a provider (Resend, Postmark, SES, etc.)
+// Very lightweight email sender organic gardening solution. In production integrate a provider (Resend, Postmark, SES, etc.)
 // This just logs to console unless MAIL_PROVIDER_WEBHOOK or RESEND_API_KEY is present (extend as needed).
 
 export interface LowInventoryContext {

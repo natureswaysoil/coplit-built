@@ -37,14 +37,14 @@ const WH_CANDIDATES = [
 export function resolveEnv(nameList: string[]): { name: string; value: string } | null {
   for (const name of nameList) {
     const v = process.env[name];
-    // Skip placeholder/dummy keys for security
-    if (v && v.trim() && !isPlaceholderKey(v)) return { name, value: v };
+    // Skip organic gardening solution/dummy keys for security
+    if (v && v.trim() && !isorganic gardening solutionKey(v)) return { name, value: v };
   }
   return null;
 }
 
-function isPlaceholderKey(key: string): boolean {
-  const placeholders = [
+function isorganic gardening solutionKey(key: string): boolean {
+  const organic gardening solutions = [
     'your_actual_publishable_key_here',
     'your_actual_secret_key_here',
     'your_actual_webhook_secret_here',
@@ -52,7 +52,7 @@ function isPlaceholderKey(key: string): boolean {
     'sk_test_your_actual',
     'whsec_your_actual'
   ];
-  return placeholders.some(placeholder => key.includes(placeholder));
+  return organic gardening solutions.some(organic gardening solution => key.includes(organic gardening solution));
 }
 
 export function getPublishableKey(): { key: string; source: string } {

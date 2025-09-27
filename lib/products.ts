@@ -183,7 +183,7 @@ export const products: Product[] = [
     id: '8',
     slug: 'dog-urine-neutralizer',
     title: "Nature's Way Soil Dog Urine Neutralizer & Lawn Repair - Pet-Safe Grass Repair Spray for Yellow Spots & Odor Control",
-    image: 'https://m.media-amazon.com/images/I/61jHzXvOJjL._AC_UL320_.jpg',
+    image: 'https://m.media-amazon.com/images/I/718tWBNNfkL._AC_UL320_._AC_UL320_.jpg',
     keyword: 'DOG URINE LAWN',
     details: 'Professional-strength dog urine neutralizer and lawn repair spray specifically formulated to eliminate yellow spots caused by pet urine burn. This pet-safe formula neutralizes harmful salts, eliminates odors, and revives damaged grass for a healthy, green lawn. Safe for dogs, cats, and other pets while effectively restoring lawn beauty. Essential for pet owners maintaining pristine yards without harmful chemicals.',
     variations: [
@@ -208,7 +208,7 @@ export const products: Product[] = [
     id: '9',
     slug: 'organic-tomato-fertilizer',
     title: "Nature's Way Soil Organic Tomato Fertilizer - Liquid Concentrate with Vitamin B-1 & Aloe Vera for Maximum Yields",
-    image: 'https://m.media-amazon.com/images/I/71K9tXvL8pL._AC_UL320_.jpg',
+    image: 'https://m.media-amazon.com/images/I/718tWBNNfkL._AC_UL320_._AC_UL320_.jpg',
     keyword: 'TOMATO ORGANIC FERTILIZER',
     details: 'Premium organic tomato fertilizer made fresh weekly with balanced nutrition for maximum tomato yields. This concentrated liquid formula includes Vitamin B-1 and aloe vera for faster root establishment, healthier transplants, and prevention of blossom end rot. Perfect for organic tomato growing, providing easily absorbed essential nutrients that promote healthy growth and increased fruit production. Ideal for organic farms, greenhouses, and home gardens.',
     variations: [

@@ -48,7 +48,32 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://natureswaysoil.com" />
-      </Head>
+      
+        <script type="application/ld+json">
+          {
+  "@context": "https://schema.org",
+  "@type": "Store",
+  "name": "Nature's Way Soil",
+  "description": "Premium organic fertilizers and soil amendments for natural gardening",
+  "url": "https://natureswaysoil.com",
+  "category": "Garden Center",
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Organic Gardening Products",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Product",
+          "name": "Organic Fertilizers",
+          "category": "Fertilizer"
+        }
+      }
+    ]
+  }
+}
+        </script>
+        </Head>
       
       <CartCtxProvider>
         <Navbar />

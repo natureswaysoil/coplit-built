@@ -36,7 +36,7 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }: { params: { category: string } }) {
-  // Placeholder: real implementation would query Supabase by keyword or category mapping
+  // organic gardening solution: real implementation would query Supabase by keyword or category mapping
   let products: CatProduct[] = []
   try {
     // Intentionally skip external fetch in build to avoid failures
