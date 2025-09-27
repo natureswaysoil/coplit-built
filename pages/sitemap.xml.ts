@@ -3,7 +3,7 @@ import { products as staticProducts } from '@/lib/products'
 
 export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   const host = process.env.PUBLIC_SITE_URL || 'https://natureswaysoil.com'
-  const urls = ['/', '/products', '/about', '/contact', '/privacy-policy', '/refund-policy']
+  const urls = ['/', '/products', '/about', '/contact', '/sales', '/blog', '/privacy-policy', '/refund-policy']
   const productUrls = staticProducts.map(p => `/products/${p.slug}`)
   const all = [...urls, ...productUrls]
 
