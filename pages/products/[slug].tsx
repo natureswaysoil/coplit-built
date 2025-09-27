@@ -15,6 +15,9 @@ export default function ProductPage(props: ProductPageProps) {
   const { addItem } = useCart()
   const [sku, setSku] = useState<string>(() => product.variations?.[0]?.sku || '')
   const variant = product.variations?.find(v => v.sku === sku) || product.variations?.[0]
+  console.log('Product data:', product)
+console.log('Usage instructions:', (product as any).usageInstructions)
+console.log('Has usage instructions?', !!(product as any).usageInstructions)
 
   return (
     <>
