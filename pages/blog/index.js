@@ -1,9 +1,13 @@
 import Head from 'next/head'
 import Link from 'next/link'
-import { getPublishedPosts } from '../../lib/contentful'
+import { getAllPosts } from '../../lib/contentful'
 import { format } from 'date-fns'
 
 export default function Blog({ posts }) {
+  // Separate featured posts
+  const featuredPosts = posts.filter(post => post.featuredPost)
+  const regularPosts = posts.filter(post => !post.featuredPost)
+
   return (
     <>
       <Head>
@@ -12,6 +16,7 @@ export default function Blog({ posts }) {
           name="description" 
           content="Discover practical gardening tips, natural solutions, and inspiring stories — all dedicated to bringing life back to the soil and helping you grow the healthy way." 
         />
+        <meta name="keywords" content="organic gardening, natural soil, compost, biochar, sustainable farming" />
       </Head>
 
       <div className="blog-container">
@@ -20,32 +25,75 @@ export default function Blog({ posts }) {
           <p>Discover practical gardening tips, natural solutions, and inspiring stories — all dedicated to bringing life back to the soil and helping you grow the healthy way.</p>
         </header>
 
-        <div className="posts-grid">
-          {posts.map((post) => (
-            <article key={post.slug} className="post-card">
-              {post.featuredImage && (
-                <img 
-                  src={`https:${post.featuredImage}`} 
-                  alt={post.title}
-                  className="post-image"
-                />
-              )}
-              <div className="post-content">
-                <span className="post-category">{post.category}</span>
-                <h2>
-                  <Link href={`/blog/${post.slug}`}>
-                    {post.title}
-                  </Link>
-                </h2>
-                <p className="post-excerpt">{post.excerpt}</p>
-                <div className="post-meta">
-                  <span>By {post.author}</span>
-                  <span>{format(new Date(post.publishDate), 'MMM dd, yyyy')}</span>
+        {/* Featured Posts Section */}
+        {featuredPosts.length > 0 && (
+          <section className="featured-section">
+            <h2>Featured Posts</h2>
+            <div className="featured-grid">
+              {featuredPosts.map((post) => (
+                <article key={post.slug} className="featured-card">
+                  {post.featuredImage && (
+                    <img 
+                      src={`https:${post.featuredImage}`} 
+                      alt={post.title}
+                      className="featured-image"
+                    />
+                  )}
+                  <div className="featured-content">
+                    <span className="post-category">{post.category}</span>
+                    <h3>
+                      <Link href={`/blog/${post.slug}`}>
+                        {post.title}
+                      </Link>
+                    </h3>
+                    <p className="post-excerpt">{post.excerpt}</p>
+                    <div className="post-meta">
+                      <span>By {post.author}</span>
+                      <span>{format(new Date(post.publishDate), 'MMM dd, yyyy')}</span>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Regular Posts Section */}
+        <section className="posts-section">
+          <h2>Latest Posts</h2>
+          <div className="posts-grid">
+            {regularPosts.map((post) => (
+              <article key={post.slug} className="post-card">
+                {post.featuredImage && (
+                  <img 
+                    src={`https:${post.featuredImage}`} 
+                    alt={post.title}
+                    className="post-image"
+                  />
+                )}
+                <div className="post-content">
+                  <span className="post-category">{post.category}</span>
+                  <h3>
+                    <Link href={`/blog/${post.slug}`}>
+                      {post.title}
+                    </Link>
+                  </h3>
+                  <p className="post-excerpt">{post.excerpt}</p>
+                  <div className="post-meta">
+                    <span>By {post.author}</span>
+                    <span>{format(new Date(post.publishDate), 'MMM dd, yyyy')}</span>
+                  </div>
                 </div>
-              </div>
-            </article>
-          ))}
-        </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {posts.length === 0 && (
+          <div className="no-posts">
+            <p>No blog posts found. Check back soon!</p>
+          </div>
+        )}
       </div>
 
       <style jsx>{`
@@ -68,6 +116,44 @@ export default function Blog({ posts }) {
           font-size: 1.1rem;
           max-width: 600px;
           margin: 0 auto;
+          line-height: 1.6;
+        }
+        .featured-section {
+          margin-bottom: 3rem;
+        }
+        .featured-section h2 {
+          color: #2d5016;
+          font-size: 1.8rem;
+          margin-bottom: 1.5rem;
+        }
+        .featured-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+          gap: 2rem;
+          margin-bottom: 3rem;
+        }
+        .featured-card {
+          border: 2px solid #4a7c59;
+          border-radius: 12px;
+          overflow: hidden;
+          transition: transform 0.3s ease;
+        }
+        .featured-card:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .featured-image {
+          width: 100%;
+          height: 250px;
+          object-fit: cover;
+        }
+        .featured-content {
+          padding: 2rem;
+        }
+        .posts-section h2 {
+          color: #2d5016;
+          font-size: 1.8rem;
+          margin-bottom: 1.5rem;
         }
         .posts-grid {
           display: grid;
@@ -78,7 +164,7 @@ export default function Blog({ posts }) {
           border: 1px solid #e0e0e0;
           border-radius: 8px;
           overflow: hidden;
-          transition: transform 0.2s;
+          transition: transform 0.2s ease;
         }
         .post-card:hover {
           transform: translateY(-4px);
@@ -99,16 +185,17 @@ export default function Blog({ posts }) {
           border-radius: 4px;
           font-size: 0.8rem;
           text-transform: uppercase;
+          font-weight: 600;
         }
-        .post-content h2 {
+        .post-content h3, .featured-content h3 {
           margin: 1rem 0 0.5rem 0;
           font-size: 1.3rem;
         }
-        .post-content h2 a {
+        .post-content h3 a, .featured-content h3 a {
           color: #2d5016;
           text-decoration: none;
         }
-        .post-content h2 a:hover {
+        .post-content h3 a:hover, .featured-content h3 a:hover {
           color: #4a7c59;
         }
         .post-excerpt {
@@ -122,13 +209,29 @@ export default function Blog({ posts }) {
           font-size: 0.9rem;
           color: #888;
         }
+        .no-posts {
+          text-align: center;
+          padding: 3rem;
+          color: #666;
+        }
+        @media (max-width: 768px) {
+          .blog-container {
+            padding: 1rem;
+          }
+          .blog-header h1 {
+            font-size: 2rem;
+          }
+          .featured-grid, .posts-grid {
+            grid-template-columns: 1fr;
+          }
+        }
       `}</style>
     </>
   )
 }
 
 export async function getStaticProps() {
-  const posts = await getPublishedPosts()
+  const posts = await getAllPosts()
   
   return {
     props: {
