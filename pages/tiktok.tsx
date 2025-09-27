@@ -22,7 +22,7 @@ async function getProducts(): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
   .select('id, title, price, image_url, slug')
-    .eq('active', true);
+    .eq('is_active', true);
 
   if (error) {
     console.error('Error fetching products:', error);
@@ -71,7 +71,7 @@ export default async function TikTokLanding() {
               </div>
             )}
             <a
-              href={`https://natureswaysoil.com/product/${product.slug}`}
+              href={`/products/${product.slug}`}
               style={styles.shopLink}
             >
               Shop Now →

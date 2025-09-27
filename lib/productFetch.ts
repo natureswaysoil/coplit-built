@@ -2,6 +2,13 @@ import { supabase } from '@/lib/supabaseClient'
 import { normalizeFromRow, normalizeFromStatic, NormalizedProduct } from '@/lib/productNormalizer'
 import { products as staticProducts } from '@/lib/products'
 
+function slugify(input: string): string {
+  return (input || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '')
+}
+
 export async function fetchProductWithVariationsBySlug(slugOrId: string): Promise<NormalizedProduct | null> {
   // Try DB: look up by slug first then fallback to id matching
   try {
@@ -12,6 +19,31 @@ export async function fetchProductWithVariationsBySlug(slugOrId: string): Promis
       .limit(1)
     if (!error && rows && rows.length) {
       const base = normalizeFromRow(rows[0])
+      // Enrich with static metadata (usageInstructions) using multiple matching strategies
+      try {
+        const candidates = new Set<string>()
+        if (base.slug) candidates.add(base.slug)
+        if (rows[0]?.slug) candidates.add(String(rows[0].slug))
+        if (rows[0]?.title) candidates.add(slugify(String(rows[0].title)))
+        candidates.add(String(slugOrId))
+
+        let staticMatch = undefined as any
+        for (const s of Array.from(candidates)) {
+          staticMatch = staticProducts.find(p => (p as any).slug === s)
+          if (staticMatch) break
+        }
+        // Fallback: try keyword match
+        if (!staticMatch && rows[0]?.keyword) {
+          staticMatch = staticProducts.find(p => (p as any).keyword === rows[0].keyword)
+        }
+        // Fallback: loose title match
+        if (!staticMatch && rows[0]?.title) {
+          staticMatch = staticProducts.find(p => slugify((p as any).title) === slugify(String(rows[0].title)))
+        }
+        if (staticMatch && (staticMatch as any).usageInstructions && !(base as any).usageInstructions) {
+          ;(base as any).usageInstructions = (staticMatch as any).usageInstructions
+        }
+      } catch {}
       // fetch variations
       try {
         const { data: vars, error: vErr } = await (supabase as any)

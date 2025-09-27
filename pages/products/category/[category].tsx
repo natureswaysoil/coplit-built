@@ -10,17 +10,19 @@ export default function CategoryPage({ products }: CategoryPageProps) {
   const { category } = router.query;
 
   return (
-    <main style={{ padding: 20 }}>
-      <h1>Category: {category}</h1>
-            {(products || []).map(prod => (
-              <div key={prod.slug || String(Math.random())}>
-                {prod.slug ? (
-                  <Link href={`/products/${prod.slug}`}>
-                    <h3>{prod.title || 'Untitled'}</h3>
-                  </Link>
-                ) : <h3>{prod.title || 'Untitled'}</h3>}
-              </div>
-            ))}
+    <main className="max-w-5xl mx-auto px-6 py-8">
+      <h1 className="text-2xl font-bold text-brand-700 mb-6">Category: {category}</h1>
+      <div className="space-y-3">
+        {(products || []).map(prod => (
+          <div key={prod.slug || String(Math.random())} className="rounded-lg border p-4 bg-white">
+            {prod.slug ? (
+              <Link href={`/products/${prod.slug}`} className="text-brand-700 hover:underline">
+                <h3 className="text-lg font-semibold">{prod.title || 'Untitled'}</h3>
+              </Link>
+            ) : <h3 className="text-lg font-semibold">{prod.title || 'Untitled'}</h3>}
+          </div>
+        ))}
+      </div>
     </main>
   );
 }
