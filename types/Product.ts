@@ -17,3 +17,9 @@ export interface Product {
     tips?: string[]
   }
 }
+
+export interface ProductVariation {
+  size: string
+  price: number
+  sku: string
+}

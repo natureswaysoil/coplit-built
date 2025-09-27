@@ -1,7 +1,3 @@
-import { Product } from '@/types/Product'
-import { ProductsRow } from '@/types/supabase'
-import { products as staticProducts } from '@/lib/products'
-
 export interface NormalizedProduct {
   id: string
   slug: string
@@ -15,76 +11,89 @@ export interface NormalizedProduct {
   inventory?: number | null
   available: boolean
   source: 'db' | 'static'
+  // 🎯 ADD THIS:
+  usageInstructions?: {
+    applicationRate: string
+    mixing: string
+    timing: string
+    frequency: string
+    method: string
+    coverage?: string
+    safety?: string
+    tips?: string[]
+  }
 }
 
-function coerceId(id: any): string {
-  return typeof id === 'string' ? id : String(id)
+import { Product } from '@/types/Product'
+
+function coerceId(id: string | number): string {
+  return typeof id === 'number' ? String(id) : id
 }
 
-export function normalizeFromRow(row: ProductsRow): NormalizedProduct {
-  const inventory = (row as any).inventory ?? null
-  const isActive = (row as any).is_active ?? true
+// Normalize a DB row into our app shape
+export function normalizeFromRow(row: any): NormalizedProduct {
   const obj: any = {
     id: coerceId(row.id),
     slug: row.slug || coerceId(row.id),
-    title: row.title,
-    description: row.details || row.short_description || row.title,
-    keyword: row.keyword || undefined,
-    image: row.image_url || '/screenshots/logo-with-tagline.png',
-    // price only if value present
-    ...(row.price !== undefined && row.price !== null ? { price: row.price } : {}),
-    inventory,
-    available: isActive && (inventory === null || inventory > 0),
-    source: 'db'
+    title: row.title || row.name || 'Untitled Product',
+    description: row.description || row.details || row.short_description || row.title || 'Product',
+    keyword: row.keyword || row.keywords || undefined,
+    image: row.image_url || row.image || '/screenshots/logo-with-tagline.png',
+    inventory: typeof row.inventory === 'number' ? row.inventory : null,
+    available: row.is_active !== false,
+    source: 'db' as const,
   }
+  if (row.price != null) obj.price = Number(row.price)
   if (row.short_description) obj.shortDescription = row.short_description
-  // variations placeholder omitted unless future support added
   return obj as NormalizedProduct
 }
 
+// Normalize a static product into our app shape (includes usageInstructions)
 export function normalizeFromStatic(p: Product): NormalizedProduct {
-  const basePrice = p.price !== undefined ? p.price : p.variations?.[0]?.price
+  const basePrice = (p as any).price ?? p.variations?.[0]?.price
   const obj: any = {
     id: coerceId(p.id),
     slug: p.slug || coerceId(p.id),
     title: p.title,
-    description: p.details || p.short_description || p.title,
-    keyword: p.keyword,
-    image: p.image_url || (p as any).image || '/screenshots/logo-with-tagline.png',
+    description: (p as any).description || p.details || (p as any).short_description || p.title,
+    keyword: (p as any).keyword,
+    image: (p as any).image_url || (p as any).image || '/screenshots/logo-with-tagline.png',
     ...(basePrice !== undefined ? { price: basePrice } : {}),
     ...(p.variations?.length ? { variations: p.variations } : {}),
+    // 🎯 ADD USAGE INSTRUCTIONS:
+    ...(p.usageInstructions ? { usageInstructions: p.usageInstructions } : {}),
     inventory: null,
     available: true,
-    source: 'static'
+    source: 'static' as const,
   }
   if ((p as any).short_description) obj.shortDescription = (p as any).short_description
   return obj as NormalizedProduct
 }
 
-export function normalizeProducts(rows: ProductsRow[] | null, fallbackStatic = true): NormalizedProduct[] {
-  const list: NormalizedProduct[] = []
-  if (rows && rows.length) {
-    for (const r of rows) list.push(normalizeFromRow(r))
-  } else if (fallbackStatic) {
-    for (const s of staticProducts) list.push(normalizeFromStatic(s))
+export function normalizeProducts(dbRows: any[] | null, includeStaticFallback = true): NormalizedProduct[] {
+  try {
+    if (dbRows && dbRows.length) {
+      const mapped = dbRows.map(normalizeFromRow)
+      return mapped
+    }
+  } catch (_) { /* ignore and fallback */ }
+
+  if (!includeStaticFallback) return []
+  try {
+    const { products } = require('./products') as { products: Product[] }
+    return products.map(normalizeFromStatic)
+  } catch (e) {
+    console.warn('Static products fallback failed:', (e as any)?.message || e)
+    return []
   }
-  return list
 }
 
-export function findProductBySlug(slug: string, rows: ProductsRow[] | null): NormalizedProduct | null {
-  const normalized = normalizeProducts(rows, true)
-  return normalized.find(p => p.slug === slug) || null
-}
-
-// Dev-time guard logging
 export function logProductAnomalies(list: NormalizedProduct[]) {
-  if (process.env.NODE_ENV === 'production') return
-  for (const p of list) {
-    if (!p.image || p.image.includes('logo-with-tagline')) {
-      console.warn('[productNormalizer] Missing image for product', p.id, p.title, 'source=', p.source)
-    }
-    if (p.price === undefined && !p.variations?.length) {
-      console.warn('[productNormalizer] Missing price and variations for product', p.id, p.title, 'source=', p.source)
-    }
-  }
+  list.forEach(p => {
+    const issues: string[] = []
+    if (!p.slug) issues.push('missing slug')
+    if (!p.image) issues.push('missing image')
+    if (p.price == null && !(p.variations && p.variations.length)) issues.push('no price or variations')
+    if (issues.length) console.warn(`[product:anomaly] ${p.id} ${p.title}: ${issues.join(', ')}`)
+  })
 }
