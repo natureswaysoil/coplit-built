@@ -24,3 +24,23 @@ export type ResolvedProduct = Product & { displayImage: string };
 export function resolveDisplayImage(p: Product): string {
   return p.image_url || p.image || '/screenshots/logo-with-tagline.png';
 }
+export interface Product {
+  id: string
+  slug: string
+  title: string
+  image: string
+  keyword: string
+  details: string
+  variations: ProductVariation[]
+  // 🎯 ADD THIS NEW FIELD:
+  usageInstructions?: {
+    applicationRate: string
+    mixing: string
+    timing: string
+    frequency: string
+    method: string
+    coverage?: string
+    safety?: string
+    tips?: string[]
+  }
+}
