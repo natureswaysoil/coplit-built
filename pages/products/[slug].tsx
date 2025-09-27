@@ -53,6 +53,177 @@ export default function ProductPage(props: ProductPageProps) {
             >Add to Cart</button>
           </div>
         </div>
+
+        {/* 🎯 NEW USAGE INSTRUCTIONS SECTION */}
+        {(product as any).usageInstructions && (
+          <div style={{ 
+            marginTop: '3rem', 
+            padding: '2rem', 
+            backgroundColor: '#f8fdf9', 
+            borderRadius: '12px',
+            border: '1px solid #e8f5e8'
+          }}>
+            <h2 style={{ 
+              color: '#174F2E', 
+              fontSize: '1.5rem', 
+              fontWeight: 700, 
+              marginBottom: '1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              📋 How to Use This Product
+            </h2>
+            
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
+              gap: '1.5rem',
+              marginBottom: '1.5rem'
+            }}>
+              <div style={{ 
+                padding: '1rem', 
+                backgroundColor: 'white', 
+                borderRadius: '8px',
+                border: '1px solid #e8f5e8'
+              }}>
+                <h3 style={{ color: '#174F2E', fontWeight: 600, marginBottom: '0.5rem' }}>
+                  🥄 Application Rate
+                </h3>
+                <p style={{ margin: 0, lineHeight: 1.4 }}>
+                  {(product as any).usageInstructions.applicationRate}
+                </p>
+              </div>
+              
+              <div style={{ 
+                padding: '1rem', 
+                backgroundColor: 'white', 
+                borderRadius: '8px',
+                border: '1px solid #e8f5e8'
+              }}>
+                <h3 style={{ color: '#174F2E', fontWeight: 600, marginBottom: '0.5rem' }}>
+                  🧪 Mixing Instructions
+                </h3>
+                <p style={{ margin: 0, lineHeight: 1.4 }}>
+                  {(product as any).usageInstructions.mixing}
+                </p>
+              </div>
+              
+              <div style={{ 
+                padding: '1rem', 
+                backgroundColor: 'white', 
+                borderRadius: '8px',
+                border: '1px solid #e8f5e8'
+              }}>
+                <h3 style={{ color: '#174F2E', fontWeight: 600, marginBottom: '0.5rem' }}>
+                  ⏰ Best Timing
+                </h3>
+                <p style={{ margin: 0, lineHeight: 1.4 }}>
+                  {(product as any).usageInstructions.timing}
+                </p>
+              </div>
+              
+              <div style={{ 
+                padding: '1rem', 
+                backgroundColor: 'white', 
+                borderRadius: '8px',
+                border: '1px solid #e8f5e8'
+              }}>
+                <h3 style={{ color: '#174F2E', fontWeight: 600, marginBottom: '0.5rem' }}>
+                  🔄 Frequency
+                </h3>
+                <p style={{ margin: 0, lineHeight: 1.4 }}>
+                  {(product as any).usageInstructions.frequency}
+                </p>
+              </div>
+              
+              <div style={{ 
+                padding: '1rem', 
+                backgroundColor: 'white', 
+                borderRadius: '8px',
+                border: '1px solid #e8f5e8'
+              }}>
+                <h3 style={{ color: '#174F2E', fontWeight: 600, marginBottom: '0.5rem' }}>
+                  🚿 Application Method
+                </h3>
+                <p style={{ margin: 0, lineHeight: 1.4 }}>
+                  {(product as any).usageInstructions.method}
+                </p>
+              </div>
+              
+              {(product as any).usageInstructions.coverage && (
+                <div style={{ 
+                  padding: '1rem', 
+                  backgroundColor: 'white', 
+                  borderRadius: '8px',
+                  border: '1px solid #e8f5e8'
+                }}>
+                  <h3 style={{ color: '#174F2E', fontWeight: 600, marginBottom: '0.5rem' }}>
+                    📏 Coverage Area
+                  </h3>
+                  <p style={{ margin: 0, lineHeight: 1.4 }}>
+                    {(product as any).usageInstructions.coverage}
+                  </p>
+                </div>
+              )}
+            </div>
+            
+            {(product as any).usageInstructions.tips && (
+              <div style={{ 
+                padding: '1.5rem', 
+                backgroundColor: 'white', 
+                borderRadius: '8px',
+                border: '1px solid #e8f5e8',
+                marginBottom: '1rem'
+              }}>
+                <h3 style={{ 
+                  color: '#174F2E', 
+                  fontWeight: 600, 
+                  marginBottom: '1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  💡 Pro Tips for Best Results
+                </h3>
+                <ul style={{ margin: 0, paddingLeft: '1.2rem' }}>
+                  {(product as any).usageInstructions.tips.map((tip: string, index: number) => (
+                    <li key={index} style={{ 
+                      marginBottom: '0.5rem', 
+                      lineHeight: 1.4,
+                      color: '#2d5a27'
+                    }}>
+                      {tip}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            
+            {(product as any).usageInstructions.safety && (
+              <div style={{ 
+                padding: '1.5rem', 
+                backgroundColor: '#e8f5e8', 
+                borderRadius: '8px',
+                border: '2px solid #c3e6c3'
+              }}>
+                <h3 style={{ 
+                  color: '#174F2E', 
+                  fontWeight: 600, 
+                  marginBottom: '0.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  🛡️ Safety Information
+                </h3>
+                <p style={{ margin: 0, lineHeight: 1.4, color: '#2d5a27', fontWeight: 500 }}>
+                  {(product as any).usageInstructions.safety}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
       </main>
     </>
   )
