@@ -240,3 +240,4 @@ export async function getStaticProps() {
     revalidate: 60, // Revalidate every 60 seconds for auto-publishing
   }
 }
+// Force deployment Sun Sep 28 19:38:14 UTC 2025
