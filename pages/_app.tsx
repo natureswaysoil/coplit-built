@@ -11,6 +11,8 @@ import Navbar from '@/components/Navbar'
 
 // Global CSS (switch to '../styles.css' if that's your file)
 import '../styles/globals.css'
+// Modern CSS for enhanced styling
+import '../styles/modern.css'
 
 // ✅ Vercel Web Analytics
 import { Analytics } from '@vercel/analytics/next'
