@@ -11,6 +11,8 @@ import Navbar from '@/components/Navbar'
 
 // Global CSS (switch to '../styles.css' if that's your file)
 import '../styles/globals.css'
+// Modern CSS for enhanced styling
+import '../styles/modern.css'
 
 // ✅ Vercel Web Analytics
 import { Analytics } from '@vercel/analytics/next'
@@ -49,30 +51,34 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://natureswaysoil.com" />
       
-        <script type="application/ld+json" dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Store",
-            "name": "Nature's Way Soil",
-            "description": "Premium organic fertilizers and soil amendments for natural gardening",
-            "url": "https://natureswaysoil.com",
-            "category": "Garden Center",
-            "hasOfferCatalog": {
-              "@type": "OfferCatalog",
-              "name": "Organic Gardening Products",
-              "itemListElement": [
-                {
-                  "@type": "Offer",
-                  "itemOffered": {
-                    "@type": "Product",
-                    "name": "Organic Fertilizers",
-                    "category": "Fertilizer"
-                  }
-                }
-              ]
-            }
-          })
-        }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Store',
+              name: "Nature's Way Soil",
+              description:
+                "Premium organic fertilizers and soil amendments for natural gardening",
+              url: 'https://natureswaysoil.com',
+              category: 'Garden Center',
+              hasOfferCatalog: {
+                '@type': 'OfferCatalog',
+                name: 'Organic Gardening Products',
+                itemListElement: [
+                  {
+                    '@type': 'Offer',
+                    itemOffered: {
+                      '@type': 'Product',
+                      name: 'Organic Fertilizers',
+                      category: 'Fertilizer',
+                    },
+                  },
+                ],
+              },
+            }),
+          }}
+        />
         </Head>
       
       <CartCtxProvider>
