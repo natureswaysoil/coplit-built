@@ -1,25 +1,20 @@
 import Head from 'next/head'
 import Link from 'next/link'
-import { getPostBySlug, getAllPostSlugs } from '../../lib/contentful'
-import { documentToReactComponents } from '@contentful/rich-text-react-renderer'
-import { BLOCKS, MARKS } from '@contentful/rich-text-types'
+import { getPostBySlug, getAllPostSlugs } from '../../lib/localBlog'
+import ReactMarkdown from 'react-markdown'
 import { format } from 'date-fns'
 
-// Custom renderer options for rich text
-const renderOptions = {
-  renderMark: {
-    [MARKS.BOLD]: (text) => <strong className="font-bold">{text}</strong>,
-  },
-  renderNode: {
-    [BLOCKS.HEADING_1]: (node, children) => <h1 className="post-h1">{children}</h1>,
-    [BLOCKS.HEADING_2]: (node, children) => <h2 className="post-h2">{children}</h2>,
-    [BLOCKS.HEADING_3]: (node, children) => <h3 className="post-h3">{children}</h3>,
-    [BLOCKS.PARAGRAPH]: (node, children) => <p className="post-paragraph">{children}</p>,
-    [BLOCKS.UL_LIST]: (node, children) => <ul className="post-ul">{children}</ul>,
-    [BLOCKS.OL_LIST]: (node, children) => <ol className="post-ol">{children}</ol>,
-    [BLOCKS.LIST_ITEM]: (node, children) => <li className="post-li">{children}</li>,
-    [BLOCKS.QUOTE]: (node, children) => <blockquote className="post-quote">{children}</blockquote>,
-  },
+// Custom components for markdown rendering
+const markdownComponents = {
+  h1: ({ children }) => <h1 className="post-h1">{children}</h1>,
+  h2: ({ children }) => <h2 className="post-h2">{children}</h2>,
+  h3: ({ children }) => <h3 className="post-h3">{children}</h3>,
+  p: ({ children }) => <p className="post-paragraph">{children}</p>,
+  ul: ({ children }) => <ul className="post-ul">{children}</ul>,
+  ol: ({ children }) => <ol className="post-ol">{children}</ol>,
+  li: ({ children }) => <li className="post-li">{children}</li>,
+  blockquote: ({ children }) => <blockquote className="post-quote">{children}</blockquote>,
+  strong: ({ children }) => <strong className="font-bold">{children}</strong>,
 }
 
 export default function BlogPost({ post }) {
@@ -80,7 +75,9 @@ export default function BlogPost({ post }) {
         </div>
 
         <div className="post-content">
-          {documentToReactComponents(post.content, renderOptions)}
+          <ReactMarkdown components={markdownComponents}>
+            {post.content}
+          </ReactMarkdown>
         </div>
 
         <div className="post-footer">

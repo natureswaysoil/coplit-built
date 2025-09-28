@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import Link from 'next/link'
-import { getAllPosts } from '../../lib/contentful'
+import { getAllPosts } from '../../lib/localBlog'
 import { format } from 'date-fns'
 
 export default function Blog({ posts }) {
