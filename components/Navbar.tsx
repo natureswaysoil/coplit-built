@@ -36,11 +36,9 @@ export default function Navbar() {
         padding: 'var(--space-xs) 0'
       }}>
         <div className="container" style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-md)', flexWrap: 'wrap'}}>
-          <Link href="/tiktok-tools" style={{color: 'var(--neutral-600)', textDecoration: 'none'}}>TikTok Tools</Link>
-          <Link href="/database-setup" style={{color: '#ea580c', textDecoration: 'none'}}>Database Setup</Link>
-          <Link href="/admin/dashboard" style={{color: 'var(--primary)', textDecoration: 'none'}}>Admin</Link>
           <Link href="/privacy-policy" style={{color: 'var(--neutral-600)', textDecoration: 'none'}}>Privacy Policy</Link>
           <Link href="/refund-policy" style={{color: 'var(--neutral-600)', textDecoration: 'none'}}>Refund Policy</Link>
+          <Link href="/admin/dashboard" style={{color: 'var(--primary)', textDecoration: 'none'}}>Admin</Link>
         </div>
       </div>
     </header>

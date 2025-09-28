@@ -14,44 +14,44 @@ export interface UsageInstructionsData {
 export default function UsageInstructionsSection({ instructions }: { instructions: UsageInstructionsData }) {
   const [open, setOpen] = useState(true)
   return (
-    <section className="mt-12 rounded-xl border border-green-100 bg-green-50/70 shadow-sm">
-      <header className={`flex items-center justify-between ${open ? 'mb-5' : ''} px-6 pt-6`}>
-        <h2 className="m-0 flex items-center gap-2 text-2xl font-extrabold text-brand-700">
-          <span>📋</span> How to Use This Product
+    <section className="card" style={{marginTop: 'var(--space-xl)', backgroundColor: 'var(--success-50)', border: '1px solid var(--success-200)'}}>
+      <header style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: open ? 'var(--space-lg)' : '0'}}>
+        <h2 style={{margin: '0', color: 'var(--primary)'}}>
+          How to Use This Product
         </h2>
         <button
           onClick={() => setOpen(x => !x)}
           aria-expanded={open}
-          className="rounded-md bg-brand-700 px-3 py-1 text-sm font-semibold text-white hover:bg-brand-800"
+          className="btn btn-primary btn-sm"
         >{open ? 'Hide' : 'Show'}</button>
       </header>
 
       {open && (
-        <div className="px-6 pb-6">
-          <div className="mb-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            <Card title="🥄 Application Rate" text={instructions.applicationRate} />
-            <Card title="🧪 Mixing Instructions" text={instructions.mixing} />
-            <Card title="⏰ Best Timing" text={instructions.timing} />
-            <Card title="🔄 Frequency" text={instructions.frequency} />
-            <Card title="🚿 Application Method" text={instructions.method} />
-            {instructions.coverage && <Card title="📏 Coverage Area" text={instructions.coverage} />}
+        <div>
+          <div className="grid grid-3" style={{marginBottom: 'var(--space-lg)'}}>
+            <Card title="Application Rate" text={instructions.applicationRate} />
+            <Card title="Mixing Instructions" text={instructions.mixing} />
+            <Card title="Best Timing" text={instructions.timing} />
+            <Card title="Frequency" text={instructions.frequency} />
+            <Card title="Application Method" text={instructions.method} />
+            {instructions.coverage && <Card title="Coverage Area" text={instructions.coverage} />}
           </div>
 
           {instructions.tips && instructions.tips.length > 0 && (
-            <div className="mb-4 rounded-lg border border-green-100 bg-white p-5">
-              <h3 className="mb-3 flex items-center gap-2 text-lg font-bold text-brand-700">💡 Pro Tips for Best Results</h3>
-              <ul className="m-0 list-disc pl-5">
+            <div className="card" style={{marginBottom: 'var(--space-md)', backgroundColor: 'var(--neutral-50)', border: '1px solid var(--neutral-200)'}}>
+              <h3 style={{marginBottom: 'var(--space-md)', color: 'var(--primary)'}}>Pro Tips for Best Results</h3>
+              <ul style={{margin: '0', paddingLeft: 'var(--space-lg)', lineHeight: '1.6'}}>
                 {instructions.tips.map((tip, idx) => (
-                  <li key={idx} className="mb-2 leading-relaxed text-green-800">{tip}</li>
+                  <li key={idx} style={{marginBottom: 'var(--space-sm)', color: 'var(--primary)'}}>{tip}</li>
                 ))}
               </ul>
             </div>
           )}
 
           {instructions.safety && (
-            <div className="rounded-lg border-2 border-green-200 bg-green-100 p-5">
-              <h3 className="mb-2 flex items-center gap-2 text-lg font-bold text-brand-700">🛡️ Safety Information</h3>
-              <p className="m-0 font-medium leading-relaxed text-green-900">{instructions.safety}</p>
+            <div className="card" style={{backgroundColor: 'var(--success-100)', border: '2px solid var(--success-200)'}}>
+              <h3 style={{marginBottom: 'var(--space-sm)', color: 'var(--primary)'}}>Safety Information</h3>
+              <p style={{margin: '0', fontWeight: '500', lineHeight: '1.6', color: 'var(--success-900)'}}>{instructions.safety}</p>
             </div>
           )}
         </div>
@@ -62,9 +62,9 @@ export default function UsageInstructionsSection({ instructions }: { instruction
 
 function Card({ title, text }: { title: string; text: string }) {
   return (
-    <div className="rounded-lg border border-green-100 bg-white p-4">
-      <h3 className="m-0 mb-2 text-lg font-bold text-brand-700">{title}</h3>
-      <p className="m-0 leading-relaxed text-gray-800">{text}</p>
+    <div className="card" style={{backgroundColor: 'var(--neutral-50)', border: '1px solid var(--success-200)'}}>
+      <h3 style={{margin: '0', marginBottom: 'var(--space-sm)', color: 'var(--primary)'}}>{title}</h3>
+      <p style={{margin: '0', lineHeight: '1.6', color: 'var(--neutral-800)'}}>{text}</p>
     </div>
   )
 }

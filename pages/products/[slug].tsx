@@ -64,27 +64,27 @@ export default function ProductPage(props: ProductPageProps) {
           }}
         />
       </Head>
-      <main className="max-w-5xl mx-auto px-6 py-8">
-        <div className="flex flex-wrap gap-8">
-          <div className="basis-[340px] grow-0 shrink-0 w-full sm:w-auto">
+      <main className="container p-xl">
+        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-xl)', alignItems: 'start'}}>
+          <div>
             <Image
               src={product.image}
               alt={product.title}
               width={600}
               height={600}
-              className="w-full rounded-xl bg-green-50 object-cover"
+              style={{width: '100%', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--neutral-50)', objectFit: 'contain'}}
             />
           </div>
-          <div className="flex-1 min-w-[280px]">
-            <h1 className="text-3xl font-bold mb-4 text-brand-700">{product.title}</h1>
-            <p className="mb-4 leading-relaxed text-gray-700">{product.description}</p>
+          <div>
+            <h1 style={{color: 'var(--primary)', marginBottom: 'var(--space-lg)'}}>{product.title}</h1>
+            <p style={{marginBottom: 'var(--space-lg)', lineHeight: '1.6', color: 'var(--neutral-700)'}}>{product.description}</p>
             {product.variations?.length ? (
-              <div className="mb-4">
-                <label className="block font-semibold mb-1">Size</label>
+              <div style={{marginBottom: 'var(--space-lg)'}}>
+                <label className="form-label">Size</label>
                 <select
                   value={sku}
                   onChange={e => setSku(e.target.value)}
-                  className="rounded-md border border-gray-300 px-3 py-2"
+                  className="form-input"
                 >
                   {product.variations.map(v => (
                     <option key={v.sku} value={v.sku}>{v.size} - ${v.price.toFixed(2)}</option>
@@ -92,7 +92,7 @@ export default function ProductPage(props: ProductPageProps) {
                 </select>
               </div>
             ) : null}
-            <div className="font-bold mb-4 text-xl text-green-800">
+            <div style={{fontWeight: 'bold', marginBottom: 'var(--space-lg)', fontSize: '1.5rem', color: 'var(--primary)'}}>
               {variant ? `$${variant.price.toFixed(2)}` : (product.price !== undefined ? `$${product.price.toFixed(2)}` : '')}
             </div>
             <button
@@ -101,19 +101,19 @@ export default function ProductPage(props: ProductPageProps) {
                 const line = variant ? { sku: variant.sku, size: variant.size, price: variant.price } : { sku: product.id, size: 'Default', price: product.price! }
                 addItem({ id: product.id, title: product.title, image: product.image, qty: 1, ...line })
               }}
-              className="bg-brand-700 hover:bg-brand-800 text-white rounded-md px-5 py-3 font-semibold"
+              className="btn btn-primary"
             >Add to Cart</button>
           </div>
         </div>
 
-        {/* 🎯 Usage instructions (collapsible) */}
+        {/* Usage instructions */}
         {product.usageInstructions ? (
           <UsageInstructionsSection instructions={product.usageInstructions} />
         ) : (
-          <section className="mt-12 rounded-xl border border-yellow-200 bg-yellow-50 p-6">
-            <h2 className="text-2xl font-extrabold text-brand-700 mb-3 flex items-center gap-2">📋 How to Use This Product</h2>
-            <p className="text-gray-800 mb-3">Detailed usage instructions for this product are being added. In the meantime, follow these general best practices:</p>
-            <ul className="list-disc pl-6 text-green-900 space-y-1">
+          <section className="card" style={{marginTop: 'var(--space-xl)', backgroundColor: 'var(--warning-50)', border: '1px solid var(--warning-200)'}}>
+            <h2 style={{color: 'var(--primary)', marginBottom: 'var(--space-md)'}}>How to Use This Product</h2>
+            <p style={{color: 'var(--neutral-800)', marginBottom: 'var(--space-md)'}}>Detailed usage instructions for this product are being added. In the meantime, follow these general best practices:</p>
+            <ul style={{paddingLeft: 'var(--space-lg)', color: 'var(--primary)', lineHeight: '1.6'}}>
               <li>Shake well before use.</li>
               <li>If concentrate, dilute with water per the label or 1–2 oz per gallon as a general starting point.</li>
               <li>Apply in early morning or evening; avoid peak heat.</li>
