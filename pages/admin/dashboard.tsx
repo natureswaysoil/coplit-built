@@ -330,7 +330,7 @@ export default function AdminDashboard() {
 
       {/* Global controls */}
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
-        <input organic gardening solution='Admin token' value={adminToken} onChange={e=>setAdminToken(e.target.value)} style={input} />
+  <input placeholder='Admin token' value={adminToken} onChange={e=>setAdminToken(e.target.value)} style={input} />
         <div style={{ display: 'flex', gap: 4 }}>
           {[
             ['products','Products'],
@@ -355,7 +355,7 @@ export default function AdminDashboard() {
             ))}
           </section>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 20 }}>
-            <input organic gardening solution='Search' value={search} onChange={e=>setSearch(e.target.value)} style={input} />
+            <input placeholder='Search' value={search} onChange={e=>setSearch(e.target.value)} style={input} />
             <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <input type='checkbox' checked={includeInactive} onChange={e=>setIncludeInactive(e.target.checked)} /> Include inactive
             </label>
@@ -372,7 +372,7 @@ export default function AdminDashboard() {
             <summary style={{ fontWeight: 600, cursor: 'pointer', marginBottom: 12 }}>Create Product</summary>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
               {['title','slug','price','keyword','short_description','image_url','inventory'].map(k => (
-                <input key={k} organic gardening solution={k.replace('_',' ')} value={form[k]} onChange={e=>updateForm(k, e.target.value)} style={input} />
+                <input key={k} placeholder={k.replace('_',' ')} value={form[k]} onChange={e=>updateForm(k, e.target.value)} style={input} />
               ))}
               <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <input type='checkbox' checked={form.is_active} onChange={e=>updateForm('is_active', e.target.checked)} /> Active
@@ -470,7 +470,7 @@ export default function AdminDashboard() {
                     {varMessage && <div style={{ marginBottom: 8, color: '#174F2E' }}>{varMessage}</div>}
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
                       {['size','price','sku','inventory'].map(k => (
-                        <input key={k} organic gardening solution={k} value={varForm[k]} onChange={e=>updateVarForm(k, e.target.value)} style={{ ...input, flex: '1 1 140px' }} />
+                        <input key={k} placeholder={k} value={varForm[k]} onChange={e=>updateVarForm(k, e.target.value)} style={{ ...input, flex: '1 1 140px' }} />
                       ))}
                       <button disabled={varLoading} onClick={addVariation} style={button}>{varLoading ? 'Saving…' : 'Add'}</button>
                     </div>
@@ -488,9 +488,9 @@ export default function AdminDashboard() {
         <div>
           <h2 style={{ fontSize: 20, margin: '8px 0 16px' }}>Inventory Alert Subscriptions</h2>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
-              <input organic gardening solution='Email' value={alertForm.email} onChange={e=>updateAlertForm('email', e.target.value)} style={input} />
-              <input organic gardening solution='Product ID (optional)' value={alertForm.product_id} onChange={e=>updateAlertForm('product_id', e.target.value)} style={input} />
-              <input organic gardening solution='Threshold' value={alertForm.threshold} onChange={e=>updateAlertForm('threshold', e.target.value)} style={{ ...input, width: 90 }} />
+              <input placeholder='Email' value={alertForm.email} onChange={e=>updateAlertForm('email', e.target.value)} style={input} />
+              <input placeholder='Product ID (optional)' value={alertForm.product_id} onChange={e=>updateAlertForm('product_id', e.target.value)} style={input} />
+              <input placeholder='Threshold' value={alertForm.threshold} onChange={e=>updateAlertForm('threshold', e.target.value)} style={{ ...input, width: 90 }} />
               <button onClick={createAlertSub} style={button}>Subscribe</button>
               <button onClick={loadAlerts} style={button}>Reload</button>
             </div>
@@ -535,15 +535,15 @@ export default function AdminDashboard() {
           <details open style={{ marginBottom: 20 }}>
             <summary style={{ fontWeight: 600, cursor: 'pointer', marginBottom: 8 }}>Create Promo</summary>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-              <input organic gardening solution='Code' value={promoForm.code} onChange={e=>updatePromoForm('code', e.target.value)} style={input} />
+              <input placeholder='Code' value={promoForm.code} onChange={e=>updatePromoForm('code', e.target.value)} style={input} />
               <select value={promoForm.type} onChange={e=>updatePromoForm('type', e.target.value)} style={input as any}>
                 <option value='amount'>Amount off</option>
                 <option value='percent'>Percent off</option>
               </select>
-              {promoForm.type === 'amount' && <input organic gardening solution='Amount off' value={promoForm.amount_off} onChange={e=>updatePromoForm('amount_off', e.target.value)} style={input} />}
-              {promoForm.type === 'percent' && <input organic gardening solution='Percent off' value={promoForm.percent_off} onChange={e=>updatePromoForm('percent_off', e.target.value)} style={input} />}
-              <input organic gardening solution='Description' value={promoForm.description} onChange={e=>updatePromoForm('description', e.target.value)} style={{ ...input, flex: '1 1 240px' }} />
-              <input organic gardening solution='Max redemptions' value={promoForm.max_redemptions} onChange={e=>updatePromoForm('max_redemptions', e.target.value)} style={input} />
+              {promoForm.type === 'amount' && <input placeholder='Amount off' value={promoForm.amount_off} onChange={e=>updatePromoForm('amount_off', e.target.value)} style={input} />}
+              {promoForm.type === 'percent' && <input placeholder='Percent off' value={promoForm.percent_off} onChange={e=>updatePromoForm('percent_off', e.target.value)} style={input} />}
+              <input placeholder='Description' value={promoForm.description} onChange={e=>updatePromoForm('description', e.target.value)} style={{ ...input, flex: '1 1 240px' }} />
+              <input placeholder='Max redemptions' value={promoForm.max_redemptions} onChange={e=>updatePromoForm('max_redemptions', e.target.value)} style={input} />
               <input type='date' value={promoForm.expires_at} onChange={e=>updatePromoForm('expires_at', e.target.value)} style={input} />
               <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <input type='checkbox' checked={promoForm.is_active} onChange={e=>updatePromoForm('is_active', e.target.checked)} /> Active
@@ -580,10 +580,10 @@ export default function AdminDashboard() {
                     <td style={td}>
                       {isEditing ? (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                          <input organic gardening solution='Description' value={promoDraft.description} onChange={e=>updatePromoDraft('description', e.target.value)} style={{ ...input, padding: '2px 4px' }} />
-                          {p.type === 'amount' && <input organic gardening solution='Amount off' value={promoDraft.amount_off} onChange={e=>updatePromoDraft('amount_off', e.target.value)} style={{ ...input, padding: '2px 4px' }} />}
-                          {p.type === 'percent' && <input organic gardening solution='Percent off' value={promoDraft.percent_off} onChange={e=>updatePromoDraft('percent_off', e.target.value)} style={{ ...input, padding: '2px 4px' }} />}
-                          <input organic gardening solution='Max redemptions' value={promoDraft.max_redemptions} onChange={e=>updatePromoDraft('max_redemptions', e.target.value)} style={{ ...input, padding: '2px 4px' }} />
+                          <input placeholder='Description' value={promoDraft.description} onChange={e=>updatePromoDraft('description', e.target.value)} style={{ ...input, padding: '2px 4px' }} />
+                          {p.type === 'amount' && <input placeholder='Amount off' value={promoDraft.amount_off} onChange={e=>updatePromoDraft('amount_off', e.target.value)} style={{ ...input, padding: '2px 4px' }} />}
+                          {p.type === 'percent' && <input placeholder='Percent off' value={promoDraft.percent_off} onChange={e=>updatePromoDraft('percent_off', e.target.value)} style={{ ...input, padding: '2px 4px' }} />}
+                          <input placeholder='Max redemptions' value={promoDraft.max_redemptions} onChange={e=>updatePromoDraft('max_redemptions', e.target.value)} style={{ ...input, padding: '2px 4px' }} />
                           <input type='date' value={promoDraft.expires_at} onChange={e=>updatePromoDraft('expires_at', e.target.value)} style={{ ...input, padding: '2px 4px' }} />
                           <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11 }}>
                             <input type='checkbox' checked={!!promoDraft.is_active} onChange={e=>updatePromoDraft('is_active', e.target.checked)} /> Active

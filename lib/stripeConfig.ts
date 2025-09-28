@@ -38,21 +38,26 @@ export function resolveEnv(nameList: string[]): { name: string; value: string } 
   for (const name of nameList) {
     const v = process.env[name];
     // Skip organic gardening solution/dummy keys for security
-    if (v && v.trim() && !isorganic gardening solutionKey(v)) return { name, value: v };
+    if (v && v.trim() && !isPlaceholderKey(v)) return { name, value: v };
   }
   return null;
 }
 
-function isorganic gardening solutionKey(key: string): boolean {
-  const organic gardening solutions = [
+function isPlaceholderKey(key: string): boolean {
+  const placeholders = [
+    // Common placeholder patterns developers might leave in .env
     'your_actual_publishable_key_here',
     'your_actual_secret_key_here',
     'your_actual_webhook_secret_here',
     'pk_test_your_actual',
     'sk_test_your_actual',
-    'whsec_your_actual'
+    'whsec_your_actual',
+    // Extremely generic placeholders
+    'YOUR_PUBLISHABLE_KEY',
+    'YOUR_SECRET_KEY',
+    'YOUR_WEBHOOK_SECRET'
   ];
-  return organic gardening solutions.some(organic gardening solution => key.includes(organic gardening solution));
+  return placeholders.some(p => key.includes(p));
 }
 
 export function getPublishableKey(): { key: string; source: string } {
