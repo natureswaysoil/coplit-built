@@ -24,7 +24,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const providedHash = crypto.createHash('sha256').update(password).digest('hex')
   const expectedHash = crypto.createHash('sha256').update(adminPassword).digest('hex')
   
-  if (providedHash !== expectedHash) {
+  // Use constant-time comparison to prevent timing attacks
+  const providedBuffer = Buffer.from(providedHash, 'hex')
+  const expectedBuffer = Buffer.from(expectedHash, 'hex')
+  if (
+    providedBuffer.length !== expectedBuffer.length ||
+    !crypto.timingSafeEqual(providedBuffer, expectedBuffer)
+  ) {
     // Add a small delay to prevent brute force attacks
     await new Promise(resolve => setTimeout(resolve, 1000))
     return res.status(401).json({ error: 'Invalid password' })
