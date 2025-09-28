@@ -6,8 +6,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   // Log logout for security monitoring
-  console.log(`Admin logout at ${new Date().toISOString()} from IP: ${req.headers['x-forwarded-for'] || req.connection.remoteAddress}`)
-
+  const ip = (typeof req.headers['x-forwarded-for'] === 'string'
+    ? req.headers['x-forwarded-for'].split(',')[0].trim()
+    : Array.isArray(req.headers['x-forwarded-for']) && req.headers['x-forwarded-for'].length > 0
+      ? req.headers['x-forwarded-for'][0]
+      : req.socket?.remoteAddress);
+  console.log(`Admin logout at ${new Date().toISOString()} from IP: ${ip}`);
   // Clear the admin session cookie
   res.setHeader('Set-Cookie', [
     'admin-session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=Strict'
