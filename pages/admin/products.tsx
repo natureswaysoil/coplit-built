@@ -1,14 +1,30 @@
 import { useState } from 'react'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { useProducts } from '@/lib/hooks/useProducts'
 
 export default function AdminProductsPage() {
+  const router = useRouter()
   const [search, setSearch] = useState('')
   const [includeInactive, setIncludeInactive] = useState(false)
   const { products, loading, error, refresh } = useProducts({ search, includeInactive, limit: 100 })
   const [token, setToken] = useState('')
   const [updating, setUpdating] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
+
+  // Admin logout function
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/logout', { method: 'POST' })
+      document.cookie = 'admin-session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
+      router.push('/admin/login')
+    } catch (error) {
+      console.error('Logout error:', error)
+      // Force logout even if API fails
+      document.cookie = 'admin-session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
+      router.push('/admin/login')
+    }
+  }
 
   async function updateInventory(id: string, inventory: number, is_active?: boolean) {
     if (!token) { setMessage('Set admin token first'); return }
@@ -33,8 +49,57 @@ export default function AdminProductsPage() {
 
   return (
     <main style={{ maxWidth: 1100, margin: '0 auto', padding: '1.5rem' }}>
-      <Head><title>Admin Products</title></Head>
-      <h1 style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 16 }}>Admin Products</h1>
+      <Head><title>Admin Products - Nature's Way Soil</title></Head>
+      
+      {/* Header with logout */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h1 style={{ fontSize: 28, fontWeight: 'bold', margin: 0 }}>Admin Products</h1>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <button 
+            onClick={() => router.push('/admin/dashboard')}
+            style={{
+              padding: '8px 16px',
+              background: '#174F2E',
+              color: 'white',
+              border: 'none',
+              borderRadius: 6,
+              cursor: 'pointer',
+              fontWeight: 600,
+              fontSize: 14
+            }}
+          >
+            📊 Dashboard
+          </button>
+          <button 
+            onClick={handleLogout}
+            style={{
+              padding: '8px 16px',
+              background: '#dc2626',
+              color: 'white',
+              border: 'none',
+              borderRadius: 6,
+              cursor: 'pointer',
+              fontWeight: 600,
+              fontSize: 14
+            }}
+          >
+            🔒 Logout
+          </button>
+        </div>
+      </div>
+
+      {/* Security notice */}
+      <div style={{
+        background: '#dcfce7',
+        border: '1px solid #16a34a',
+        borderRadius: 8,
+        padding: '12px 16px',
+        marginBottom: 16,
+        fontSize: 14,
+        color: '#15803d'
+      }}>
+        <strong>🔒 Security Active:</strong> Admin panel is now protected with authentication.
+      </div>
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
         <input
           placeholder="Search title or keyword"
