@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { useProducts } from '@/lib/hooks/useProducts'
 
 // Lightweight dashboard to monitor products, create new ones, and manage variations
 export default function AdminDashboard() {
+  const router = useRouter()
+  
   // Global / shared state
   const [adminToken, setAdminToken] = useState('')
   const [activeTab, setActiveTab] = useState<'products' | 'alerts' | 'promos' | 'analytics'>('products')
@@ -323,10 +326,56 @@ export default function AdminDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab])
 
+  // Admin logout function
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/logout', { method: 'POST' })
+      document.cookie = 'admin-session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
+      router.push('/admin/login')
+    } catch (error) {
+      console.error('Logout error:', error)
+      // Force logout even if API fails
+      document.cookie = 'admin-session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
+      router.push('/admin/login')
+    }
+  }
+
   return (
     <main style={{ maxWidth: 1380, margin: '0 auto', padding: '1.5rem' }}>
-      <Head><title>Admin Dashboard</title></Head>
-      <h1 style={{ fontSize: 30, fontWeight: 700, marginBottom: 8 }}>Admin Dashboard</h1>
+      <Head><title>Admin Dashboard - Nature's Way Soil</title></Head>
+      
+      {/* Header with logout */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h1 style={{ fontSize: 30, fontWeight: 700, margin: 0 }}>Admin Dashboard</h1>
+        <button 
+          onClick={handleLogout}
+          style={{
+            padding: '8px 16px',
+            background: '#dc2626',
+            color: 'white',
+            border: 'none',
+            borderRadius: 6,
+            cursor: 'pointer',
+            fontWeight: 600,
+            fontSize: 14
+          }}
+        >
+          🔒 Logout
+        </button>
+      </div>
+
+      {/* Security notice */}
+      <div style={{
+        background: '#dcfce7',
+        border: '1px solid #16a34a',
+        borderRadius: 8,
+        padding: '12px 16px',
+        marginBottom: 16,
+        fontSize: 14,
+        color: '#15803d'
+      }}>
+        <strong>🔒 Security Active:</strong> Admin panel is now protected with authentication. Session expires in 24 hours.
+      </div>
 
       {/* Global controls */}
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
