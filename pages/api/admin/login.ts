@@ -31,7 +31,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   // Log successful admin login (for security monitoring)
-  console.log(`Admin login successful at ${new Date().toISOString()} from IP: ${req.headers['x-forwarded-for'] || req.connection.remoteAddress}`)
+  const ip = (typeof req.headers['x-forwarded-for'] === 'string'
+    ? req.headers['x-forwarded-for'].split(',')[0].trim()
+    : req.socket?.remoteAddress);
+  console.log(`Admin login successful at ${new Date().toISOString()} from IP: ${ip}`);
 
   return res.status(200).json({ 
     success: true,
