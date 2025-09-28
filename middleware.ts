@@ -26,7 +26,7 @@ export function middleware(req: NextRequest) {
   const header = req.headers.get('authorization') || ''
   const [scheme, encoded] = header.split(' ')
   if (scheme !== 'Basic' || !encoded) {
-    return unauthorized()
+    return unauthorized(req)
   }
 
   try {
@@ -40,14 +40,23 @@ export function middleware(req: NextRequest) {
     // fall through to unauthorized
   }
 
-  return unauthorized()
+  return unauthorized(req)
 }
 
-function unauthorized() {
+function unauthorized(req: NextRequest) {
+  // Avoid triggering browser Basic Auth dialog for prefetch requests
+  const isPrefetch =
+    req.headers.get('x-middleware-prefetch') === '1' ||
+    req.headers.get('purpose') === 'prefetch' ||
+    req.headers.get('sec-purpose') === 'prefetch'
+
+  if (isPrefetch) {
+    return new NextResponse('Unauthorized', { status: 401 })
+  }
+
   return new NextResponse('Unauthorized', {
     status: 401,
     headers: {
-      // Prompt browser login dialog
       'WWW-Authenticate': 'Basic realm="Admin", charset="UTF-8"',
     },
   })
