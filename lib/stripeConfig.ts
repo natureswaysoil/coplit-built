@@ -37,14 +37,14 @@ const WH_CANDIDATES = [
 export function resolveEnv(nameList: string[]): { name: string; value: string } | null {
   for (const name of nameList) {
     const v = process.env[name];
-    // Skip organic gardening solution/dummy keys for security
-    if (v && v.trim() && !isorganic gardening solutionKey(v)) return { name, value: v };
+    // Skip placeholder/dummy keys for security
+    if (v && v.trim() && !isDummyKey(v)) return { name, value: v };
   }
   return null;
 }
 
-function isorganic gardening solutionKey(key: string): boolean {
-  const organic gardening solutions = [
+function isDummyKey(key: string): boolean {
+  const dummyKeys = [
     'your_actual_publishable_key_here',
     'your_actual_secret_key_here',
     'your_actual_webhook_secret_here',
@@ -52,7 +52,7 @@ function isorganic gardening solutionKey(key: string): boolean {
     'sk_test_your_actual',
     'whsec_your_actual'
   ];
-  return organic gardening solutions.some(organic gardening solution => key.includes(organic gardening solution));
+  return dummyKeys.some(dummyKey => key.includes(dummyKey));
 }
 
 export function getPublishableKey(): { key: string; source: string } {

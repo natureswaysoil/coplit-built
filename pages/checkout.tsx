@@ -317,24 +317,24 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
           </label>
           <label style={{ display: 'block', marginTop: 8 }}>
             Address line 1 *
-            <input type="text" value={address1} onChange={e => setAddress1(e.target.value)} organic gardening solution="Street address" style={{ width: '100%', padding: 8, marginTop: 6, border: !address1.trim() ? '2px solid #ef4444' : '1px solid #ccc' }} />
+            <input type="text" value={address1} onChange={e => setAddress1(e.target.value)} placeholder="Street address" style={{ width: '100%', padding: 8, marginTop: 6, border: !address1.trim() ? '2px solid #ef4444' : '1px solid #ccc' }} />
           </label>
           <label style={{ display: 'block', marginTop: 8 }}>
             Address line 2 (optional)
-            <input type="text" value={address2} onChange={e => setAddress2(e.target.value)} organic gardening solution="Apt, suite, etc." style={{ width: '100%', padding: 8, marginTop: 6 }} />
+            <input type="text" value={address2} onChange={e => setAddress2(e.target.value)} placeholder="Apt, suite, etc." style={{ width: '100%', padding: 8, marginTop: 6 }} />
           </label>
           <div style={{ display: 'flex', gap: 12 }}>
             <label style={{ display: 'block', marginTop: 8, flex: 1 }}>
               ZIP *
-              <input type="text" value={zip} onChange={e => setZip(e.target.value)} organic gardening solution="e.g., 28580" style={{ width: '100%', padding: 8, marginTop: 6, border: !zip.trim() ? '2px solid #ef4444' : '1px solid #ccc' }} />
+              <input type="text" value={zip} onChange={e => setZip(e.target.value)} placeholder="e.g., 28580" style={{ width: '100%', padding: 8, marginTop: 6, border: !zip.trim() ? '2px solid #ef4444' : '1px solid #ccc' }} />
             </label>
             <label style={{ display: 'block', marginTop: 8, flex: 1 }}>
               City *
-              <input type="text" value={city} onChange={e => setCity(e.target.value)} organic gardening solution="e.g., Snow Hill" style={{ width: '100%', padding: 8, marginTop: 6, border: !city.trim() ? '2px solid #ef4444' : '1px solid #ccc' }} />
+              <input type="text" value={city} onChange={e => setCity(e.target.value)} placeholder="e.g., Snow Hill" style={{ width: '100%', padding: 8, marginTop: 6, border: !city.trim() ? '2px solid #ef4444' : '1px solid #ccc' }} />
             </label>
             <label style={{ display: 'block', marginTop: 8, flex: 1 }}>
               State *
-              <input type="text" value={stateCode} onChange={e => setStateCode(e.target.value.toUpperCase())} organic gardening solution="NC" maxLength={2} style={{ width: '100%', padding: 8, marginTop: 6, border: !stateCode.trim() ? '2px solid #ef4444' : '1px solid #ccc' }} />
+              <input type="text" value={stateCode} onChange={e => setStateCode(e.target.value.toUpperCase())} placeholder="NC" maxLength={2} style={{ width: '100%', padding: 8, marginTop: 6, border: !stateCode.trim() ? '2px solid #ef4444' : '1px solid #ccc' }} />
             </label>
           </div>
           <button disabled={disabled || loading} onClick={ensurePaymentIntent} style={{ marginTop: 12, padding: '10px 16px' }}>
