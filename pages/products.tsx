@@ -19,38 +19,46 @@ export default function ProductsPage({ products }: ProductsPageProps) {
         />
       </Head>
 
-      <main className="px-6 py-10">
-        <h1 className="text-3xl font-bold text-center text-green-800 mb-10">
-          Our Products
-        </h1>
+      <main className="p-xl">
+        <div className="container">
+          <div className="text-center mb-xl">
+            <h1>Our Products</h1>
+            <p style={{fontSize: '1.1rem', color: 'var(--neutral-600)', maxWidth: '600px', margin: '0 auto'}}>
+              Shop Nature's Way Soil organic fertilizers, compost, and plant boosters designed to restore soil health naturally.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {products.map((product) => (
-            <Link
-              href={`/products/${product.slug}`}
-              key={product.id}
-              className="block border rounded-2xl shadow-md hover:shadow-lg transition p-4 bg-white"
-            >
-              <img
-                src={product.image}
-                alt={product.title}
-                className="w-full h-56 object-cover rounded-lg mb-4"
-              />
-              <h2 className="text-xl font-semibold text-green-900 mb-2">
-                {product.title}
-              </h2>
-              <p className="text-gray-600 text-sm mb-3">
-                {product.shortDescription}
-              </p>
-              <p className="text-lg font-bold text-green-700">
-                {product.price !== undefined
-                  ? `$${product.price}`
-                  : product.variations && product.variations.length > 0
-                    ? `$${product.variations[0].price}`
-                    : ''}
-              </p>
-            </Link>
-          ))}
+          <div className="grid grid-3">
+            {products.map((product) => (
+              <Link
+                href={`/products/${product.slug}`}
+                key={product.id}
+                className="product-card"
+                style={{textDecoration: 'none', color: 'inherit'}}
+              >
+                <img
+                  src={product.image}
+                  alt={product.title}
+                  style={{width: '100%', height: '200px', objectFit: 'contain'}}
+                />
+                <div className="product-card-content">
+                  <h3 style={{color: 'var(--neutral-800)', marginBottom: 'var(--space-sm)'}}>
+                    {product.title}
+                  </h3>
+                  <p style={{color: 'var(--neutral-600)', fontSize: '0.9rem', marginBottom: 'var(--space-md)'}}>
+                    {product.shortDescription}
+                  </p>
+                  <div className="product-price">
+                    {product.price !== undefined
+                      ? `$${product.price}`
+                      : product.variations && product.variations.length > 0
+                        ? `Starting at $${product.variations[0].price}`
+                        : 'Price varies'}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </main>
     </>

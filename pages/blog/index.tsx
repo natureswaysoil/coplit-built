@@ -21,22 +21,35 @@ export default function BlogIndex() {
         <meta name="twitter:description" content={description} />
       </Head>
 
-      <main className="max-w-6xl mx-auto px-6 py-10">
-        <section className="rounded-2xl bg-gradient-to-br from-green-50 to-white border border-green-100 p-10 text-center">
-          <h1 className="text-4xl font-bold text-green-900 mb-3">Our Blog</h1>
-          <p className="text-gray-700 mb-6">Guides and updates for healthier soil and happier plants. New posts are on the way.</p>
-          <div className="flex justify-center gap-3">
-            <Link href="/products" className="rounded-md px-5 py-3 font-semibold text-white bg-brand-700 hover:bg-brand-800">Shop Products</Link>
-            <Link href="/contact" className="rounded-md px-5 py-3 font-semibold border border-brand-700 text-brand-700 hover:bg-brand-50">Contact Us</Link>
-          </div>
-        </section>
+      <main className="p-xl">
+        <div className="container">
+          <section className="hero" style={{borderRadius: '1rem', marginBottom: 'var(--space-xl)'}}>
+            <div className="container text-center">
+              <h1>Our Blog</h1>
+              <p className="mb-lg" style={{fontSize: '1.2rem'}}>
+                Guides and updates for healthier soil and happier plants. New posts are on the way.
+              </p>
+              <div style={{display: 'flex', justifyContent: 'center', gap: 'var(--space-md)', flexWrap: 'wrap'}}>
+                <Link href="/products" className="btn btn-secondary" style={{backgroundColor: 'white', color: 'var(--primary)'}}>
+                  Shop Products
+                </Link>
+                <Link href="/contact" className="btn btn-primary" style={{backgroundColor: 'rgba(255, 255, 255, 0.2)', color: 'white', border: '1px solid rgba(255, 255, 255, 0.3)'}}>
+                  Contact Us
+                </Link>
+              </div>
+            </div>
+          </section>
 
-        <section className="mt-10">
-          <div className="rounded-xl border border-green-100 bg-white p-6 text-center text-gray-600">
-            <div className="mb-2 font-semibold text-green-900">available now</div>
-            <p>We\'re preparing articles on application rates, season-by-season plans, and troubleshooting common lawn & garden issues.</p>
-          </div>
-        </section>
+          <section>
+            <div className="card text-center" style={{backgroundColor: 'var(--neutral-50)'}}>
+              <h3 style={{color: 'var(--primary)', marginBottom: 'var(--space-md)'}}>Coming Soon</h3>
+              <p style={{color: 'var(--neutral-600)', fontSize: '1.1rem'}}>
+                We're preparing comprehensive articles on application rates, season-by-season care plans, 
+                and troubleshooting common lawn and garden issues. Stay tuned for expert tips and guidance!
+              </p>
+            </div>
+          </section>
+        </div>
       </main>
     </>
   )
