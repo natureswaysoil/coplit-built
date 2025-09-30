@@ -5,6 +5,7 @@ export default function Document() {
     <Html>
       <Head>
         <meta name="google-site-verification" content="BqQM4alYBSVlcmM4Y252DprrpLJiCQ9dc8AiX26N5WA" />
+        <meta name="tiktok-developers-site-verification" content="Vppdkkg17zPwMXE5vCnTmcHXvGI2moBj" />
       </Head>
       <body>
         <Main />
