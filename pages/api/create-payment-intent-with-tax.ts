@@ -123,13 +123,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const effectiveRate = subtotal > 0 ? (tax / subtotal) : 0;
     const shippingAmount = shipping?.amount ? Math.round(shipping.amount) : 0;
 
+    // IMPORTANT: Do NOT set shipping here with secret key.
+    // Shipping information will be set by the frontend during payment confirmation
+    // using the publishable key via stripe.confirmPayment(). This prevents the
+    // Stripe error: "shipping information was last set with a secret key and 
+    // therefore cannot be changed with a publishable key."
     const pi = await stripe.paymentIntents.create({
       amount: total,
       currency: "usd",
       customer: stripeCustomerId,
       automatic_payment_methods: { enabled: true },
       receipt_email: customer?.email,
-      shipping: { name: customer?.name ?? "", address },
+      // shipping: REMOVED - will be set by frontend during confirmPayment
       metadata: {
         tax_calculation: calc.id,
         promo_code: promoCode || "",
