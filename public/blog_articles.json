@@ -9,7 +9,14 @@
     "category": "Soil Health",
     "featuredImage": "//images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&h=400&fit=crop",
     "author": "Nature's Way Team",
-    "featuredPost": false
+    "featuredPost": false,
+    "videos": {
+      "tiktok": null,
+      "instagram": null,
+      "youtube": null
+    },
+    "videoDescription": null,
+    "socialMediaPromoted": false
   },
   {
     "id": "article_20250928_190850",
@@ -21,7 +28,14 @@
     "category": "Soil Health",
     "featuredImage": null,
     "author": "Nature's Way Team",
-    "featuredPost": true
+    "featuredPost": true,
+    "videos": {
+      "tiktok": null,
+      "instagram": null,
+      "youtube": null
+    },
+    "videoDescription": null,
+    "socialMediaPromoted": false
   },
   {
     "id": "article_20251001_120000",
@@ -47,6 +61,13 @@
       "fertilizing"
     ],
     "metaDescription": "Expert guide to pruning techniques for healthier plants. Natural gardening tips and organic solutions for healthier plants and soil.",
-    "featuredPost": false
+    "featuredPost": false,
+    "videos": {
+      "tiktok": null,
+      "instagram": null,
+      "youtube": "https://www.youtube.com/embed/Vz_fJK0bPFg"
+    },
+    "videoDescription": "Watch our expert demonstrate these pruning techniques in action! Learn the proper cuts, timing, and tools for healthier plants.",
+    "socialMediaPromoted": true
   }
 ]
