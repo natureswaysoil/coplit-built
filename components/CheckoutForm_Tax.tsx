@@ -36,7 +36,11 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
     setSubmitting(true);
     setError(null);
 
-  const { error } = await stripe.confirmPayment({
+  // IMPORTANT: Shipping information is set here during payment confirmation
+    // using the publishable key. The backend does NOT set shipping when creating
+    // the PaymentIntent to avoid Stripe's security restriction that prevents
+    // updating shipping info set with a secret key using a publishable key.
+    const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
     receipt_email: linkEmail || email,
@@ -55,6 +59,7 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
             } : undefined,
           },
         },
+        // Shipping info is set here with publishable key (safe and correct approach)
         shipping: address?.address1 ? {
           name,
           phone: address?.phone,
