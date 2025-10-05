@@ -10,6 +10,7 @@ import EnhancedChatWidget from '../components/EnhancedChatWidget';
 import AdvancedEmailCapture from '../components/AdvancedEmailCapture';
 import PersonalizedRecommendations from '../components/PersonalizedRecommendations';
 import SocialProofBanner from '../components/SocialProofBanner';
+import Footer from '../components/Footer';
 
 export default function Home() {
   const { addItem } = useCart();
@@ -23,14 +24,14 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Nature's Way Soil | Organic Soil Health & Fertility</title>
+        <title>Nature's Way Soil | Organic Soil Health & Fertility Products</title>
         <meta name="description" content="Bring life back to your soil with microbe-rich fertilizers, compost, and plant boosters. Safe for kids, pets, and pollinators." />
         <link rel="canonical" href={`${process.env.PUBLIC_SITE_URL || 'https://natureswaysoil.com'}/`} />
       </Head>
       
       {/* Hero Video Section with Educational Content */}
       <HeroVideoSection 
-        videoUrl="/videos/hero-video.mp4"
+        videoUrl="https://d3uryq9bhgb5qr.cloudfront.net/Pictory-API-Self-Service-USD-Monthly/6brpmrpiu3k3kud3b4eb7nc1rs/a2a35808-5743-40eb-8023-22b2c6b6cf2d/VIDEO/soil_symbiosis_hero_video.mp4"
         posterUrl="/videos/hero-poster.jpg"
       />
 
@@ -108,8 +109,8 @@ export default function Home() {
             </div>
             <div className="text-center">
               <Image
-                src="/screenshots/soil-comparison.png"
-                alt="Before and after soil comparison"
+                src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=500&h=300&fit=crop"
+                alt="Healthy soil comparison"
                 width={500}
                 height={300}
                 style={{maxWidth: '100%', height: 'auto', borderRadius: '1rem'}}
@@ -157,6 +158,9 @@ export default function Home() {
       
       {/* Social Proof Banner */}
       <SocialProofBanner />
+
+      {/* Footer */}
+      <Footer />
     </>
   );
 }
