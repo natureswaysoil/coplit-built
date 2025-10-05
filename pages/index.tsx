@@ -27,6 +27,8 @@ export default function Home() {
         <title>Nature's Way Soil | Organic Soil Health & Fertility Products</title>
         <meta name="description" content="Bring life back to your soil with microbe-rich fertilizers, compost, and plant boosters. Safe for kids, pets, and pollinators." />
         <link rel="canonical" href={`${process.env.PUBLIC_SITE_URL || 'https://natureswaysoil.com'}/`} />
+        <link rel="preconnect" href="https://d3uryq9bhgb5qr.cloudfront.net" />
+        <link rel="dns-prefetch" href="https://d3uryq9bhgb5qr.cloudfront.net" />
       </Head>
       
       {/* Hero Video Section with Educational Content */}
