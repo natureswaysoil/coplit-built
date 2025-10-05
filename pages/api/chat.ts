@@ -1,101 +1,78 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import OpenAI from 'openai';
-import { getServiceSupabase } from '../../lib/supabase';
+
+import type { NextApiRequest, NextApiResponse } from 'next'
+import OpenAI from 'openai'
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-const SYSTEM_PROMPT = `You are a knowledgeable and friendly soil health expert for Nature's Way Soil. Your role is to educate customers about:
-
-1. Soil Ecosystems: Explain how healthy soil is a living ecosystem with billions of microorganisms
-2. Synthetic Fertilizer Problems: Educate about how synthetic fertilizers harm soil life and create dependency
-3. Organic Solutions: Promote natural, sustainable soil health practices
-4. Product Benefits: When relevant, mention how Nature's Way Soil products support soil health
-
-Key Points to Remember:
-- Be educational, not pushy or sales-focused
-- Use simple, clear language that anyone can understand
-- Be enthusiastic about soil health and natural growing
-- Provide actionable advice
-- If asked about specific products, explain their benefits for soil health
-- Always emphasize the importance of feeding the soil, not just the plants
-
-Available Products:
-- Organic Soil Conditioner: Improves soil structure and microbial activity
-- Compost Tea: Liquid microbial inoculant for instant soil life boost
-- Mycorrhizal Fungi: Beneficial fungi that extend root systems
-- Worm Castings: Rich in nutrients and beneficial microbes
-- Rock Dust: Slow-release minerals for long-term soil health
-
-Keep responses concise (2-3 paragraphs max) and friendly. Use emojis occasionally to keep it engaging 🌱`;
+  apiKey: process.env.OPENAI_API_KEY
+})
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ error: 'Method not allowed' })
   }
 
   try {
-    const { message, sessionId, chatHistory = [] } = req.body;
+    const { message, sessionId, history } = req.body
 
-    if (!message) {
-      return res.status(400).json({ error: 'Message is required' });
+    // Build context from history
+    const messages: any[] = [
+      {
+        role: 'system',
+        content: `You are a knowledgeable and friendly customer service representative for Nature's Way Soil, an organic fertilizer company. 
+
+Your expertise includes:
+- The science of soil microbiomes and mycorrhizal fungi
+- How synthetic fertilizers disrupt natural soil processes
+- Benefits of organic fertilizers vs synthetic ones
+- Product recommendations based on customer needs
+- Application instructions and best practices
+- Troubleshooting plant and soil issues
+
+Key facts to reference:
+- Mycorrhizal fungi form symbiotic relationships with 90% of plant species
+- Synthetic fertilizers can reduce beneficial soil microbes by up to 84%
+- Our products work WITH soil biology, not against it
+- All products are USDA certified organic and made fresh weekly
+
+Be helpful, educational, and guide customers toward making informed decisions. Keep responses concise (2-3 paragraphs max) and actionable. If asked about specific products, recommend based on their needs. Always emphasize science-backed benefits.`
+      }
+    ]
+
+    // Add conversation history
+    if (history && Array.isArray(history)) {
+      history.forEach((msg: any) => {
+        messages.push({
+          role: msg.role,
+          content: msg.content
+        })
+      })
     }
 
-    // Build conversation history
-    const messages: any[] = [
-      { role: 'system', content: SYSTEM_PROMPT },
-      ...chatHistory.map((msg: any) => ({
-        role: msg.role,
-        content: msg.content,
-      })),
-      { role: 'user', content: message },
-    ];
+    // Add current message
+    messages.push({
+      role: 'user',
+      content: message
+    })
 
-    // Get AI response
+    // Get response from OpenAI
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4o',
       messages,
-      temperature: 0.7,
       max_tokens: 500,
-    });
+      temperature: 0.7
+    })
 
-    const aiResponse = completion.choices[0].message.content;
+    const response = completion.choices[0].message.content
 
-    // Save to Supabase
-    const supabase = getServiceSupabase();
-    
-    // Save user message
-    await supabase.from('chat_messages').insert([
-      {
-        session_id: sessionId,
-        role: 'user',
-        content: message,
-      },
-    ]);
-
-    // Save AI response
-    await supabase.from('chat_messages').insert([
-      {
-        session_id: sessionId,
-        role: 'assistant',
-        content: aiResponse || '',
-      },
-    ]);
-
-    return res.status(200).json({ 
-      response: aiResponse,
-      success: true 
-    });
-
-  } catch (error) {
-    console.error('Chat error:', error);
+    return res.status(200).json({ response })
+  } catch (error: any) {
+    console.error('Chat API error:', error)
     return res.status(500).json({ 
-      error: 'Failed to process chat message. Please try again.',
-      response: 'I apologize, but I\'m having trouble responding right now. Please try again in a moment! 🌱'
-    });
+      error: 'Failed to process chat message',
+      details: error.message 
+    })
   }
 }
