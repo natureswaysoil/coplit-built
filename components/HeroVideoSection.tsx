@@ -19,24 +19,47 @@ export default function HeroVideoSection({
     const video = videoRef.current
     if (!video) return
 
-    // Ensure video is muted for autoplay to work
+    // Set all required attributes for autoplay
     video.muted = true
+    video.playsInline = true
+    video.setAttribute('playsinline', '')
+    video.setAttribute('webkit-playsinline', '')
     
-    // Attempt to play the video
-    const playPromise = video.play()
+    // Handle video load
+    const handleLoadedData = () => {
+      setIsLoaded(true)
+      setHasError(false)
+      
+      // Attempt to play after video is loaded
+      const playPromise = video.play()
+      
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log('Video autoplay started successfully')
+          })
+          .catch((error) => {
+            console.log('Autoplay prevented, user interaction required:', error)
+            // Video will show with controls for user to click play
+          })
+      }
+    }
+
+    const handleError = (e: Event) => {
+      console.error('Video loading error:', e)
+      setHasError(true)
+      setIsLoaded(true)
+    }
+
+    video.addEventListener('loadeddata', handleLoadedData)
+    video.addEventListener('error', handleError)
     
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          setIsLoaded(true)
-          setHasError(false)
-        })
-        .catch((error) => {
-          console.log('Autoplay prevented:', error)
-          // Autoplay was prevented, video will show with controls
-          setIsLoaded(true)
-          setHasError(false)
-        })
+    // Force load the video
+    video.load()
+
+    return () => {
+      video.removeEventListener('loadeddata', handleLoadedData)
+      video.removeEventListener('error', handleError)
     }
   }, [])
 
@@ -64,21 +87,33 @@ export default function HeroVideoSection({
           {/* Video Container */}
           <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-black">
             <div className="aspect-video relative">
-              <video
-                ref={videoRef}
-                src={videoUrl}
-                poster={posterUrl}
-                controls
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
-                className="w-full h-full object-cover"
-                onError={() => setHasError(true)}
-              >
-                Your browser does not support the video tag.
-              </video>
+              {hasError ? (
+                <div className="w-full h-full flex items-center justify-center bg-gray-900 text-white">
+                  <div className="text-center p-8">
+                    <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-lg">Video temporarily unavailable</p>
+                    <p className="text-sm text-gray-400 mt-2">Please check back soon</p>
+                  </div>
+                </div>
+              ) : (
+                <video
+                  ref={videoRef}
+                  src={videoUrl}
+                  poster={posterUrl}
+                  controls
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="auto"
+                  className="w-full h-full object-cover"
+                  style={{ backgroundColor: '#000' }}
+                >
+                  Your browser does not support the video tag.
+                </video>
+              )}
               
               {/* Mute/Unmute Button */}
               {isLoaded && !hasError && (
