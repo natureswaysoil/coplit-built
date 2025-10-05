@@ -1,10 +1,10 @@
 
 {
   "hero": {
-    "src": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    "poster": "/videos/hero-poster.jpg",
+    "src": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    "poster": "/videos/soil-health-poster.jpg",
     "fallbackImage": "/screenshots/logo-with-tagline.png",
-    "alt": "Nature's Way Soil - Organic farming and soil restoration"
+    "alt": "Nature's Way Soil - Healthy soil restoration and organic farming practices"
   },
   "settings": {
     "autoplay": true,
