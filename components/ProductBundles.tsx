@@ -1,15 +1,25 @@
 import { useState } from 'react';
 import Link from 'next/link';
-import type { Product } from '@/lib/cart';
+
+// Simplified product interface for bundle display
+interface BundleProduct {
+  id: string;
+  title: string;
+  slug: string;
+  price: number;
+  image: string;
+  category: string;
+  active: boolean;
+}
 
 interface BundleItem {
-  product: Product;
+  product: BundleProduct;
   selected: boolean;
 }
 
 interface ProductBundlesProps {
-  currentProduct: Product;
-  relatedProducts: Product[];
+  currentProduct: BundleProduct;
+  relatedProducts: BundleProduct[];
 }
 
 export default function ProductBundles({ currentProduct, relatedProducts }: ProductBundlesProps) {
