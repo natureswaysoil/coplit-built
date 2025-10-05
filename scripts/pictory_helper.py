@@ -37,7 +37,7 @@ def get_access_token():
         return None
 
 def create_video_from_script(script_text, video_name, use_getty=True):
-    """Create video from script using Pictory API"""
+    """Create video from script using Pictory API - returns job_id for async processing"""
     access_token = get_access_token()
     if not access_token:
         return None
@@ -61,7 +61,7 @@ def create_video_from_script(script_text, video_name, use_getty=True):
     
     for i, paragraph in enumerate(paragraphs[:10]):  # Limit to 10 scenes
         scene = {
-            "sceneText": paragraph[:500],  # Limit text length
+            "text": paragraph[:500],  # Limit text length
             "voiceOver": True,
             "splitTextOnNewLine": False,
             "splitTextOnPeriod": True
@@ -85,40 +85,93 @@ def create_video_from_script(script_text, video_name, use_getty=True):
             print(f"No job ID returned: {job_data}", file=sys.stderr)
             return None
         
-        # Poll for completion
-        print(f"Job ID: {job_id}. Waiting for video generation...", file=sys.stderr)
-        max_attempts = 60
-        attempt = 0
-        
-        while attempt < max_attempts:
-            status_url = f"{BASE_URL}/jobs/{job_id}"
-            status_response = requests.get(status_url, headers=headers)
-            status_response.raise_for_status()
-            status_data = status_response.json()
-            
-            status = status_data.get('status')
-            print(f"Attempt {attempt + 1}: Status = {status}", file=sys.stderr)
-            
-            if status == 'completed':
-                video_url = status_data.get('videoUrl') or status_data.get('data', {}).get('videoUrl')
-                if video_url:
-                    print(f"Video created successfully: {video_url}", file=sys.stderr)
-                    return video_url
-                else:
-                    print(f"Video completed but no URL found: {status_data}", file=sys.stderr)
-                    return None
-            elif status == 'failed':
-                print(f"Video generation failed: {status_data}", file=sys.stderr)
-                return None
-            
-            time.sleep(10)
-            attempt += 1
-        
-        print("Video generation timed out", file=sys.stderr)
-        return None
+        print(f"Storyboard job created: {job_id}", file=sys.stderr)
+        return job_id
         
     except Exception as e:
         print(f"Error creating video: {e}", file=sys.stderr)
+        import traceback
+        traceback.print_exc()
+        return None
+
+def check_job_status(job_id):
+    """Check status of a Pictory job"""
+    access_token = get_access_token()
+    if not access_token:
+        return None
+    
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json",
+        "X-Pictory-User-Id": CLIENT_ID
+    }
+    
+    try:
+        status_url = f"{BASE_URL}/jobs/{job_id}"
+        response = requests.get(status_url, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+        
+        if not data.get('success'):
+            return {'status': 'failed', 'error': data.get('data', {}).get('error_message', 'Unknown error')}
+        
+        job_data = data.get('data', {})
+        
+        # For render jobs, check the status field
+        if 'status' in job_data:
+            status = job_data['status']
+            if status == 'completed':
+                return {
+                    'status': 'completed',
+                    'videoUrl': job_data.get('videoURL') or job_data.get('shareVideoURL'),
+                    'data': job_data
+                }
+            elif status == 'failed':
+                return {'status': 'failed', 'error': job_data.get('error_message', 'Render failed')}
+            else:
+                return {'status': status}  # in-progress, etc.
+        
+        # For storyboard jobs, check if renderParams exists
+        elif 'renderParams' in job_data:
+            return {'status': 'completed', 'data': job_data}
+        else:
+            # Job is still processing
+            return {'status': 'processing'}
+        
+    except Exception as e:
+        print(f"Error checking job status: {e}", file=sys.stderr)
+        return None
+
+def render_video(storyboard_job_id):
+    """Render video from completed storyboard"""
+    access_token = get_access_token()
+    if not access_token:
+        return None
+    
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json",
+        "X-Pictory-User-Id": CLIENT_ID
+    }
+    
+    try:
+        render_url = f"{BASE_URL}/video/render/{storyboard_job_id}"
+        response = requests.put(render_url, headers=headers)
+        response.raise_for_status()
+        job_data = response.json()
+        
+        # The API returns job_id in data.job_id
+        render_job_id = job_data.get('data', {}).get('job_id') or job_data.get('jobId')
+        
+        if not render_job_id:
+            print(f"No render job ID returned: {job_data}", file=sys.stderr)
+            return None
+        
+        print(f"Render job created: {render_job_id}", file=sys.stderr)
+        return render_job_id
+        
+    except Exception as e:
+        print(f"Error rendering video: {e}", file=sys.stderr)
         import traceback
         traceback.print_exc()
         return None

@@ -7,7 +7,7 @@ interface HeroVideoSectionProps {
 }
 
 export default function HeroVideoSection({ 
-  videoUrl = '/videos/hero-video.mp4',
+  videoUrl = 'https://d3uryq9bhgb5qr.cloudfront.net/Pictory-API-Self-Service-USD-Monthly/6brpmrpiu3k3kud3b4eb7nc1rs/a2a35808-5743-40eb-8023-22b2c6b6cf2d/VIDEO/soil_symbiosis_hero_video.mp4',
   posterUrl = '/videos/hero-poster.jpg'
 }: HeroVideoSectionProps) {
   const [isPlaying, setIsPlaying] = useState(false)
