@@ -48,7 +48,7 @@ export default async function TikTokLanding() {
           width={150}
           height={150}
         />
-        <h1>Welcome TikTok Gardeners! 🌱</h1>
+        <h1>Welcome TikTok Gardeners! </h1>
         <p>Fix your lawn, grow vibrant plants, and protect your pets — all naturally.</p>
       </header>
 

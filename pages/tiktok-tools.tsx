@@ -141,7 +141,7 @@ export default function TikTokTools() {
           <h3>🎯 TikTok Content Ideas</h3>
           <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))' }}>
             <div style={{ padding: '1rem', background: '#f8f9fa', borderRadius: '8px' }}>
-              <strong>🌱 Before/After</strong><br />
+              <strong> Before/After</strong><br />
               Show lawn transformations using your products
             </div>
             <div style={{ padding: '1rem', background: '#f8f9fa', borderRadius: '8px' }}>
@@ -153,7 +153,7 @@ export default function TikTokTools() {
               Show how organic vs synthetic works
             </div>
             <div style={{ padding: '1rem', background: '#f8f9fa', borderRadius: '8px' }}>
-              <strong>🌿 Quick Tips</strong><br />
+              <strong> Quick Tips</strong><br />
               "3 signs your soil needs help"
             </div>
           </div>

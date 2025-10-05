@@ -95,11 +95,11 @@ export default function Home() {
             <div>
               <h2>Why Choose Nature's Way Soil?</h2>
               <div className="mb-lg">
-                <h4 style={{color: 'var(--primary)', marginBottom: 'var(--space-sm)'}}>🌱 Science-Based Solutions</h4>
+                <h4 style={{color: 'var(--primary)', marginBottom: 'var(--space-sm)'}}>Science-Based Solutions</h4>
                 <p>Our products are formulated based on the latest soil science research, combining beneficial microbes, organic matter, and natural nutrients.</p>
               </div>
               <div className="mb-lg">
-                <h4 style={{color: 'var(--primary)', marginBottom: 'var(--space-sm)'}}>🌍 Environmentally Safe</h4>
+                <h4 style={{color: 'var(--primary)', marginBottom: 'var(--space-sm)'}}>Environmentally Safe</h4>
                 <p>Every ingredient is carefully selected to be safe for children, pets, pollinators, and the environment.</p>
               </div>
               <div className="mb-lg">
