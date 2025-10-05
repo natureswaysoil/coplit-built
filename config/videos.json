@@ -1,0 +1,22 @@
+
+{
+  "hero": {
+    "src": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    "poster": "/videos/soil-health-poster.jpg",
+    "fallbackImage": "/screenshots/logo-with-tagline.png",
+    "alt": "Nature's Way Soil - Healthy soil restoration and organic farming practices"
+  },
+  "settings": {
+    "autoplay": true,
+    "muted": true,
+    "loop": true,
+    "controls": false,
+    "playsInline": true,
+    "preload": "metadata"
+  },
+  "fallbacks": {
+    "enableFallback": true,
+    "fallbackDelay": 5000,
+    "retryAttempts": 2
+  }
+}
