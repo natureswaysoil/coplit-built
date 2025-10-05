@@ -1,0 +1,22 @@
+
+{
+  "hero": {
+    "src": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "poster": "/videos/hero-poster.jpg",
+    "fallbackImage": "/screenshots/logo-with-tagline.png",
+    "alt": "Nature's Way Soil - Organic farming and soil restoration"
+  },
+  "settings": {
+    "autoplay": true,
+    "muted": true,
+    "loop": true,
+    "controls": false,
+    "playsInline": true,
+    "preload": "metadata"
+  },
+  "fallbacks": {
+    "enableFallback": true,
+    "fallbackDelay": 5000,
+    "retryAttempts": 2
+  }
+}
