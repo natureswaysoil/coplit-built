@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { fetchProductWithVariationsBySlug } from '@/lib/productFetch'
 import { products as staticProducts } from '@/lib/products'
 import { NormalizedProduct, normalizeFromStatic } from '@/lib/productNormalizer'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import UsageInstructionsSection from '@/components/UsageInstructions'
 import { useCart } from '@/lib/cartContext'
 import ReviewSection from '@/components/ReviewSection'
@@ -12,6 +12,11 @@ import UrgencyBadges from '@/components/UrgencyBadges'
 import MoneyBackGuarantee from '@/components/MoneyBackGuarantee'
 import ProductBundles from '@/components/ProductBundles'
 import EmailCaptureSection from '@/components/EmailCaptureSection'
+import ProductVideoPlayer from '@/components/ProductVideoPlayer'
+import InventoryTracker from '@/components/InventoryTracker'
+import PersonalizedRecommendations from '@/components/PersonalizedRecommendations'
+import EnhancedChatWidget from '@/components/EnhancedChatWidget'
+import { trackProductView } from '@/lib/supabase_client'
 
 interface ProductPageProps { product: NormalizedProduct }
 
@@ -21,8 +26,17 @@ export default function ProductPage(props: ProductPageProps) {
   const { product } = props
   const { addItem } = useCart()
   const [sku, setSku] = useState<string>(() => product.variations?.[0]?.sku || '')
+  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`)
   const variant = product.variations?.find(v => v.sku === sku) || product.variations?.[0]
-  // Debug logs removed for production cleanliness
+  
+  // Track product view
+  useEffect(() => {
+    if (product.id) {
+      trackProductView(product.id, sessionId).catch(err => {
+        console.error('Failed to track product view:', err)
+      })
+    }
+  }, [product.id, sessionId])
 
   return (
     <>
@@ -72,6 +86,13 @@ export default function ProductPage(props: ProductPageProps) {
       <main className="container p-xl">
         <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-xl)', alignItems: 'start'}}>
           <div>
+            {/* Product Video */}
+            <ProductVideoPlayer 
+              videoUrl={`/videos/products/${product.id}.mp4`}
+              productName={product.title}
+              posterUrl={product.image}
+            />
+            
             <Image
               src={product.image}
               alt={product.title}
@@ -82,6 +103,10 @@ export default function ProductPage(props: ProductPageProps) {
           </div>
           <div>
             <h1 style={{color: 'var(--primary)', marginBottom: 'var(--space-lg)'}}>{product.title}</h1>
+            
+            {/* Inventory Tracker */}
+            <InventoryTracker productId={product.id} />
+            
             <p style={{marginBottom: 'var(--space-lg)', lineHeight: '1.6', color: 'var(--neutral-700)'}}>{product.description}</p>
             {product.variations?.length ? (
               <div style={{marginBottom: 'var(--space-lg)'}}>
@@ -157,10 +182,18 @@ export default function ProductPage(props: ProductPageProps) {
           />
         </div>
 
+        {/* Personalized Recommendations */}
+        <div style={{marginTop: 'var(--space-xl)'}}>
+          <PersonalizedRecommendations currentProductId={product.id} />
+        </div>
+
         {/* Email Capture Section */}
         <div style={{marginTop: 'var(--space-xl)'}}>
           <EmailCaptureSection />
         </div>
+        
+        {/* Enhanced Chat Widget */}
+        <EnhancedChatWidget />
 
         {/* Usage instructions */}
         {product.usageInstructions ? (
