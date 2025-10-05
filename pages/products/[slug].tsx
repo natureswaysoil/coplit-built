@@ -7,6 +7,11 @@ import { NormalizedProduct, normalizeFromStatic } from '@/lib/productNormalizer'
 import { useState } from 'react'
 import UsageInstructionsSection from '@/components/UsageInstructions'
 import { useCart } from '@/lib/cartContext'
+import ReviewSection from '@/components/ReviewSection'
+import UrgencyBadges from '@/components/UrgencyBadges'
+import MoneyBackGuarantee from '@/components/MoneyBackGuarantee'
+import ProductBundles from '@/components/ProductBundles'
+import EmailCaptureSection from '@/components/EmailCaptureSection'
 
 interface ProductPageProps { product: NormalizedProduct }
 
@@ -95,6 +100,16 @@ export default function ProductPage(props: ProductPageProps) {
             <div style={{fontWeight: 'bold', marginBottom: 'var(--space-lg)', fontSize: '1.5rem', color: 'var(--primary)'}}>
               {variant ? `$${variant.price.toFixed(2)}` : (product.price !== undefined ? `$${product.price.toFixed(2)}` : '')}
             </div>
+            {/* Urgency Badges */}
+            <UrgencyBadges 
+              stockLevel="low"
+              recentPurchases={Math.floor(Math.random() * 20) + 5}
+              showFreeShipping={true}
+            />
+
+            {/* Money-Back Guarantee */}
+            <MoneyBackGuarantee />
+
             <button
               onClick={() => {
                 if (!(variant || product.price !== undefined)) return
@@ -104,6 +119,47 @@ export default function ProductPage(props: ProductPageProps) {
               className="btn btn-primary"
             >Add to Cart</button>
           </div>
+        </div>
+
+        {/* Product Bundles */}
+        <div style={{marginTop: 'var(--space-xl)'}}>
+          <ProductBundles 
+            currentProduct={{
+              id: product.id,
+              title: product.title,
+              slug: product.slug || String(product.id),
+              price: variant?.price || product.price || 0,
+              image: product.image,
+              category: (product as any).category || 'soil-health',
+              active: true
+            }}
+            relatedProducts={staticProducts
+              .filter(p => (p as any).category === (product as any).category && p.id !== product.id)
+              .map(p => ({
+                id: p.id,
+                title: (p as any).title,
+                slug: p.slug || String(p.id),
+                price: (p as any).price || 0,
+                image: (p as any).image || '',
+                category: (p as any).category || 'soil-health',
+                active: true
+              }))
+            }
+          />
+        </div>
+
+        {/* Customer Reviews */}
+        <div style={{marginTop: 'var(--space-xl)'}}>
+          <ReviewSection 
+            productCategory={(product as any).category || 'soil-health'}
+            averageRating={4.8}
+            reviewCount={127}
+          />
+        </div>
+
+        {/* Email Capture Section */}
+        <div style={{marginTop: 'var(--space-xl)'}}>
+          <EmailCaptureSection />
         </div>
 
         {/* Usage instructions */}
