@@ -7,7 +7,7 @@ import { products } from '../lib/products';
 import { useCart } from '../lib/cartContext';
 import HeroVideoSection from '../components/HeroVideoSection';
 import EnhancedChatWidget from '../components/EnhancedChatWidget';
-import AdvancedEmailCapture from '../components/AdvancedEmailCapture';
+import CouponForm from '../components/CouponForm';
 import PersonalizedRecommendations from '../components/PersonalizedRecommendations';
 import SocialProofBanner from '../components/SocialProofBanner';
 import Footer from '../components/Footer';
@@ -27,6 +27,8 @@ export default function Home() {
         <title>Nature's Way Soil | Organic Soil Health & Fertility Products</title>
         <meta name="description" content="Bring life back to your soil with microbe-rich fertilizers, compost, and plant boosters. Safe for kids, pets, and pollinators." />
         <link rel="canonical" href={`${process.env.PUBLIC_SITE_URL || 'https://natureswaysoil.com'}/`} />
+        <link rel="preconnect" href="https://d3uryq9bhgb5qr.cloudfront.net" />
+        <link rel="dns-prefetch" href="https://d3uryq9bhgb5qr.cloudfront.net" />
       </Head>
       
       {/* Hero Video Section with Educational Content */}
@@ -123,18 +125,8 @@ export default function Home() {
       {/* Personalized Product Recommendations */}
       <PersonalizedRecommendations />
 
-      {/* Email Capture Section */}
-      <section className="p-xl" style={{backgroundColor: 'white'}}>
-        <div className="container">
-          <AdvancedEmailCapture 
-            source="homepage_bottom"
-            headline="Get Expert Soil Health Tips & Exclusive Offers"
-            subheadline="Join our community and learn how to transform your soil naturally"
-            incentive="Get 10% off your first order"
-            showTimer={true}
-          />
-        </div>
-      </section>
+      {/* 15% Off Coupon Form */}
+      <CouponForm />
 
       <section className="p-xl" style={{backgroundColor: 'var(--neutral-50)'}}>
         <div className="container text-center">

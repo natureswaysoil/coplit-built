@@ -92,7 +92,8 @@ export default function App({ Component, pageProps }: AppProps) {
         <Analytics />
         {/* Conversion Optimization Components */}
         <EducationalChatWidget />
-        <ExitIntentPopup />
+        {/* ExitIntentPopup disabled - replaced with new 15% off coupon form */}
+        {/* <ExitIntentPopup /> */}
 
         {/* TikTok Pixel */}
         <Script id="tiktok-pixel" strategy="afterInteractive">
