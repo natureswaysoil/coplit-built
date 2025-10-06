@@ -1,0 +1,9 @@
+# Ignore unnecessary files during Vercel build
+node_modules
+.git
+.next
+out
+*.log
+.DS_Store
+.env*
+!.env.example
