@@ -26,8 +26,6 @@ const nextConfig = {
   },
   // Enable compression
   compress: true,
-  // Enable SWC minification for better performance
-  swcMinify: true,
   async rewrites() {
     return [
       // Safety net: if Stripe is configured to POST to the site root, route it to the webhook handler
