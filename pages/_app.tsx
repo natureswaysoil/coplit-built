@@ -1,5 +1,4 @@
 import Head from 'next/head'
-// pages/_app.tsx
 import type { AppProps } from 'next/app'
 import Script from 'next/script'
 import { useEffect } from 'react'
@@ -42,44 +41,37 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <>
-      {/* 🎯 NEW SEO SECTION - ADD THIS */}
       <Head>
-        <html lang="en" />
-        <title>Nature's Way Soil - Natural Fertilizers & Soil Products | Horse-Safe & Pet-Friendly</title>
-        <meta name="description" content="Premium natural soil products, compost, and fertilizers from Nature's Way Soil. Horse-safe, pet-friendly solutions for healthier gardens and pastures. Free shipping over $75." />
+        <title>Nature's Way Soil – Natural Fertilizers & Soil Products</title>
+        <meta name="description" content="Premium natural soil products, compost, and fertilizers. Horse-safe, pet-friendly solutions for healthier gardens and pastures." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://natureswaysoil.com" />
-      
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'Store',
-              name: "Nature's Way Soil",
-              description:
-                "Premium organic fertilizers and soil amendments for natural gardening",
-              url: 'https://natureswaysoil.com',
-              category: 'Garden Center',
-              hasOfferCatalog: {
-                '@type': 'OfferCatalog',
-                name: 'Organic Gardening Products',
-                itemListElement: [
-                  {
-                    '@type': 'Offer',
-                    itemOffered: {
-                      '@type': 'Product',
-                      name: 'Organic Fertilizers',
-                      category: 'Fertilizer',
-                    },
-                  },
+        {/* Page components set their own canonical; keep global minimal */}
+        {router.pathname === '/' && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'Store',
+                name: "Nature's Way Soil",
+                url: 'https://natureswaysoil.com',
+                description: 'Premium organic fertilizers and soil amendments for natural gardening',
+                image: 'https://natureswaysoil.com/screenshots/logo-with-tagline.png',
+                sameAs: [
+                  'https://www.facebook.com/',
+                  'https://www.instagram.com/'
                 ],
-              },
-            }),
-          }}
-        />
-        </Head>
+                potentialAction: {
+                  '@type': 'SearchAction',
+                  target: 'https://natureswaysoil.com/products?q={search_term_string}',
+                  'query-input': 'required name=search_term_string'
+                }
+              })
+            }}
+          />
+        )}
+      </Head>
       
       <CartCtxProvider>
         <Navbar />

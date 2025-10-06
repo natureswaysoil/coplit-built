@@ -19,8 +19,8 @@ export function middleware(req: NextRequest) {
   const isProd = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1'
   const mustEnforce = isProd || (!!process.env.ADMIN_USER && !!(process.env.ADMIN_PASSWORD || process.env.ADMIN_API_TOKEN))
 
-  if (!mustEnforce) {
-    return NextResponse.next()
+  if (!mustEnforce || !pass) {
+    return securityHeaders(NextResponse.next())
   }
 
   const header = req.headers.get('authorization') || ''
@@ -34,7 +34,7 @@ export function middleware(req: NextRequest) {
     const decoded = atob(encoded)
     const [u, p] = decoded.split(':')
     if (u === user && p === pass && pass) {
-      return NextResponse.next()
+      return securityHeaders(NextResponse.next())
     }
   } catch (_) {
     // fall through to unauthorized
@@ -51,15 +51,33 @@ function unauthorized(req: NextRequest) {
     req.headers.get('sec-purpose') === 'prefetch'
 
   if (isPrefetch) {
-    return new NextResponse('Unauthorized', { status: 401 })
+    return securityHeaders(new NextResponse('Unauthorized', { status: 401 }))
   }
 
-  return new NextResponse('Unauthorized', {
+  return securityHeaders(new NextResponse('Unauthorized', {
     status: 401,
     headers: {
       'WWW-Authenticate': 'Basic realm="Admin", charset="UTF-8"',
     },
-  })
+  }))
+}
+
+function securityHeaders(res: NextResponse) {
+  res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  res.headers.set('X-Frame-Options', 'DENY')
+  res.headers.set('X-Content-Type-Options', 'nosniff')
+  res.headers.set('Permissions-Policy', 'geolocation=(), camera=(), microphone=()')
+  // Simple CSP (can be expanded later)
+  const csp = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' https://analytics.tiktok.com",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: https:",
+    "connect-src 'self' https://*.supabase.co https://api.resend.com",
+    "frame-ancestors 'none'"
+  ].join('; ')
+  res.headers.set('Content-Security-Policy', csp)
+  return res
 }
 
 export const config = {

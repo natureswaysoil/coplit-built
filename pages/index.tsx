@@ -3,11 +3,9 @@ import Link from 'next/link';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import { products } from '../lib/products';
-import { useCart } from '../lib/cartContext';
+import { ProductGrid } from '@/components/ProductGrid';
 
 export default function Home() {
-  const { addItem } = useCart();
-  const [selected, setSelected] = useState<Record<string, string>>({});
   const [items, setItems] = useState(Array.isArray(products) ? products : []);
 
   useEffect(() => {
@@ -81,100 +79,7 @@ export default function Home() {
               Discover our range of organic soil amendments and fertilizers designed to restore soil health naturally.
             </p>
           </div>
-          <div className="grid grid-3">
-            {items.length === 0 && (
-              <div style={{gridColumn: '1 / -1', textAlign: 'center', padding: 'var(--space-xl)'}}>
-                <p style={{color: 'var(--neutral-500)', fontSize: '1.1rem'}}>No products available at the moment.</p>
-              </div>
-            )}
-            {items.map((p) => (
-              <div key={p.id} className="product-card">
-                <div style={{position: 'relative'}}>
-                  <Image
-                    src={p.image}
-                    alt={p.title}
-                    width={300}
-                    height={200}
-                    style={{width: '100%', height: '200px', objectFit: 'contain'}}
-                  />
-                  {p.keyword && (
-                    <span style={{
-                      position: 'absolute',
-                      top: 'var(--space-sm)',
-                      left: 'var(--space-sm)',
-                      backgroundColor: 'var(--primary)',
-                      color: 'white',
-                      fontSize: '0.75rem',
-                      padding: 'var(--space-xs) var(--space-sm)',
-                      borderRadius: '0.25rem',
-                      fontWeight: '600'
-                    }}>
-                      {p.keyword}
-                    </span>
-                  )}
-                </div>
-                <div className="product-card-content">
-                  <h3>{p.title}</h3>
-                  <p>{p.details}</p>
-                  <div className="mb-md">
-                    <Link href={`/products/${p.slug}`} style={{color: 'var(--primary)', textDecoration: 'none', fontWeight: '500'}}>
-                      View Details →
-                    </Link>
-                  </div>
-                  <div className="mb-md">
-                    <label htmlFor={`home-size-${p.id}`} style={{display: 'block', fontWeight: '600', marginBottom: 'var(--space-xs)', color: 'var(--neutral-700)'}}>
-                      Choose size
-                    </label>
-                    <select
-                      id={`home-size-${p.id}`}
-                      value={selected[p.id] || ''}
-                      onChange={(e) => setSelected((s) => ({ ...s, [p.id]: e.target.value }))}
-                      style={{
-                        width: '100%',
-                        borderRadius: '0.5rem',
-                        border: '1px solid var(--neutral-300)',
-                        padding: 'var(--space-sm) var(--space-md)',
-                        backgroundColor: 'white',
-                        fontSize: '0.9rem'
-                      }}
-                      disabled={!p.variations || p.variations.length === 0}
-                    >
-                      <option value="" disabled>Select a size</option>
-                      {p.variations?.map(v => (
-                        <option key={v.sku} value={v.sku}>{v.size} - ${v.price.toFixed(2)}</option>
-                      ))}
-                    </select>
-                    {(!p.variations || p.variations.length === 0) && (
-                      <small style={{display: 'block', marginTop: 'var(--space-xs)', color: 'var(--neutral-500)'}}>
-                        Currently unavailable
-                      </small>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => {
-                      if (!p.variations || p.variations.length === 0) return;
-                      const sku = selected[p.id] || p.variations[0]?.sku;
-                      const variant = p.variations.find(v => v.sku === sku) || p.variations[0]!;
-                      addItem({
-                        id: String(p.id),
-                        title: p.title,
-                        image: p.image || '',
-                        sku: variant.sku,
-                        size: variant.size,
-                        price: variant.price,
-                        qty: 1,
-                      });
-                    }}
-                    disabled={!p.variations || p.variations.length === 0}
-                    className={(!p.variations || p.variations.length === 0) ? 'btn btn-secondary' : 'btn btn-primary'}
-                    style={{width: '100%'}}
-                  >
-                    {(!p.variations || p.variations.length === 0) ? 'Unavailable' : 'Add to Cart'}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+          <ProductGrid products={items as any} />
         </div>
       </section>
 
