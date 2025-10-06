@@ -24,6 +24,7 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
   const [promoCode, setPromoCode] = useState('')
   const [promoApplied, setPromoApplied] = useState(false)
   const [promoError, setPromoError] = useState<string | null>(null)
+  const [validatingPromo, setValidatingPromo] = useState(false)
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [intentId, setIntentId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -306,10 +307,109 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
           )}
           {subtotal >= FREE_SHIPPING_MINIMUM && (
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, color: '#22c55e' }}>
-              <span>🎉 Free Shipping!</span>
+              <span>Free Shipping!</span>
               <strong>$0.00</strong>
             </div>
           )}
+        </div>
+
+        {/* Promo Code Section */}
+        <div style={{ minWidth: 280, padding: 16, background: '#f8f9fa', borderRadius: 8 }}>
+          <h3 style={{ margin: '0 0 12px 0', fontSize: 16 }}>Have a Promo Code?</h3>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input
+              type="text"
+              value={promoCode}
+              onChange={(e) => {
+                setPromoCode(e.target.value.toUpperCase())
+                setPromoError('')
+              }}
+              placeholder="Enter code"
+              disabled={promoApplied || validatingPromo}
+              style={{
+                flex: 1,
+                padding: '8px 12px',
+                border: '1px solid #ccc',
+                borderRadius: 4,
+                fontSize: 14
+              }}
+            />
+            <button
+              onClick={async () => {
+                if (!promoCode.trim()) {
+                  setPromoError('Please enter a promo code')
+                  return
+                }
+                setValidatingPromo(true)
+                setPromoError('')
+                try {
+                  const resp = await fetch(`/api/promo/validate?code=${encodeURIComponent(promoCode)}`)
+                  const data = await resp.json()
+                  if (data.valid) {
+                    setPromoApplied(true)
+                    setPromoError('')
+                    // Trigger payment intent refresh
+                    await ensurePaymentIntent()
+                  } else {
+                    setPromoError('Invalid or expired promo code')
+                    setPromoApplied(false)
+                  }
+                } catch (err) {
+                  setPromoError('Failed to validate promo code')
+                  setPromoApplied(false)
+                } finally {
+                  setValidatingPromo(false)
+                }
+              }}
+              disabled={promoApplied || validatingPromo || !promoCode.trim()}
+              style={{
+                padding: '8px 16px',
+                background: promoApplied ? '#22c55e' : '#0d6efd',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 4,
+                cursor: promoApplied || validatingPromo ? 'not-allowed' : 'pointer',
+                fontSize: 14,
+                fontWeight: 600
+              }}
+            >
+              {validatingPromo ? 'Checking...' : promoApplied ? 'Applied' : 'Apply'}
+            </button>
+          </div>
+          {promoApplied && (
+            <div style={{ marginTop: 8, color: '#22c55e', fontSize: 14, display: 'flex', alignItems: 'center', gap: 4 }}>
+              <svg style={{ width: 16, height: 16 }} fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span>Promo code applied successfully!</span>
+              <button
+                onClick={() => {
+                  setPromoApplied(false)
+                  setPromoCode('')
+                  ensurePaymentIntent()
+                }}
+                style={{
+                  marginLeft: 'auto',
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#dc2626',
+                  cursor: 'pointer',
+                  fontSize: 12,
+                  textDecoration: 'underline'
+                }}
+              >
+                Remove
+              </button>
+            </div>
+          )}
+          {promoError && (
+            <div style={{ marginTop: 8, color: '#dc2626', fontSize: 14 }}>
+              {promoError}
+            </div>
+          )}
+          <p style={{ fontSize: 12, color: '#666', margin: '8px 0 0 0' }}>
+            Try code: <strong>SAVE15</strong> for 15% off your order!
+          </p>
         </div>
 
         {/* Shipping Options */}
@@ -353,7 +453,7 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
               </label>
             )}
             <p style={{ fontSize: 14, color: '#666', margin: '8px 0 0 0' }}>
-              💡 Get <strong>FREE SHIPPING</strong> on orders over ${FREE_SHIPPING_MINIMUM.toFixed(2)}!
+              Tip: Get <strong>FREE SHIPPING</strong> on orders over ${FREE_SHIPPING_MINIMUM.toFixed(2)}!
             </p>
           </div>
         )}

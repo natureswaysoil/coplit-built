@@ -16,7 +16,7 @@ export default function Navbar() {
         <div style={{display: 'flex', alignItems: 'center', gap: 'var(--space-lg)'}}>
           <Link href="/" style={{display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', textDecoration: 'none'}}>
             <Image 
-              src="/logo-with-tagline.png" 
+              src="/screenshots/logo-with-tagline.png" 
               alt="Nature's Way Soil Logo" 
               width={50} 
               height={50}
