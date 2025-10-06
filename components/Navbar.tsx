@@ -55,3 +55,12 @@ export default function Navbar() {
     </header>
   )
 }
+
+<Image 
+  src="/screenshots/logo-with-tagline.png" 
+  alt="Nature's Way Soil Logo" 
+  width={50} 
+  height={50}
+  priority  // ✅ ADD THIS LINE
+  style={{objectFit: 'contain'}}
+/>
