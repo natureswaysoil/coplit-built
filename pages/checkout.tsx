@@ -201,7 +201,14 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
         {items.map((it) => (
           <div key={it.sku} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #eee', padding: '8px 0' }}>
             <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-              <img src={it.image} alt={it.title} width={48} height={48} style={{ objectFit: 'cover', borderRadius: 4 }} />
+              <Image 
+  src={it.image} 
+  alt={it.title} 
+  width={48} 
+  height={48} 
+  style={{ objectFit: 'cover', borderRadius: 4 }}
+  unoptimized
+/>
               <div>
                 <div style={{ fontWeight: 600 }}>{it.title}</div>
                 <div style={{ fontSize: 12, color: '#555' }}>SKU: {it.sku}{it.size ? ` • ${it.size}` : ''}</div>
