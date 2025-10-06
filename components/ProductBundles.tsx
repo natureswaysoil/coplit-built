@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import Link from 'next/link';
 
@@ -135,7 +136,7 @@ export default function ProductBundles({ currentProduct, relatedProducts }: Prod
       >
         {discount > 0 ? (
           <>
-            🎉 Add Bundle to Cart - Save ${savings.toFixed(2)}
+            Add Bundle to Cart - Save ${savings.toFixed(2)}
           </>
         ) : (
           <>
@@ -148,7 +149,7 @@ export default function ProductBundles({ currentProduct, relatedProducts }: Prod
       {selectedItems.length >= 2 && (
         <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-3">
           <p className="text-sm text-green-800 text-center">
-            <strong>🌱 Complete Soil Solution:</strong> These products work together to maximize soil health and plant growth!
+            <strong>Complete Soil Solution:</strong> These products work together to maximize soil health and plant growth!
           </p>
         </div>
       )}

@@ -1,7 +1,29 @@
 
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// CRITICAL: This module must ONLY be imported in server-side code (API routes, getServerSideProps, etc.)
+// Never import this in client components or pages that run in the browser
+
+let resend: Resend | null = null
+
+function getResendClient(): Resend | null {
+  // Ensure this only runs on server-side
+  if (typeof window !== 'undefined') {
+    console.error('[resend_client] ERROR: Attempted to initialize Resend on client-side. This is a security risk!')
+    return null
+  }
+  
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('[resend_client] RESEND_API_KEY not configured')
+    return null
+  }
+  
+  if (!resend) {
+    resend = new Resend(process.env.RESEND_API_KEY)
+  }
+  
+  return resend
+}
 
 export interface EmailTemplate {
   to: string
@@ -12,10 +34,16 @@ export interface EmailTemplate {
 
 // Welcome email for new subscribers
 export async function sendWelcomeEmail(email: string, firstName?: string) {
+  const client = getResendClient()
+  if (!client) {
+    console.log('[email:mock] sendWelcomeEmail', { email, firstName })
+    return { success: false, error: 'Email service not configured' }
+  }
+  
   const name = firstName || 'Friend'
   
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await client.emails.send({
       from: 'Nature\'s Way Soil <hello@natureswaysoil.com>',
       to: email,
       subject: 'Welcome to Nature\'s Way Soil - Your Journey to Healthier Soil Starts Here',
@@ -55,6 +83,12 @@ export async function sendWelcomeEmail(email: string, firstName?: string) {
 
 // Abandoned cart email
 export async function sendAbandonedCartEmail(email: string, cartItems: any[]) {
+  const client = getResendClient()
+  if (!client) {
+    console.log('[email:mock] sendAbandonedCartEmail', { email, itemCount: cartItems.length })
+    return { success: false, error: 'Email service not configured' }
+  }
+  
   try {
     const itemsHtml = cartItems.map(item => `
       <li style="margin-bottom: 10px;">
@@ -62,7 +96,7 @@ export async function sendAbandonedCartEmail(email: string, cartItems: any[]) {
       </li>
     `).join('')
     
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await client.emails.send({
       from: 'Nature\'s Way Soil <hello@natureswaysoil.com>',
       to: email,
       subject: 'Don\'t Forget Your Cart - Complete Your Order Today',
@@ -97,6 +131,12 @@ export async function sendAbandonedCartEmail(email: string, cartItems: any[]) {
 
 // Educational drip campaign
 export async function sendEducationalEmail(email: string, topic: string, dayNumber: number) {
+  const client = getResendClient()
+  if (!client) {
+    console.log('[email:mock] sendEducationalEmail', { email, topic, dayNumber })
+    return { success: false, error: 'Email service not configured' }
+  }
+  
   const topics: Record<string, any> = {
     'soil-health': {
       1: {
@@ -118,7 +158,7 @@ export async function sendEducationalEmail(email: string, topic: string, dayNumb
   if (!emailContent) return { success: false, error: 'Invalid topic or day' }
   
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await client.emails.send({
       from: 'Nature\'s Way Soil <hello@natureswaysoil.com>',
       to: email,
       subject: emailContent.subject,
@@ -144,8 +184,14 @@ export async function sendEducationalEmail(email: string, topic: string, dayNumb
 
 // Order confirmation
 export async function sendOrderConfirmation(email: string, orderDetails: any) {
+  const client = getResendClient()
+  if (!client) {
+    console.log('[email:mock] sendOrderConfirmation', { email, orderNumber: orderDetails.orderNumber })
+    return { success: false, error: 'Email service not configured' }
+  }
+  
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await client.emails.send({
       from: 'Nature\'s Way Soil <orders@natureswaysoil.com>',
       to: email,
       subject: `Order Confirmation #${orderDetails.orderNumber}`,

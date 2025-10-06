@@ -2,7 +2,28 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServiceSupabase } from '../../lib/supabase';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy initialization of Resend client to ensure it only runs server-side
+// and properly reads environment variables
+let resendClient: Resend | null = null;
+
+function getResendClient(): Resend | null {
+  // Ensure this only runs on server-side
+  if (typeof window !== 'undefined') {
+    console.error('[subscribe] ERROR: Attempted to initialize Resend on client-side');
+    return null;
+  }
+  
+  if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === 'your_actual_resend_api_key_here') {
+    console.warn('[subscribe] RESEND_API_KEY not configured or using placeholder value');
+    return null;
+  }
+  
+  if (!resendClient) {
+    resendClient = new Resend(process.env.RESEND_API_KEY);
+  }
+  
+  return resendClient;
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -40,6 +61,16 @@ export default async function handler(
 
     // Send welcome email via Resend
     try {
+      const resend = getResendClient();
+      if (!resend) {
+        console.log('[subscribe] Email service not configured, skipping welcome email');
+        return res.status(200).json({ 
+          message: 'Successfully subscribed!',
+          success: true,
+          emailSkipped: true
+        });
+      }
+      
       await resend.emails.send({
         from: 'Nature\'s Way Soil <hello@natureswaysoil.com>',
         to: email,

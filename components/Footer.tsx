@@ -1,4 +1,5 @@
 
+
 import Link from 'next/link'
 
 export default function Footer() {
@@ -47,6 +48,9 @@ export default function Footer() {
           <div>
             <h4 style={{color: 'var(--neutral-100)', marginBottom: 'var(--space-md)'}}>Customer Service</h4>
             <ul style={{listStyle: 'none', padding: 0}}>
+              <li style={{marginBottom: 'var(--space-sm)'}}>
+                <Link href="/terms-of-service" style={{color: 'var(--neutral-300)', textDecoration: 'none'}}>Terms of Service</Link>
+              </li>
               <li style={{marginBottom: 'var(--space-sm)'}}>
                 <Link href="/privacy-policy" style={{color: 'var(--neutral-300)', textDecoration: 'none'}}>Privacy Policy</Link>
               </li>
