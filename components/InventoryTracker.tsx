@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react'
 
 interface InventoryTrackerProps {
@@ -14,18 +15,13 @@ export default function InventoryTracker({
   const [isLowStock, setIsLowStock] = useState(false)
 
   useEffect(() => {
-    // Simulate real-time inventory updates
     const checkInventory = () => {
-      // In production, this would fetch from your inventory system
       const randomStock = Math.floor(Math.random() * 100)
       setStock(randomStock)
       setIsLowStock(randomStock < 20)
     }
 
-    // Check on mount
     checkInventory()
-
-    // Update every 30 seconds
     const interval = setInterval(checkInventory, 30000)
 
     return () => clearInterval(interval)
@@ -65,7 +61,7 @@ export default function InventoryTracker({
           </svg>
           <div>
             <p className="font-semibold text-yellow-900">
-              {stockLevel === 'critical' ? '🔥 Only' : 'Low Stock -'} {stock} left in stock!
+              {stockLevel === 'critical' ? 'Only' : 'Low Stock -'} {stock} left in stock!
             </p>
             <p className="text-sm text-yellow-700">Order soon to avoid missing out</p>
           </div>

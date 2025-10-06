@@ -1,4 +1,5 @@
 
+
 import React, { useState, useRef, useEffect } from 'react'
 
 interface HeroVideoSectionProps {
@@ -7,7 +8,7 @@ interface HeroVideoSectionProps {
 }
 
 export default function HeroVideoSection({ 
-  videoUrl = 'https://d3uryq9bhgb5qr.cloudfront.net/Pictory-API-Self-Service-USD-Monthly/6brpmrpiu3k3kud3b4eb7nc1rs/a2a35808-5743-40eb-8023-22b2c6b6cf2d/VIDEO/soil_symbiosis_hero_video.mp4',
+  videoUrl = 'https://video.pictory.ai/20251005232652546b1d31054cfaf4b53a5bcd69b75790ef2/20251005234145374VOVQHL5UUwmevS4?el=app_video_share',
   posterUrl = '/videos/hero-poster.jpg'
 }: HeroVideoSectionProps) {
   const [isMuted, setIsMuted] = useState(true)
@@ -163,3 +164,4 @@ export default function HeroVideoSection({
     </section>
   )
 }
+

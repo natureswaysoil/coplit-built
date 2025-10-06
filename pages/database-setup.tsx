@@ -1,4 +1,3 @@
-// pages/database-setup.tsx
 import { useState } from 'react';
 
 export default function DatabaseSetup() {
@@ -67,12 +66,12 @@ CREATE TABLE IF NOT EXISTS public.order_items (
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- Enable Row Level Security (optional, but recommended)
+-- Enable Row Level Security
 ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
 
--- Create policies for service role access (bypass RLS for API calls)
+-- Create policies for service role access
 CREATE POLICY IF NOT EXISTS "Service role can access customers" ON public.customers
   FOR ALL USING (auth.role() = 'service_role');
 
@@ -103,10 +102,9 @@ COMMIT;`;
     }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
         <h1 style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          🗄️ Database Setup - Nature's Way Soil
+          Database Setup - Nature's Way Soil
         </h1>
         
-        {/* Connection Test */}
         <div style={{ 
           background: 'white', 
           color: '#174F2E', 
@@ -114,7 +112,7 @@ COMMIT;`;
           borderRadius: '12px',
           marginBottom: '2rem'
         }}>
-          <h2 style={{ marginTop: 0 }}>🔌 Step 1: Test Connection</h2>
+          <h2 style={{ marginTop: 0 }}>Step 1: Test Connection</h2>
           <p>First, let's verify your Supabase connection is working:</p>
           
           <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
@@ -152,22 +150,20 @@ COMMIT;`;
           </div>
 
           {testResult && (
-            <div style={{ 
-              background: testResult.error || testResult.success === false ? '#fee' : '#efe',
-              color: testResult.error || testResult.success === false ? '#c33' : '#363',
+            <div style={{
+              marginTop: '1rem',
               padding: '1rem',
+              backgroundColor: testResult.error ? '#fee' : '#efe',
               borderRadius: '6px',
-              marginTop: '1rem'
+              border: `1px solid ${testResult.error ? '#fcc' : '#cfc'}`
             }}>
-              <h4>Test Results:</h4>
-              <pre style={{ whiteSpace: 'pre-wrap', fontSize: '12px' }}>
+              <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontSize: '14px' }}>
                 {JSON.stringify(testResult, null, 2)}
               </pre>
             </div>
           )}
         </div>
 
-        {/* Manual Setup Instructions */}
         <div style={{ 
           background: 'white', 
           color: '#174F2E', 
@@ -175,28 +171,20 @@ COMMIT;`;
           borderRadius: '12px',
           marginBottom: '2rem'
         }}>
-          <h2 style={{ marginTop: 0 }}>⚙️ Step 2: Manual Database Setup</h2>
-          
-          <div style={{ marginBottom: '2rem' }}>
-            <h3>Instructions:</h3>
-            <ol style={{ fontSize: '16px', lineHeight: '1.6' }}>
-              <li><strong>Open your Supabase Dashboard:</strong><br />
-                <a href="https://supabase.com/dashboard/project/gixjfavlefeldoostsij" 
-                   target="_blank" 
-                   style={{ color: '#22c55e', textDecoration: 'none' }}>
-                  👉 https://supabase.com/dashboard → Your Project
-                </a>
-              </li>
-              <li><strong>Go to the "SQL Editor" tab</strong></li>
-              <li><strong>Copy the SQL below and paste it into the editor</strong></li>
-              <li><strong>Click "RUN" to execute the migration</strong></li>
-              <li><strong>Test the connection above to verify it worked</strong></li>
+          <h2 style={{ marginTop: 0 }}>Step 2: Manual Database Setup</h2>
+          <div style={{ marginBottom: '1rem' }}>
+            <p><strong>Instructions:</strong></p>
+            <ol style={{ lineHeight: 1.8 }}>
+              <li>Go to your Supabase dashboard</li>
+              <li>Select your project</li>
+              <li>Click SQL Editor in the left sidebar</li>
+              <li>Click New Query</li>
+              <li>Copy the SQL below and paste it into the editor</li>
+              <li>Click Run to execute</li>
             </ol>
-          </div>
-
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h3 style={{ margin: 0 }}>SQL Migration Code:</h3>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+              <h3 style={{ margin: 0 }}>Migration SQL:</h3>
               <button
                 onClick={() => copyToClipboard(migrationSQL)}
                 style={{
@@ -209,7 +197,7 @@ COMMIT;`;
                   fontSize: '14px'
                 }}
               >
-                📋 Copy SQL
+                Copy SQL
               </button>
             </div>
             
@@ -230,41 +218,39 @@ COMMIT;`;
           </div>
         </div>
 
-        {/* What This Creates */}
         <div style={{ 
           background: 'rgba(255,255,255,0.1)', 
           padding: '2rem', 
           borderRadius: '12px',
           marginBottom: '2rem'
         }}>
-          <h2 style={{ marginTop: 0 }}>📋 What This Creates</h2>
+          <h2 style={{ marginTop: 0 }}>What This Creates</h2>
           <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))' }}>
             <div style={{ background: 'rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '8px' }}>
-              <h4>👥 customers table</h4>
+              <h4>Customers Table</h4>
               <p>Stores customer information like name and email</p>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '8px' }}>
-              <h4>📦 orders table</h4>
+              <h4>Orders Table</h4>
               <p>Stores order details, shipping address, tax calculation</p>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '8px' }}>
-              <h4>🛒 order_items table</h4>
+              <h4>Order Items Table</h4>
               <p>Stores individual items within each order</p>
             </div>
           </div>
         </div>
 
-        {/* Troubleshooting */}
         <div style={{ 
           background: 'rgba(255,255,255,0.1)', 
           padding: '2rem', 
           borderRadius: '12px'
         }}>
-          <h2 style={{ marginTop: 0 }}>🔧 Troubleshooting</h2>
+          <h2 style={{ marginTop: 0 }}>Troubleshooting</h2>
           <div style={{ fontSize: '14px' }}>
             <h4>If connection test fails:</h4>
             <ul>
-              <li>Check <a href="https://status.supabase.com" target="_blank" style={{ color: '#22c55e' }}>Supabase status</a></li>
+              <li>Check Supabase status page</li>
               <li>Verify your project is active in the dashboard</li>
               <li>Make sure your .env.local file has the correct credentials</li>
             </ul>
@@ -291,7 +277,7 @@ COMMIT;`;
               display: 'inline-block'
             }}
           >
-            ← Back to Home
+            Back to Home
           </a>
         </div>
       </div>

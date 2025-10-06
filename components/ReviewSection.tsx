@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 
 interface Review {
@@ -22,7 +23,6 @@ export default function ReviewSection({
 }: ReviewSectionProps) {
   const [showAll, setShowAll] = useState(false);
 
-  // Sample reviews - replace with actual reviews from your database
   const allReviews: Review[] = [
     {
       rating: 5,
@@ -97,67 +97,51 @@ export default function ReviewSection({
           <h2 className="text-2xl font-bold mb-2">Customer Reviews</h2>
           <div className="flex items-center gap-4">
             {renderStars(averageRating)}
-            <span className="text-gray-600">
-              Based on {reviewCount} reviews
-            </span>
+            <span className="text-gray-600">Based on {reviewCount} reviews</span>
           </div>
         </div>
-        <div className="text-center">
-          <div className="text-4xl font-bold text-green-600">{averageRating}</div>
-          <div className="text-sm text-gray-500">Average Rating</div>
-        </div>
+        <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
+          Write a Review
+        </button>
       </div>
 
       <div className="space-y-6">
         {displayedReviews.map((review, index) => (
-          <div key={index} className="border-l-4 border-green-600 pl-4 py-2">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
+          <div key={index} className="border-b border-gray-200 pb-6 last:border-0">
+            <div className="flex items-start justify-between mb-2">
+              <div>
                 {renderStars(review.rating)}
-                {review.verified && (
-                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                    ✓ Verified Purchase
-                  </span>
-                )}
+                <h3 className="font-semibold text-lg mt-2">{review.title}</h3>
               </div>
-              <span className="text-sm text-gray-500">{review.date}</span>
+              {review.verified && (
+                <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-semibold flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  Verified Purchase
+                </span>
+              )}
             </div>
-            <h3 className="font-semibold text-lg mb-2">{review.title}</h3>
             <p className="text-gray-700 mb-2">{review.text}</p>
-            <p className="text-sm text-gray-600">— {review.author}</p>
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <span className="font-medium">{review.author}</span>
+              <span>•</span>
+              <span>{new Date(review.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            </div>
           </div>
         ))}
       </div>
 
       {allReviews.length > 3 && (
-        <button
-          onClick={() => setShowAll(!showAll)}
-          className="mt-6 w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-3 rounded-lg transition-colors"
-        >
-          {showAll ? 'Show Less Reviews' : `Show All ${allReviews.length} Reviews`}
-        </button>
-      )}
-
-      {/* Review Summary */}
-      <div className="mt-6 pt-6 border-t">
-        <div className="grid grid-cols-5 gap-2">
-          {[5, 4, 3, 2, 1].map((stars) => {
-            const percentage = stars === 5 ? 85 : stars === 4 ? 12 : 3;
-            return (
-              <div key={stars} className="flex items-center gap-2">
-                <span className="text-sm text-gray-600 w-8">{stars}★</span>
-                <div className="flex-1 bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-yellow-400 h-2 rounded-full"
-                    style={{ width: `${percentage}%` }}
-                  ></div>
-                </div>
-                <span className="text-sm text-gray-600 w-10">{percentage}%</span>
-              </div>
-            );
-          })}
+        <div className="text-center mt-6">
+          <button
+            onClick={() => setShowAll(!showAll)}
+            className="text-green-600 hover:text-green-700 font-semibold"
+          >
+            {showAll ? 'Show Less' : `Show All ${reviewCount} Reviews`}
+          </button>
         </div>
-      </div>
+      )}
     </section>
   );
 }

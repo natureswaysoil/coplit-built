@@ -1,97 +1,81 @@
-// pages/success.tsx
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
-import { useCart } from '../lib/cartContext'
 
-type Summary = {
-  amount?: number
-  currency?: string
-  email?: string
-  payment_status?: string
-} | null
+import Head from 'next/head';
+import Link from 'next/link';
+import { useEffect } from 'react';
+import { useCart } from '@/lib/cartContext';
 
 export default function Success() {
-  const router = useRouter()
-  const { clearCart } = useCart()
-
-  const [status, setStatus] = useState<'working' | 'done' | 'error'>('working')
-  const [summary, setSummary] = useState<Summary>(null)
+  const { clearCart } = useCart();
 
   useEffect(() => {
-    const run = async () => {
-      try {
-        // Clear client cart (fulfillment should happen via webhook)
-        clearCart?.()
-
-        // If coming from Stripe Checkout, we may have a session_id
-        const sessionId = router.query.session_id as string | undefined
-        if (sessionId) {
-          try {
-            const r = await fetch(`/api/stripe/session?session_id=${encodeURIComponent(sessionId)}`)
-            if (r.ok) {
-              const s = await r.json()
-              setSummary({
-                amount: typeof s?.amount_total === 'number' ? s.amount_total / 100 : undefined,
-                currency: s?.currency ? String(s.currency).toUpperCase() : undefined,
-                email: s?.customer_details?.email,
-                payment_status: s?.payment_status || s?.status,
-              })
-            }
-          } catch (e) {
-            // non-fatal; we’ll still show the thank-you
-            console.warn('Could not fetch session details:', e)
-          }
-        }
-
-        setStatus('done')
-      } catch (e) {
-        console.error(e)
-        setStatus('error')
-      }
-    }
-    if (router.isReady) run()
-  }, [router.isReady, clearCart, router.query.session_id])
-
-  if (status === 'working') {
-    return (
-      <main style={{ padding: 24 }}>
-        <h1>Processing your order…</h1>
-        <p>Hang tight while we wrap things up.</p>
-      </main>
-    )
-  }
-
-  if (status === 'error') {
-    return (
-      <main style={{ padding: 24 }}>
-        <h1>Payment received.</h1>
-        <p>We couldn’t display the order summary automatically. If you don’t see a confirmation email shortly, contact support.</p>
-      </main>
-    )
-  }
+    // Clear the cart after successful purchase
+    clearCart();
+  }, [clearCart]);
 
   return (
-    <main style={{ padding: 24, maxWidth: 720, margin: '0 auto' }}>
-      <h1>Thank you! 🎉</h1>
-      <p>Your payment was successful and your order is confirmed.</p>
+    <>
+      <Head>
+        <title>Order Confirmed | Nature's Way Soil</title>
+        <meta name="description" content="Thank you for your order!" />
+      </Head>
 
-      {summary && (
-        <div style={{ marginTop: 16, border: '1px solid #eee', borderRadius: 8, padding: 12 }}>
-          <div><b>Status:</b> {summary.payment_status ?? 'paid'}</div>
-          {summary.amount != null && (
-            <div><b>Charged:</b> {summary.currency ?? 'USD'} ${summary.amount.toFixed(2)}</div>
-          )}
-          {summary.email && <div><b>Receipt sent to:</b> {summary.email}</div>}
+      <main className="container p-xl">
+        <div className="text-center" style={{maxWidth: '600px', margin: '0 auto'}}>
+          <div style={{fontSize: '4rem', marginBottom: '1rem'}}>
+            <svg className="w-24 h-24 mx-auto text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          
+          <h1 style={{marginBottom: '1rem'}}>Thank You for Your Order</h1>
+          
+          <p style={{fontSize: '1.1rem', color: 'var(--neutral-600)', marginBottom: '2rem'}}>
+            Your order has been confirmed and will be processed shortly. 
+            You will receive an email confirmation with your order details and tracking information.
+          </p>
+
+          <div className="card" style={{backgroundColor: 'var(--neutral-50)', marginBottom: '2rem', textAlign: 'left'}}>
+            <h3 style={{marginBottom: '1rem'}}>What's Next?</h3>
+            <ul style={{listStyle: 'none', padding: 0}}>
+              <li style={{marginBottom: '0.75rem', display: 'flex', alignItems: 'start'}}>
+                <span style={{marginRight: '0.5rem', color: 'var(--primary)', fontWeight: 'bold'}}>1.</span>
+                <span>Check your email for order confirmation and receipt</span>
+              </li>
+              <li style={{marginBottom: '0.75rem', display: 'flex', alignItems: 'start'}}>
+                <span style={{marginRight: '0.5rem', color: 'var(--primary)', fontWeight: 'bold'}}>2.</span>
+                <span>Your order will be carefully prepared and packaged</span>
+              </li>
+              <li style={{marginBottom: '0.75rem', display: 'flex', alignItems: 'start'}}>
+                <span style={{marginRight: '0.5rem', color: 'var(--primary)', fontWeight: 'bold'}}>3.</span>
+                <span>You'll receive tracking information once shipped</span>
+              </li>
+              <li style={{display: 'flex', alignItems: 'start'}}>
+                <span style={{marginRight: '0.5rem', color: 'var(--primary)', fontWeight: 'bold'}}>4.</span>
+                <span>Expect delivery within 5-7 business days</span>
+              </li>
+            </ul>
+          </div>
+
+          <div style={{display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap'}}>
+            <Link href="/products" className="btn btn-primary">
+              Continue Shopping
+            </Link>
+            <Link href="/" className="btn btn-secondary">
+              Return Home
+            </Link>
+          </div>
+
+          <div style={{marginTop: '3rem', padding: '1.5rem', backgroundColor: 'var(--primary-50)', borderRadius: '0.5rem'}}>
+            <h3 style={{marginBottom: '0.5rem'}}>Need Help?</h3>
+            <p style={{color: 'var(--neutral-600)', marginBottom: '1rem'}}>
+              If you have any questions about your order, please don't hesitate to contact us.
+            </p>
+            <Link href="/contact" className="btn btn-outline">
+              Contact Support
+            </Link>
+          </div>
         </div>
-      )}
-
-      <p style={{ marginTop: 16 }}>
-        A confirmation email will arrive shortly. If you need help, email <a href="mailto:support@natureswaysoil.com">support@natureswaysoil.com</a>.
-      </p>
-
-      <a href="/products" style={{ display: 'inline-block', marginTop: 16, padding: '10px 16px', background: '#174F2E', color: 'white', borderRadius: 6, fontWeight: 700 }}>
-        Continue Shopping
-      </a>
-    </main>
-  )
+      </main>
+    </>
+  );
 }

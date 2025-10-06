@@ -1,3 +1,4 @@
+
 import Head from 'next/head';
 import Image from 'next/image';
 
@@ -48,10 +49,10 @@ export default function About() {
             <div className="card">
               <h3>Our Promise</h3>
               <ul style={{listStyle: 'none', padding: 0}}>
-                <li className="mb-sm">✓ <strong>Safe & Natural</strong> – Every product we make is safe for children, pets, and pollinators</li>
-                <li className="mb-sm">✓ <strong>Microbe-Rich Formulas</strong> – We use beneficial microbes, worm castings, biochar, and natural extracts</li>
-                <li className="mb-sm">✓ <strong>Sustainable Farming</strong> – From duckweed to compost teas, our ingredients recycle nutrients and heal the land</li>
-                <li className="mb-sm">✓ <strong>Results You Can See</strong> – Greener lawns, healthier pastures, stronger roots, and thriving gardens</li>
+                <li className="mb-sm"><strong>Safe & Natural</strong> – Every product we make is safe for children, pets, and pollinators</li>
+                <li className="mb-sm"><strong>Microbe-Rich Formulas</strong> – We use beneficial microbes, worm castings, biochar, and natural extracts</li>
+                <li className="mb-sm"><strong>Sustainable Farming</strong> – From duckweed to compost teas, our ingredients recycle nutrients and heal the land</li>
+                <li className="mb-sm"><strong>Results You Can See</strong> – Greener lawns, healthier pastures, stronger roots, and thriving gardens</li>
               </ul>
             </div>
             <div className="card">
