@@ -38,12 +38,22 @@ export default async function handler(
     const filePath = path.join(dataDir, 'coupon-signups.csv')
     const timestamp = new Date().toISOString()
     const couponCode = 'WELCOME15'
+
+    // Helper to sanitize email for CSV injection
+    function sanitizeForCSV(value: string): string {
+      // If value starts with =, +, -, or @, prefix with a single quote
+      if (/^[=+\-@]/.test(value)) {
+        return "'" + value;
+      }
+      return value;
+    }
     
     // Check if file exists to determine if we need headers
     const fileExists = fs.existsSync(filePath)
     
     // Prepare CSV row
-    const csvRow = `"${email}","${timestamp}","${couponCode}"\n`
+    const sanitizedEmail = sanitizeForCSV(email)
+    const csvRow = `"${sanitizedEmail}","${timestamp}","${couponCode}"\n`
     
     // If file doesn't exist, add headers
     if (!fileExists) {
