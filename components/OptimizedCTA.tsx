@@ -1,3 +1,4 @@
+
 import React from 'react'
 import Link from 'next/link'
 
@@ -29,7 +30,7 @@ export default function OptimizedCTA({
           {/* Urgency Badge */}
           {showUrgency && (
             <div className="inline-block bg-yellow-400 text-gray-900 font-bold px-4 py-2 rounded-full mb-6 animate-pulse">
-              🔥 Limited Time: Free Shipping on Orders Over $50
+              Limited Time: Free Shipping on Orders Over $50
             </div>
           )}
 
