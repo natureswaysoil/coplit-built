@@ -25,7 +25,7 @@ export default function HeroVideoSection({
     // Attempt to play the video
     const playPromise = video.play()
     
-    if (playPromise !== undefined) {
+    if (playPromise && typeof playPromise.then === 'function') {
       playPromise
         .then(() => {
           setIsLoaded(true)
