@@ -7,6 +7,14 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'm.media-amazon.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'd3uryq9bhgb5qr.cloudfront.net',
+      },
     ],
   },
   async rewrites() {

@@ -21,6 +21,9 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
   const [phone, setPhone] = useState('')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [promoCode, setPromoCode] = useState('')
+  const [promoApplied, setPromoApplied] = useState(false)
+  const [promoError, setPromoError] = useState<string | null>(null)
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [intentId, setIntentId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -100,6 +103,7 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
     // Stripe will be initialized separately; don't block on env here
     setLoading(true)
     setError(null)
+    setPromoError(null)
     try {
       const resp = await fetch('/api/create-payment-intent-with-tax', {
         method: 'POST',
@@ -116,7 +120,8 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
           })),
           customer: { name, email },
           address: { line1: address1, city, state: stateCode, postal_code: zip, country: 'US' },
-          shipping: { amount: Math.round(shippingCost * 100) } // Convert to cents
+          shipping: { amount: Math.round(shippingCost * 100) }, // Convert to cents
+          promoCode: promoCode.trim() || undefined
         })
       })
       const data = await resp.json()
@@ -124,6 +129,15 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
       setClientSecret(data.clientSecret || null)
       setIntentId(data.intentId || null)
       setBreakdown(data.breakdown || null)
+      
+      // Check if promo code was applied
+      if (promoCode.trim() && data.breakdown?.discount && data.breakdown.discount > 0) {
+        setPromoApplied(true)
+        setPromoError(null)
+      } else if (promoCode.trim()) {
+        setPromoError('Promo code not found or invalid')
+        setPromoApplied(false)
+      }
     } catch (e: any) {
       setError(e?.message || 'Failed to prepare checkout')
     } finally {
@@ -198,6 +212,53 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
             </div>
           </div>
         ))}
+      </section>
+
+      {/* Promo Code Section */}
+      <section style={{ marginTop: 16, padding: 16, background: '#f8f9fa', borderRadius: 8 }}>
+        <h3 style={{ margin: '0 0 12px 0', fontSize: 16 }}>Have a Promo Code?</h3>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+          <input
+            type="text"
+            value={promoCode}
+            onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+            placeholder="Enter code (e.g., WELCOME15)"
+            style={{ 
+              flex: 1, 
+              padding: '8px 12px', 
+              border: promoError ? '2px solid #ef4444' : '1px solid #ccc',
+              borderRadius: 4,
+              fontSize: 14
+            }}
+          />
+          <button
+            onClick={ensurePaymentIntent}
+            disabled={!promoCode.trim() || disabled || loading}
+            style={{
+              padding: '8px 16px',
+              background: promoApplied ? '#22c55e' : '#0d6efd',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 4,
+              cursor: disabled || loading ? 'not-allowed' : 'pointer',
+              opacity: disabled || loading ? 0.6 : 1,
+              fontSize: 14,
+              fontWeight: 600
+            }}
+          >
+            {promoApplied ? '✓ Applied' : 'Apply'}
+          </button>
+        </div>
+        {promoApplied && (
+          <p style={{ margin: '8px 0 0 0', fontSize: 14, color: '#22c55e', fontWeight: 600 }}>
+            ✓ Promo code applied successfully!
+          </p>
+        )}
+        {promoError && (
+          <p style={{ margin: '8px 0 0 0', fontSize: 14, color: '#ef4444' }}>
+            {promoError}
+          </p>
+        )}
       </section>
 
       {/* Summary */}

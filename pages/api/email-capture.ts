@@ -12,7 +12,7 @@ export default async function handler(
   }
 
   try {
-    const { email, source, metadata } = req.body
+    const { email, source, metadata, couponCode } = req.body
 
     if (!email || !source) {
       return res.status(400).json({ error: 'Email and source are required' })
@@ -24,21 +24,28 @@ export default async function handler(
       return res.status(400).json({ error: 'Invalid email format' })
     }
 
+    // Add coupon code to metadata if provided
+    const enrichedMetadata = {
+      ...metadata,
+      couponCode: couponCode || null
+    }
+
     // Capture to Supabase
-    const captureResult = await captureEmail(email, source, metadata)
+    const captureResult = await captureEmail(email, source, enrichedMetadata)
 
     if (!captureResult.success) {
       throw new Error('Failed to capture email')
     }
 
-    // Send welcome email (don't wait for it)
-    sendWelcomeEmail(email).catch(err => {
+    // Send welcome email with coupon code (don't wait for it)
+    sendWelcomeEmail(email, couponCode).catch(err => {
       console.error('Failed to send welcome email:', err)
     })
 
     return res.status(200).json({ 
       success: true,
-      message: 'Email captured successfully' 
+      message: 'Email captured successfully',
+      couponCode: couponCode || null
     })
   } catch (error: any) {
     console.error('Email capture error:', error)
