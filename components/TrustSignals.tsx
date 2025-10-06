@@ -1,3 +1,4 @@
+
 import React from 'react'
 
 export default function TrustSignals() {
@@ -14,7 +15,7 @@ export default function TrustSignals() {
                 </svg>
               </div>
               <h3 className="font-bold text-gray-900 text-sm md:text-base">100% Organic</h3>
-              <p className="text-xs md:text-sm text-gray-600 mt-1">OMRI Listed</p>
+              <p className="text-xs md:text-sm text-gray-600 mt-1">Certified Natural</p>
             </div>
 
             <div className="text-center">
@@ -81,9 +82,6 @@ export default function TrustSignals() {
           <div className="mt-8 text-center">
             <p className="text-sm text-gray-600 mb-4">Certified & Trusted By:</p>
             <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8">
-              <div className="bg-white px-4 py-2 rounded shadow-sm">
-                <span className="text-xs md:text-sm font-semibold text-gray-700">OMRI Listed</span>
-              </div>
               <div className="bg-white px-4 py-2 rounded shadow-sm">
                 <span className="text-xs md:text-sm font-semibold text-gray-700">USDA Organic</span>
               </div>

@@ -1,4 +1,5 @@
 
+
 import React, { useState, useRef, useEffect } from 'react'
 
 interface HeroVideoSectionProps {
@@ -7,7 +8,7 @@ interface HeroVideoSectionProps {
 }
 
 export default function HeroVideoSection({ 
-  videoUrl = 'https://video.pictory.ai/20251005232653546b1d31054cfaf4b53a5bcd69b75790ef2/20251005234145374VOVQHL5UUwmevS4',
+  videoUrl = 'https://video.pictory.ai/20251005232652546b1d31054cfaf4b53a5bcd69b75790ef2/20251005234145374VOVQHL5UUwmevS4?el=app_video_share',
   posterUrl = '/videos/hero-poster.jpg'
 }: HeroVideoSectionProps) {
   const [isMuted, setIsMuted] = useState(true)
