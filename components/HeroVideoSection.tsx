@@ -21,7 +21,6 @@ export default function HeroVideoSection({
     // Set all required attributes for autoplay
     video.muted = true
     video.playsInline = true
-    video.setAttribute('playsinline', '')
     video.setAttribute('webkit-playsinline', '')
     
     // Handle video load
