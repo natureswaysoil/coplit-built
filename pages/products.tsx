@@ -1,4 +1,5 @@
 // pages/products.tsx
+import Image from 'next/image';
 import Head from 'next/head';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
@@ -35,11 +36,14 @@ export default function ProductsPage({ products }: ProductsPageProps) {
                 key={product.id}
                 className="product-card"
                 style={{textDecoration: 'none', color: 'inherit'}}
-              >
-                <img
-                  src={product.image}
-                  alt={product.title}
-                  style={{width: '100%', height: '200px', objectFit: 'contain'}}
+           <Image
+  src={product.image}
+  alt={product.title}
+  width={300}
+  height={200}
+  style={{width: '100%', height: '200px', objectFit: 'contain'}}
+  unoptimized
+               
                 />
                 <div className="product-card-content">
                   <h3 style={{color: 'var(--neutral-800)', marginBottom: 'var(--space-sm)'}}>
