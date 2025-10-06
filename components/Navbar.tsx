@@ -1,4 +1,6 @@
+
 import Link from 'next/link'
+import Image from 'next/image'
 import { useCart } from '@/lib/cartContext'
 import { useEffect, useState } from 'react'
 
@@ -12,7 +14,16 @@ export default function Navbar() {
     <header className="header" style={{position: 'sticky', top: 0, zIndex: 50}}>
       <nav className="nav container">
         <div style={{display: 'flex', alignItems: 'center', gap: 'var(--space-lg)'}}>
-          <Link href="/" style={{color: 'var(--primary)', fontWeight: '800', fontSize: '1.25rem'}}>Nature's Way Soil</Link>
+          <Link href="/" style={{display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', textDecoration: 'none'}}>
+            <Image 
+              src="/screenshots/logo-with-tagline.png" 
+              alt="Nature's Way Soil Logo" 
+              width={50} 
+              height={50}
+              style={{objectFit: 'contain'}}
+            />
+            <span style={{color: 'var(--primary)', fontWeight: '800', fontSize: '1.25rem'}}>Nature's Way Soil</span>
+          </Link>
           <ul className="nav-links">
             <li><Link href="/products">Products</Link></li>
             <li><Link href="/about">About</Link></li>
@@ -44,3 +55,12 @@ export default function Navbar() {
     </header>
   )
 }
+
+<Image 
+  src="/screenshots/logo-with-tagline.png" 
+  alt="Nature's Way Soil Logo" 
+  width={50} 
+  height={50}
+  priority  // ✅ ADD THIS LINE
+  style={{objectFit: 'contain'}}
+/>

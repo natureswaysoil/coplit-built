@@ -17,6 +17,10 @@ import '../styles/modern.css'
 // ✅ Vercel Web Analytics
 import { Analytics } from '@vercel/analytics/next'
 
+// Conversion Optimization Components
+import EducationalChatWidget from '@/components/EducationalChatWidget'
+import ExitIntentPopup from '@/components/ExitIntentPopup'
+
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -86,6 +90,9 @@ export default function App({ Component, pageProps }: AppProps) {
         <Component {...pageProps} />
         {/* Sends pageview events to Vercel Analytics (cookieless) */}
         <Analytics />
+        {/* Conversion Optimization Components */}
+        <EducationalChatWidget />
+        <ExitIntentPopup />
 
         {/* TikTok Pixel */}
         <Script id="tiktok-pixel" strategy="afterInteractive">

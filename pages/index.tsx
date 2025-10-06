@@ -1,197 +1,199 @@
-import Image from 'next/image';
-import Link from 'next/link';
-import Head from 'next/head';
-import { useEffect, useState } from 'react';
-import { products } from '../lib/products';
-import { useCart } from '../lib/cartContext';
+
+import Head from 'next/head'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import HeroVideoSection from '../components/HeroVideoSection'
+import TrustSignals from '../components/TrustSignals'
+import OptimizedCTA from '../components/OptimizedCTA'
+import EnhancedChatWidget from '../components/EnhancedChatWidget'
 
 export default function Home() {
-  const { addItem } = useCart();
-  const [selected, setSelected] = useState<Record<string, string>>({});
-  const [items, setItems] = useState(Array.isArray(products) ? products : []);
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setItems(products);
-  }, []);
+    setMounted(true)
+  }, [])
 
   return (
     <>
       <Head>
-        <title>Nature's Way Soil | Organic Soil Health & Fertility</title>
-        <meta name="description" content="Bring life back to your soil with microbe-rich fertilizers, compost, and plant boosters. Safe for kids, pets, and pollinators." />
-        <link rel="canonical" href={`${process.env.PUBLIC_SITE_URL || 'https://natureswaysoil.com'}/`} />
+        <title>Nature's Way Soil - Premium Organic Soil Amendments</title>
+        <meta name="description" content="Transform your garden with Nature's Way Soil premium organic amendments. Science-backed formulas for healthier plants and sustainable growing." />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
-      
-      <section className="hero">
-        <div className="container">
-          <div className="text-center mb-lg">
-            <div className="mb-md" style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.2)',
-              padding: 'var(--space-sm)',
-              borderRadius: '0.5rem',
-              display: 'inline-block',
-              fontSize: '0.9rem',
-              fontWeight: '600'
-            }}>
-              FREE SHIPPING ON ORDERS OVER $75
-            </div>
-          </div>
-          <div className="grid grid-2" style={{alignItems: 'center', gap: 'var(--space-xl)'}}>
-            <div>
-              <h1>Restore Your Soil Naturally</h1>
-              <p className="mb-lg">
-                At Nature's Way Soil, our mission is simple: to bring life back to the soil, naturally.
-              </p>
-              <p className="mb-lg">
-                We're a family-run farm that saw firsthand the damage years of synthetic fertilizers had done to the land. 
-                The soil was tired, lifeless, and unable to sustain the healthy crops and pastures we needed. Instead of 
-                following the same path, we set out to restore the earth the way nature intended—through biology, not chemistry.
-              </p>
-              <div className="mb-lg">
-                <h3 style={{color: 'white', marginBottom: 'var(--space-md)'}}>Our Promise</h3>
-                <ul style={{listStyle: 'none', padding: 0}}>
-                  <li className="mb-sm">✓ Safe & Natural – Every product we make is safe for children, pets, and pollinators</li>
-                  <li className="mb-sm">✓ Microbe-Rich Formulas – We use beneficial microbes, worm castings, biochar, and natural extracts</li>
-                  <li className="mb-sm">✓ Sustainable Farming – From duckweed to compost teas, our ingredients recycle nutrients and heal the land</li>
-                  <li className="mb-sm">✓ Results You Can See – Greener lawns, healthier pastures, stronger roots, and thriving gardens</li>
-                </ul>
+
+      <main>
+        {/* Hero Section with Video */}
+        <HeroVideoSection />
+
+        {/* Trust Signals */}
+        <TrustSignals />
+
+        {/* Why Choose Us Section */}
+        <section style={{padding: 'var(--space-2xl) var(--space-md)', background: 'var(--bg-secondary)'}}>
+          <div style={{maxWidth: 'var(--container-lg)', margin: '0 auto'}}>
+            <h2 style={{textAlign: 'center', marginBottom: 'var(--space-xl)', fontSize: 'var(--text-3xl)', fontWeight: 700}}>
+              Why Choose Nature's Way Soil?
+            </h2>
+            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-xl)'}}>
+              <div>
+                <h4 style={{color: 'var(--primary)', marginBottom: 'var(--space-sm)'}}>Science-Backed Formulas</h4>
+                <p>Our products are formulated based on the latest soil science research, combining beneficial microbes, organic matter, and natural nutrients.</p>
               </div>
-              <Link href="/products" className="btn btn-secondary" style={{backgroundColor: 'white', color: 'var(--primary)'}}>
-                Shop Our Products
-              </Link>
+              <div className="mb-lg">
+                <h4 style={{color: 'var(--primary)', marginBottom: 'var(--space-sm)'}}>Environmentally Safe</h4>
+                <p>Every ingredient is carefully selected to be safe for children, pets, pollinators, and the environment.</p>
+              </div>
+              <div className="mb-lg">
+                <h4 style={{color: 'var(--primary)', marginBottom: 'var(--space-sm)'}}>Proven Results</h4>
+                <p>Join thousands of satisfied customers who have transformed their soil and seen remarkable improvements in plant health.</p>
+              </div>
             </div>
             <div className="text-center">
               <Image
-                src="/screenshots/logo-with-tagline.png"
-                alt="Nature's Way Soil Logo"
-                width={400}
-                height={200}
-                style={{maxWidth: '100%', height: 'auto', borderRadius: '1rem', backgroundColor: 'rgba(255, 255, 255, 0.1)', padding: 'var(--space-lg)'}}
+                src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=500&h=300&fit=crop"
+                alt="Healthy soil comparison"
+                width={500}
+                height={300}
+                style={{borderRadius: 'var(--radius-md)', margin: 'var(--space-xl) auto 0'}}
               />
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="p-xl" style={{backgroundColor: 'white'}}>
-        <div className="container">
-          <div className="text-center mb-xl">
-            <h2>Featured Products</h2>
-            <p style={{fontSize: '1.1rem', color: 'var(--neutral-600)', maxWidth: '600px', margin: '0 auto'}}>
-              Discover our range of organic soil amendments and fertilizers designed to restore soil health naturally.
-            </p>
-          </div>
-          <div className="grid grid-3">
-            {items.length === 0 && (
-              <div style={{gridColumn: '1 / -1', textAlign: 'center', padding: 'var(--space-xl)'}}>
-                <p style={{color: 'var(--neutral-500)', fontSize: '1.1rem'}}>No products available at the moment.</p>
-              </div>
-            )}
-            {items.map((p) => (
-              <div key={p.id} className="product-card">
-                <div style={{position: 'relative'}}>
-                  <Image
-                    src={p.image}
-                    alt={p.title}
-                    width={300}
-                    height={200}
-                    style={{width: '100%', height: '200px', objectFit: 'contain'}}
-                  />
-                  {p.keyword && (
-                    <span style={{
-                      position: 'absolute',
-                      top: 'var(--space-sm)',
-                      left: 'var(--space-sm)',
-                      backgroundColor: 'var(--primary)',
-                      color: 'white',
-                      fontSize: '0.75rem',
-                      padding: 'var(--space-xs) var(--space-sm)',
-                      borderRadius: '0.25rem',
-                      fontWeight: '600'
-                    }}>
-                      {p.keyword}
-                    </span>
-                  )}
+        {/* Featured Products */}
+        <section style={{padding: 'var(--space-2xl) var(--space-md)'}}>
+          <div style={{maxWidth: 'var(--container-lg)', margin: '0 auto'}}>
+            <h2 style={{textAlign: 'center', marginBottom: 'var(--space-xl)', fontSize: 'var(--text-3xl)', fontWeight: 700}}>
+              Our Premium Products
+            </h2>
+            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-xl)'}}>
+              {/* Product 1 */}
+              <div style={{border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: 'var(--space-lg)', textAlign: 'center'}}>
+                <Image
+                  src="https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=300&h=300&fit=crop"
+                  alt="Soil Amendment"
+                  width={300}
+                  height={300}
+                  style={{borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-md)'}}
+                />
+                <h3 style={{marginBottom: 'var(--space-sm)'}}>Premium Soil Amendment</h3>
+                <p style={{color: 'var(--text-secondary)', marginBottom: 'var(--space-md)'}}>
+                  Our flagship product enriches soil with beneficial microbes and organic matter.
+                </p>
+                <div style={{fontSize: 'var(--text-2xl)', fontWeight: 700, color: 'var(--primary)', marginBottom: 'var(--space-md)'}}>
+                  $24.99
                 </div>
-                <div className="product-card-content">
-                  <h3>{p.title}</h3>
-                  <p>{p.details}</p>
-                  <div className="mb-md">
-                    <Link href={`/products/${p.slug}`} style={{color: 'var(--primary)', textDecoration: 'none', fontWeight: '500'}}>
-                      View Details →
-                    </Link>
-                  </div>
-                  <div className="mb-md">
-                    <label htmlFor={`home-size-${p.id}`} style={{display: 'block', fontWeight: '600', marginBottom: 'var(--space-xs)', color: 'var(--neutral-700)'}}>
-                      Choose size
-                    </label>
-                    <select
-                      id={`home-size-${p.id}`}
-                      value={selected[p.id] || ''}
-                      onChange={(e) => setSelected((s) => ({ ...s, [p.id]: e.target.value }))}
-                      style={{
-                        width: '100%',
-                        borderRadius: '0.5rem',
-                        border: '1px solid var(--neutral-300)',
-                        padding: 'var(--space-sm) var(--space-md)',
-                        backgroundColor: 'white',
-                        fontSize: '0.9rem'
-                      }}
-                      disabled={!p.variations || p.variations.length === 0}
-                    >
-                      <option value="" disabled>Select a size</option>
-                      {p.variations?.map(v => (
-                        <option key={v.sku} value={v.sku}>{v.size} - ${v.price.toFixed(2)}</option>
-                      ))}
-                    </select>
-                    {(!p.variations || p.variations.length === 0) && (
-                      <small style={{display: 'block', marginTop: 'var(--space-xs)', color: 'var(--neutral-500)'}}>
-                        Currently unavailable
-                      </small>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => {
-                      if (!p.variations || p.variations.length === 0) return;
-                      const sku = selected[p.id] || p.variations[0]?.sku;
-                      const variant = p.variations.find(v => v.sku === sku) || p.variations[0]!;
-                      addItem({
-                        id: String(p.id),
-                        title: p.title,
-                        image: p.image || '',
-                        sku: variant.sku,
-                        size: variant.size,
-                        price: variant.price,
-                        qty: 1,
-                      });
-                    }}
-                    disabled={!p.variations || p.variations.length === 0}
-                    className={(!p.variations || p.variations.length === 0) ? 'btn btn-secondary' : 'btn btn-primary'}
-                    style={{width: '100%'}}
-                  >
-                    {(!p.variations || p.variations.length === 0) ? 'Unavailable' : 'Add to Cart'}
-                  </button>
-                </div>
+                <Link href="/products" style={{display: 'inline-block', padding: 'var(--space-sm) var(--space-lg)', background: 'var(--primary)', color: 'white', borderRadius: 'var(--radius-md)', textDecoration: 'none', fontWeight: 600}}>
+                  Shop Now
+                </Link>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      <section className="p-xl" style={{backgroundColor: 'var(--neutral-50)'}}>
-        <div className="container">
-          <div className="text-center">
-            <h2>Why Choose Nature's Way Soil?</h2>
-            <p className="mb-xl" style={{fontSize: '1.1rem', color: 'var(--neutral-600)', maxWidth: '700px', margin: '0 auto var(--space-xl)'}}>
-              Soil isn't just dirt—it's a living ecosystem. By nurturing the microbes and natural processes in the ground, 
-              we create healthier plants, stronger food systems, and a cleaner environment for future generations.
-            </p>
-            <p style={{fontSize: '1.2rem', fontWeight: '600', color: 'var(--neutral-800)'}}>
-              Every bottle and bag of Nature's Way Soil carries this commitment: to restore the balance between people, plants, and the planet.
-            </p>
+              {/* Product 2 */}
+              <div style={{border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: 'var(--space-lg)', textAlign: 'center'}}>
+                <Image
+                  src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=300&h=300&fit=crop"
+                  alt="Compost Activator"
+                  width={300}
+                  height={300}
+                  style={{borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-md)'}}
+                />
+                <h3 style={{marginBottom: 'var(--space-sm)'}}>Compost Activator</h3>
+                <p style={{color: 'var(--text-secondary)', marginBottom: 'var(--space-md)'}}>
+                  Speed up your composting process with our powerful microbial blend.
+                </p>
+                <div style={{fontSize: 'var(--text-2xl)', fontWeight: 700, color: 'var(--primary)', marginBottom: 'var(--space-md)'}}>
+                  $19.99
+                </div>
+                <Link href="/products" style={{display: 'inline-block', padding: 'var(--space-sm) var(--space-lg)', background: 'var(--primary)', color: 'white', borderRadius: 'var(--radius-md)', textDecoration: 'none', fontWeight: 600}}>
+                  Shop Now
+                </Link>
+              </div>
+
+              {/* Product 3 */}
+              <div style={{border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: 'var(--space-lg)', textAlign: 'center'}}>
+                <Image
+                  src="https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=300&h=300&fit=crop"
+                  alt="Plant Booster"
+                  width={300}
+                  height={300}
+                  style={{borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-md)'}}
+                />
+                <h3 style={{marginBottom: 'var(--space-sm)'}}>Plant Growth Booster</h3>
+                <p style={{color: 'var(--text-secondary)', marginBottom: 'var(--space-md)'}}>
+                  Give your plants the nutrients they need for explosive growth.
+                </p>
+                <div style={{fontSize: 'var(--text-2xl)', fontWeight: 700, color: 'var(--primary)', marginBottom: 'var(--space-md)'}}>
+                  $29.99
+                </div>
+                <Link href="/products" style={{display: 'inline-block', padding: 'var(--space-sm) var(--space-lg)', background: 'var(--primary)', color: 'white', borderRadius: 'var(--radius-md)', textDecoration: 'none', fontWeight: 600}}>
+                  Shop Now
+                </Link>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* Testimonials */}
+        <section style={{padding: 'var(--space-2xl) var(--space-md)', background: 'var(--bg-secondary)'}}>
+          <div style={{maxWidth: 'var(--container-lg)', margin: '0 auto'}}>
+            <h2 style={{textAlign: 'center', marginBottom: 'var(--space-xl)', fontSize: 'var(--text-3xl)', fontWeight: 700}}>
+              What Our Customers Say
+            </h2>
+            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-xl)'}}>
+              <div style={{background: 'white', padding: 'var(--space-lg)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-sm)'}}>
+                <div style={{display: 'flex', marginBottom: 'var(--space-sm)'}}>
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} style={{width: 20, height: 20, fill: 'var(--primary)'}} viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+                <p style={{marginBottom: 'var(--space-md)'}}>
+                  "My tomatoes have never been healthier! The difference in soil quality is remarkable."
+                </p>
+                <p style={{fontWeight: 600}}>- Sarah M., Home Gardener</p>
+              </div>
+
+              <div style={{background: 'white', padding: 'var(--space-lg)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-sm)'}}>
+                <div style={{display: 'flex', marginBottom: 'var(--space-sm)'}}>
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} style={{width: 20, height: 20, fill: 'var(--primary)'}} viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+                <p style={{marginBottom: 'var(--space-md)'}}>
+                  "As a professional landscaper, I trust Nature's Way Soil for all my projects. Consistent quality every time."
+                </p>
+                <p style={{fontWeight: 600}}>- Mike R., Professional Landscaper</p>
+              </div>
+
+              <div style={{background: 'white', padding: 'var(--space-lg)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-sm)'}}>
+                <div style={{display: 'flex', marginBottom: 'var(--space-sm)'}}>
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} style={{width: 20, height: 20, fill: 'var(--primary)'}} viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+                <p style={{marginBottom: 'var(--space-md)'}}>
+                  "Finally, an organic solution that actually works! My vegetable garden is thriving."
+                </p>
+                <p style={{fontWeight: 600}}>- Jennifer L., Organic Farmer</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <OptimizedCTA />
+
+        {/* Chat Widget */}
+        {mounted && <EnhancedChatWidget />}
+      </main>
     </>
-  );
+  )
 }

@@ -25,12 +25,18 @@ const stripe = new Stripe(getSecretKey().key, {
 } as any)
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') return res.status(405).end()
+  if (req.method !== 'POST') {
+    res.status(405).end()
+    return
+  }
 
   const sig = req.headers['stripe-signature'] as string
   const wh = getWebhookSecret()
   const whSecret = wh?.key as string
-  if (!whSecret) return res.status(500).send('Missing STRIPE_WEBHOOK_SECRET')
+  if (!whSecret) {
+    res.status(500).send('Missing STRIPE_WEBHOOK_SECRET')
+    return
+  }
 
   let event: Stripe.Event
   try {
@@ -38,7 +44,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     event = stripe.webhooks.constructEvent(buf, sig, whSecret)
   } catch (err: any) {
     console.error('Webhook signature verify failed:', err?.message || err)
-    return res.status(400).send(`Webhook Error: ${err.message}`)
+    res.status(400).send(`Webhook Error: ${err.message}`)
+    return
   }
 
   try {
@@ -135,9 +142,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // ignore other events
         break
     }
-    return res.status(200).json({ received: true })
+    res.status(200).json({ received: true })
   } catch (err: any) {
     console.error('Webhook handler error:', err)
-    return res.status(500).send('Webhook handler error')
+    res.status(500).send('Webhook handler error')
   }
 }
