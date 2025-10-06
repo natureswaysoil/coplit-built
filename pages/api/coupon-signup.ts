@@ -52,7 +52,20 @@ export default async function handler(
     } else {
       // Check if email already exists
       const existingData = fs.readFileSync(filePath, 'utf-8')
-      if (existingData.includes(email)) {
+      // Check for duplicate email by parsing the CSV and comparing only the email column
+      const lines = existingData.split('\n').filter(line => line.trim() !== '');
+      // Skip header
+      let duplicate = false;
+      for (let i = 1; i < lines.length; i++) {
+        const row = lines[i];
+        // Split CSV row, handling quoted fields
+        const match = row.match(/^"([^"]*)","[^"]*","[^"]*"$/);
+        if (match && match[1] === email) {
+          duplicate = true;
+          break;
+        }
+      }
+      if (duplicate) {
         return res.status(200).json({ 
           success: true, 
           message: 'You are already subscribed! Check your email for the coupon code.' 
