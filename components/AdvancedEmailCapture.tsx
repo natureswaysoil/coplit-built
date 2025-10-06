@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react'
 import { captureEmail } from '../lib/supabase_client'
-import { sendWelcomeEmail } from '../lib/resend_client'
+// DO NOT import resend_client here - it must only run server-side
+// We'll call an API route instead
 
 interface AdvancedEmailCaptureProps {
   source: string
@@ -59,8 +60,17 @@ export default function AdvancedEmailCapture({
         throw new Error('Failed to save email')
       }
 
-      // Send welcome email
-      await sendWelcomeEmail(email)
+      // Send welcome email via API route (server-side only)
+      try {
+        await fetch('/api/email/welcome', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        })
+      } catch (emailError) {
+        // Don't fail the whole flow if email fails
+        console.warn('Welcome email failed:', emailError)
+      }
 
       setIsSuccess(true)
       setEmail('')

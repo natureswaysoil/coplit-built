@@ -24,8 +24,24 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Nature's Way Soil | Organic Soil Health & Fertility Products</title>
-        <meta name="description" content="Bring life back to your soil with microbe-rich fertilizers, compost, and plant boosters. Safe for kids, pets, and pollinators." />
+        <title>Nature's Way Soil | Premium Organic Fertilizers & Soil Health Solutions</title>
+        <meta name="description" content="Restore soil health naturally with our premium organic fertilizers. Work with nature, not against it. Safe for kids, pets, and pollinators. Free shipping on orders over $50." />
+        <meta name="keywords" content="organic fertilizer, soil health, mycorrhizal fungi, organic gardening, sustainable agriculture, natural fertilizer, soil microbes" />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://natureswaysoil.com/" />
+        <meta property="og:title" content="Nature's Way Soil | Premium Organic Fertilizers" />
+        <meta property="og:description" content="Restore soil health naturally with our premium organic fertilizers. Work with nature, not against it." />
+        <meta property="og:image" content="https://media.springernature.com/m685/springer-static/image/art%3A10.1038%2Fs43017-022-00366-w/MediaObjects/43017_2022_366_Fig1_HTML.png" />
+        
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="https://natureswaysoil.com/" />
+        <meta property="twitter:title" content="Nature's Way Soil | Premium Organic Fertilizers" />
+        <meta property="twitter:description" content="Restore soil health naturally with our premium organic fertilizers. Work with nature, not against it." />
+        <meta property="twitter:image" content="https://m.media-amazon.com/images/I/718tWBNNfkL.jpg" />
+        
         <link rel="canonical" href={`${process.env.PUBLIC_SITE_URL || 'https://natureswaysoil.com'}/`} />
       </Head>
       
