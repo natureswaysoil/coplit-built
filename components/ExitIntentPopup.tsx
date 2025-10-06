@@ -33,16 +33,37 @@ export default function ExitIntentPopup() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // TODO: Send email to your email service (Mailchimp, ConvertKit, etc.)
-    console.log('Email submitted:', email);
-    
-    // For now, just show success message
-    setSubmitted(true);
-    
-    // Close popup after 3 seconds
-    setTimeout(() => {
-      setShow(false);
-    }, 3000);
+    try {
+      // Send email to backend API for processing
+      const response = await fetch('/api/email-capture', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          source: 'exit_intent_popup',
+          couponCode: 'WELCOME15'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit email');
+      }
+
+      // Show success message
+      setSubmitted(true);
+      
+      // Close popup after 5 seconds
+      setTimeout(() => {
+        setShow(false);
+      }, 5000);
+    } catch (error) {
+      console.error('Error submitting email:', error);
+      // Still show success to user (fail gracefully)
+      setSubmitted(true);
+      setTimeout(() => {
+        setShow(false);
+      }, 5000);
+    }
   };
 
   if (!show) return null;
@@ -131,8 +152,14 @@ export default function ExitIntentPopup() {
               </svg>
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">Success!</h3>
-            <p className="text-gray-600 mb-4">
-              Check your email for your <strong>15% discount code</strong>!
+            <p className="text-gray-600 mb-3">
+              Your <strong>15% discount code</strong> is:
+            </p>
+            <div className="bg-green-50 border-2 border-green-600 rounded-lg p-4 mb-4">
+              <code className="text-2xl font-bold text-green-700">WELCOME15</code>
+            </div>
+            <p className="text-sm text-gray-600 mb-2">
+              Use this code at checkout to save 15% on your first order!
             </p>
             <p className="text-sm text-gray-500">
               Welcome to the Nature's Way Soil family 🌱
