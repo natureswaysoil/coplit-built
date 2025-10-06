@@ -1,5 +1,8 @@
 import { Resend } from 'resend'
 
+// CRITICAL: This module must ONLY be imported in server-side code (API routes, getServerSideProps, etc.)
+// Never import this in client components or pages that run in the browser
+
 export interface SendArgs {
   to: string | string[]
   subject: string
@@ -11,9 +14,23 @@ export interface SendArgs {
 }
 
 let client: Resend | null = null
+
 function getClient(): Resend | null {
-  if (!process.env.RESEND_API_KEY) return null
-  if (!client) client = new Resend(process.env.RESEND_API_KEY)
+  // Ensure this only runs on server-side
+  if (typeof window !== 'undefined') {
+    console.error('[resendClient] ERROR: Attempted to initialize Resend on client-side. This is a security risk!')
+    return null
+  }
+  
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('[resendClient] RESEND_API_KEY not configured')
+    return null
+  }
+  
+  if (!client) {
+    client = new Resend(process.env.RESEND_API_KEY)
+  }
+  
   return client
 }
 
