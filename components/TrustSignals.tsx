@@ -5,30 +5,26 @@ export default function TrustSignals() {
     <section className="bg-gradient-to-b from-white to-green-50 py-12 md:py-16">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
-          {/* Main Trust Indicators - Clean & Simple */}
+          {/* Main Trust Indicators - Clean Text Only */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12">
-            <div className="text-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
-              <div className="text-3xl mb-2">🛡️</div>
-              <h3 className="font-semibold text-gray-900 text-sm md:text-base mb-1">Safe & Natural</h3>
-              <p className="text-xs text-gray-600">Eco-Friendly Products</p>
+            <div className="text-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border-t-4 border-green-600">
+              <h3 className="font-bold text-gray-900 text-base md:text-lg mb-2">Safe & Natural</h3>
+              <p className="text-sm text-gray-600">Eco-Friendly Products</p>
             </div>
 
-            <div className="text-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
-              <div className="text-3xl mb-2">💰</div>
-              <h3 className="font-semibold text-gray-900 text-sm md:text-base mb-1">Money Back</h3>
-              <p className="text-xs text-gray-600">30-Day Guarantee</p>
+            <div className="text-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border-t-4 border-green-600">
+              <h3 className="font-bold text-gray-900 text-base md:text-lg mb-2">Money Back</h3>
+              <p className="text-sm text-gray-600">30-Day Guarantee</p>
             </div>
 
-            <div className="text-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
-              <div className="text-3xl mb-2">🚚</div>
-              <h3 className="font-semibold text-gray-900 text-sm md:text-base mb-1">Free Shipping</h3>
-              <p className="text-xs text-gray-600">Orders Over $50</p>
+            <div className="text-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border-t-4 border-green-600">
+              <h3 className="font-bold text-gray-900 text-base md:text-lg mb-2">Free Shipping</h3>
+              <p className="text-sm text-gray-600">Orders Over $50</p>
             </div>
 
-            <div className="text-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
-              <div className="text-3xl mb-2">💬</div>
-              <h3 className="font-semibold text-gray-900 text-sm md:text-base mb-1">Expert Support</h3>
-              <p className="text-xs text-gray-600">24/7 Available</p>
+            <div className="text-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border-t-4 border-green-600">
+              <h3 className="font-bold text-gray-900 text-base md:text-lg mb-2">Expert Support</h3>
+              <p className="text-sm text-gray-600">24/7 Available</p>
             </div>
           </div>
 

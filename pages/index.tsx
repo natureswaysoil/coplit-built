@@ -82,39 +82,24 @@ export default function Home() {
 
             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {/* Benefit 1 */}
-              <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
-                  <svg className="w-8 h-8 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Science-Backed Formulas</h3>
+              <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow border-t-4 border-green-600">
+                <h3 className="text-2xl font-bold text-green-700 mb-4">Science-Backed Formulas</h3>
                 <p className="text-gray-600 leading-relaxed">
                   Developed using the latest soil science research, combining beneficial microbes, organic matter, and natural nutrients for optimal results.
                 </p>
               </div>
 
               {/* Benefit 2 */}
-              <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
-                  <svg className="w-8 h-8 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Safe & Natural</h3>
+              <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow border-t-4 border-green-600">
+                <h3 className="text-2xl font-bold text-green-700 mb-4">Safe & Natural</h3>
                 <p className="text-gray-600 leading-relaxed">
                   Every ingredient is carefully selected to be safe for children, pets, pollinators, and the environment. Grow with confidence.
                 </p>
               </div>
 
               {/* Benefit 3 */}
-              <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
-                  <svg className="w-8 h-8 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Proven Results</h3>
+              <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow border-t-4 border-green-600">
+                <h3 className="text-2xl font-bold text-green-700 mb-4">Proven Results</h3>
                 <p className="text-gray-600 leading-relaxed">
                   Join thousands of satisfied customers who have transformed their soil and seen remarkable improvements in plant health and yields.
                 </p>
