@@ -1,4 +1,3 @@
-
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -7,9 +6,12 @@ import HeroVideoSection from '../components/HeroVideoSection'
 import TrustSignals from '../components/TrustSignals'
 import OptimizedCTA from '../components/OptimizedCTA'
 import EnhancedChatWidget from '../components/EnhancedChatWidget'
+import { products } from '../lib/products'
+import { ProductGrid } from '@/components/ProductGrid'
 
 export default function Home() {
   const [mounted, setMounted] = useState(false)
+  const [items] = useState(Array.isArray(products) ? products : [])
 
   useEffect(() => {
     setMounted(true)
@@ -63,79 +65,17 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Featured Products */}
-        <section style={{padding: 'var(--space-2xl) var(--space-md)'}}>
-          <div style={{maxWidth: 'var(--container-lg)', margin: '0 auto'}}>
-            <h2 style={{textAlign: 'center', marginBottom: 'var(--space-xl)', fontSize: 'var(--text-3xl)', fontWeight: 700}}>
-              Our Premium Products
-            </h2>
-            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-xl)'}}>
-              {/* Product 1 */}
-              <div style={{border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: 'var(--space-lg)', textAlign: 'center'}}>
-                <Image
-                  src="https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=300&h=300&fit=crop"
-                  alt="Soil Amendment"
-                  width={300}
-                  height={300}
-                  style={{borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-md)'}}
-                />
-                <h3 style={{marginBottom: 'var(--space-sm)'}}>Premium Soil Amendment</h3>
-                <p style={{color: 'var(--text-secondary)', marginBottom: 'var(--space-md)'}}>
-                  Our flagship product enriches soil with beneficial microbes and organic matter.
-                </p>
-                <div style={{fontSize: 'var(--text-2xl)', fontWeight: 700, color: 'var(--primary)', marginBottom: 'var(--space-md)'}}>
-                  $24.99
-                </div>
-                <Link href="/products" style={{display: 'inline-block', padding: 'var(--space-sm) var(--space-lg)', background: 'var(--primary)', color: 'white', borderRadius: 'var(--radius-md)', textDecoration: 'none', fontWeight: 600}}>
-                  Shop Now
-                </Link>
-              </div>
-
-              {/* Product 2 */}
-              <div style={{border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: 'var(--space-lg)', textAlign: 'center'}}>
-                <Image
-                  src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=300&h=300&fit=crop"
-                  alt="Compost Activator"
-                  width={300}
-                  height={300}
-                  style={{borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-md)'}}
-                />
-                <h3 style={{marginBottom: 'var(--space-sm)'}}>Compost Activator</h3>
-                <p style={{color: 'var(--text-secondary)', marginBottom: 'var(--space-md)'}}>
-                  Speed up your composting process with our powerful microbial blend.
-                </p>
-                <div style={{fontSize: 'var(--text-2xl)', fontWeight: 700, color: 'var(--primary)', marginBottom: 'var(--space-md)'}}>
-                  $19.99
-                </div>
-                <Link href="/products" style={{display: 'inline-block', padding: 'var(--space-sm) var(--space-lg)', background: 'var(--primary)', color: 'white', borderRadius: 'var(--radius-md)', textDecoration: 'none', fontWeight: 600}}>
-                  Shop Now
-                </Link>
-              </div>
-
-              {/* Product 3 */}
-              <div style={{border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: 'var(--space-lg)', textAlign: 'center'}}>
-                <Image
-                  src="https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=300&h=300&fit=crop"
-                  alt="Plant Booster"
-                  width={300}
-                  height={300}
-                  style={{borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-md)'}}
-                />
-                <h3 style={{marginBottom: 'var(--space-sm)'}}>Plant Growth Booster</h3>
-                <p style={{color: 'var(--text-secondary)', marginBottom: 'var(--space-md)'}}>
-                  Give your plants the nutrients they need for explosive growth.
-                </p>
-                <div style={{fontSize: 'var(--text-2xl)', fontWeight: 700, color: 'var(--primary)', marginBottom: 'var(--space-md)'}}>
-                  $29.99
-                </div>
-                <Link href="/products" style={{display: 'inline-block', padding: 'var(--space-sm) var(--space-lg)', background: 'var(--primary)', color: 'white', borderRadius: 'var(--radius-md)', textDecoration: 'none', fontWeight: 600}}>
-                  Shop Now
-                </Link>
-              </div>
+        <section className="p-xl" style={{backgroundColor: 'white'}}>
+          <div className="container">
+            <div className="text-center mb-xl">
+              <h2>Featured Products</h2>
+              <p style={{fontSize: '1.1rem', color: 'var(--neutral-600)', maxWidth: '600px', margin: '0 auto'}}>
+                Discover our range of organic soil amendments and fertilizers designed to restore soil health naturally.
+              </p>
             </div>
+            <ProductGrid products={items as any} />
           </div>
         </section>
-
         {/* Testimonials */}
         <section style={{padding: 'var(--space-2xl) var(--space-md)', background: 'var(--bg-secondary)'}}>
           <div style={{maxWidth: 'var(--container-lg)', margin: '0 auto'}}>

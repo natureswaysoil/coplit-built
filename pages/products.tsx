@@ -35,15 +35,15 @@ export default function ProductsPage({ products }: ProductsPageProps) {
                 href={`/products/${product.slug}`}
                 key={product.id}
                 className="product-card"
-                style={{textDecoration: 'none', color: 'inherit'}}
-           <Image
-  src={product.image}
-  alt={product.title}
-  width={300}
-  height={200}
-  style={{width: '100%', height: '200px', objectFit: 'contain'}}
-  unoptimized
-               
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                <Image
+                  src={product.image}
+                  alt={product.title}
+                  width={300}
+                  height={200}
+                  style={{ width: '100%', height: '200px', objectFit: 'contain' }}
+                  unoptimized
                 />
                 <div className="product-card-content">
                   <h3 style={{color: 'var(--neutral-800)', marginBottom: 'var(--space-sm)'}}>

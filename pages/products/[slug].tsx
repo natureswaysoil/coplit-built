@@ -55,31 +55,40 @@ export default function ProductPage(props: ProductPageProps) {
         <meta name="twitter:image" content={product.image} />
         <script
           type="application/ld+json"
-          // Basic Product structured data for richer results
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'Product',
-              name: product.title,
-              image: [product.image],
-              description: product.shortDescription || product.description,
-              sku: product.variations?.[0]?.sku || product.id,
-              offers: (product.variations && product.variations.length > 0)
-                ? product.variations.map(v => ({
-                    '@type': 'Offer',
-                    priceCurrency: 'USD',
-                    price: v.price,
-                    availability: 'https://schema.org/InStock',
-                  }))
-                : product.price !== undefined
-                  ? {
-                      '@type': 'Offer',
-                      priceCurrency: 'USD',
-                      price: product.price,
-                      availability: 'https://schema.org/InStock',
-                    }
-                  : undefined,
-            })
+            __html: JSON.stringify((() => {
+              const hasVars = product.variations && product.variations.length > 0
+              const prices = hasVars ? product.variations!.map(v => v.price) : (product.price !== undefined ? [product.price] : [])
+              const aggregate = prices.length ? {
+                '@type': 'AggregateOffer',
+                priceCurrency: 'USD',
+                lowPrice: Math.min(...prices),
+                highPrice: Math.max(...prices),
+                offerCount: prices.length,
+                offers: hasVars ? product.variations!.map(v => ({
+                  '@type': 'Offer',
+                  price: v.price,
+                  priceCurrency: 'USD',
+                  sku: v.sku,
+                  availability: 'https://schema.org/InStock'
+                })) : undefined
+              } : undefined
+              return {
+                '@context': 'https://schema.org',
+                '@type': 'Product',
+                name: product.title,
+                image: [product.image],
+                description: product.shortDescription || product.description,
+                sku: product.variations?.[0]?.sku || product.id,
+                brand: { '@type': 'Brand', name: "Nature's Way Soil" },
+                offers: aggregate || (product.price !== undefined ? {
+                  '@type': 'Offer',
+                  priceCurrency: 'USD',
+                  price: product.price,
+                  availability: 'https://schema.org/InStock'
+                } : undefined)
+              }
+            })())
           }}
         />
       </Head>
