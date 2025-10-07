@@ -32,13 +32,9 @@ async function getProducts(): Promise<Product[]> {
   return data as Product[];
 }
 
-export default async function TikTokLanding() {
-  let products: Product[] = []
-  try {
-    products = await getProducts();
-  } catch {
-    products = []
-  }
+interface TikTokProps { products: Product[] }
+
+export default function TikTokLanding({ products }: TikTokProps) {
 
   return (
     <div>
@@ -87,6 +83,15 @@ export default async function TikTokLanding() {
       </div>
     </div>
   );
+}
+
+export async function getServerSideProps() {
+  try {
+    const products = await getProducts()
+    return { props: { products } }
+  } catch {
+    return { props: { products: [] } }
+  }
 }
 
 function renderStars(rating: number) {
