@@ -1,5 +1,6 @@
 // pages/checkout.tsx
 import { useEffect, useMemo, useState } from 'react'
+import Image from 'next/image'
 import type { GetServerSideProps } from 'next'
 import { getPublishableKey } from '../lib/stripeConfig'
 import { useCart } from '../lib/cartContext'

@@ -22,12 +22,12 @@ interface ProductPageProps { product: NormalizedProduct }
 
 export default function ProductPage(props: ProductPageProps) {
   const router = useRouter()
-  if (router.isFallback) return <div>Loading...</div>
   const { product } = props
   const { addItem } = useCart()
   const [sku, setSku] = useState<string>(() => product.variations?.[0]?.sku || '')
   const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`)
   const variant = product.variations?.find(v => v.sku === sku) || product.variations?.[0]
+  if (router.isFallback) return <div>Loading...</div>
   
   // Track product view
   useEffect(() => {
