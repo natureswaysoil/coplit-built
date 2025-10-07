@@ -2,7 +2,6 @@ import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import HeroVideoSection from '../components/HeroVideoSection'
 import TrustSignals from '../components/TrustSignals'
 import OptimizedCTA from '../components/OptimizedCTA'
 import EnhancedChatWidget from '../components/EnhancedChatWidget'
@@ -27,8 +26,33 @@ export default function Home() {
       </Head>
 
       <main>
-        {/* Hero Section with Video */}
-        <HeroVideoSection />
+        {/* Hero Section */}
+        <section className="relative w-full bg-gradient-to-b from-green-50 to-white py-16 md:py-24">
+          <div className="container mx-auto px-4">
+            <div className="max-w-6xl mx-auto text-center">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-green-900 mb-6">
+                Premium Soil Amendments for Healthier Plants
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto mb-8">
+                Science-backed organic formulas that work with nature to restore soil health and boost plant growth
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <a
+                  href="/products"
+                  className="inline-block bg-green-700 hover:bg-green-800 text-white font-semibold px-8 py-4 rounded-lg text-lg transition-colors shadow-lg hover:shadow-xl"
+                >
+                  Shop Products
+                </a>
+                <a
+                  href="#featured"
+                  className="inline-block bg-white hover:bg-gray-50 text-green-700 font-semibold px-8 py-4 rounded-lg text-lg transition-colors shadow-lg hover:shadow-xl border-2 border-green-700"
+                >
+                  Learn More
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* Trust Signals */}
         <TrustSignals />
@@ -65,7 +89,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="p-xl" style={{backgroundColor: 'white'}}>
+        <section id="featured" className="p-xl" style={{backgroundColor: 'white'}}>
           <div className="container">
             <div className="text-center mb-xl">
               <h2>Featured Products</h2>
