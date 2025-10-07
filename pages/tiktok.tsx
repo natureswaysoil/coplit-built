@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Head from 'next/head';
 import { createClient } from '@supabase/supabase-js';
+export const dynamic = 'force-dynamic'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -32,7 +33,12 @@ async function getProducts(): Promise<Product[]> {
 }
 
 export default async function TikTokLanding() {
-  const products = await getProducts();
+  let products: Product[] = []
+  try {
+    products = await getProducts();
+  } catch {
+    products = []
+  }
 
   return (
     <div>
