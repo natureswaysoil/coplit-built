@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import TrustSignals from '../components/TrustSignals'
 import OptimizedCTA from '../components/OptimizedCTA'
 import EnhancedChatWidget from '../components/EnhancedChatWidget'
+import Footer from '../components/Footer'
 import { products } from '../lib/products'
 import { ProductGrid } from '@/components/ProductGrid'
 
@@ -159,6 +160,9 @@ export default function Home() {
         {/* Chat Widget */}
         {mounted && <EnhancedChatWidget />}
       </main>
+
+      {/* Footer */}
+      <Footer />
     </>
   )
 }
