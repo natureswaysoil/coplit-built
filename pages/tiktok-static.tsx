@@ -11,7 +11,7 @@ export default function TikTokLanding() {
       </Head>
 
       <header style={styles.header}>
-        <Image src="/logo-with-tagline.png" alt="Nature's Way Soil Logo" width={150} height={150} />
+        <Image src="/screenshots/logo-with-tagline.png" alt="Nature's Way Soil Logo" width={150} height={150} />
         <h1>Welcome TikTok Gardeners! </h1>
         <p>Fix your lawn, grow vibrant plants, and protect your pets — all naturally.</p>
         <div style={styles.ctaButtons}>
