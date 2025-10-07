@@ -16,7 +16,12 @@ import ProductVideoPlayer from '@/components/ProductVideoPlayer'
 import InventoryTracker from '@/components/InventoryTracker'
 import PersonalizedRecommendations from '@/components/PersonalizedRecommendations'
 import EnhancedChatWidget from '@/components/EnhancedChatWidget'
-import { trackProductView } from '@/lib/supabase_client'
+let trackProductView: any = () => Promise.resolve()
+try {
+  // Dynamic require to avoid breaking static export if module has edge-incompatible code
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  trackProductView = require('@/lib/supabase_client').trackProductView || trackProductView
+} catch {}
 
 interface ProductPageProps { product: NormalizedProduct }
 
@@ -31,9 +36,11 @@ export default function ProductPage(props: ProductPageProps) {
   
   // Track product view
   useEffect(() => {
-    if (product.id) {
-      trackProductView(product.id, sessionId).catch(err => {
-        console.error('Failed to track product view:', err)
+    if (typeof window !== 'undefined' && product.id) {
+  trackProductView(product.id, sessionId).catch((err: unknown) => {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Failed to track product view:', err)
+        }
       })
     }
   }, [product.id, sessionId])
