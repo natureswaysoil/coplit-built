@@ -293,3 +293,4 @@ This README reflects the bigint-first migration strategy. Adjust or prune legacy
 - Last trigger: 2025-08-28.
 - Redeploy triggered: 2025-09-10.
 - Force refresh env vars: 2025-09-10.# Force rebuild Tue Oct  7 17:36:54 UTC 2025
+# Trigger fresh deployment 1759859613
