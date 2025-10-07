@@ -29,10 +29,10 @@ export default function ProductPage(props: ProductPageProps) {
   const router = useRouter()
   const { product } = props
   const { addItem } = useCart()
-  const [sku, setSku] = useState<string>(() => product.variations?.[0]?.sku || '')
+  const [sku, setSku] = useState<string>(() => product?.variations?.[0]?.sku || '')
   const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`)
-  const variant = product.variations?.find(v => v.sku === sku) || product.variations?.[0]
-  if (router.isFallback) return <div>Loading...</div>
+  const variant = product?.variations?.find(v => v.sku === sku) || product?.variations?.[0]
+  if (router.isFallback || !product) return <div>Loading...</div>
   
   // Track product view
   useEffect(() => {
