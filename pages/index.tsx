@@ -28,18 +28,15 @@ export default function Home() {
 
       <main className="min-h-screen bg-white">
         {/* Hero Section - Professional & Clean */}
-        <section className="relative w-full overflow-hidden">
-          {/* Background Image with Overlay */}
-          <div className="absolute inset-0 z-0">
-            <Image
-              src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=1920&h=800&fit=crop&q=80"
-              alt="Lush garden background"
-              fill
-              className="object-cover"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-green-900/90 to-green-800/70"></div>
-          </div>
+        <section 
+          className="relative w-full overflow-hidden bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: 'url(https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=1920&h=800&fit=crop&q=80)',
+            minHeight: '600px'
+          }}
+        >
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-green-900/90 to-green-800/70"></div>
 
           {/* Hero Content */}
           <div className="relative z-10 container mx-auto px-4 py-24 md:py-32 lg:py-40">
