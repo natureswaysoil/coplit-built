@@ -5,6 +5,21 @@ export default function CouponForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState('')
+  const [hp, setHp] = useState('') // honeypot
+  const [cooldownLeft, setCooldownLeft] = useState(0)
+
+  const startCooldown = (secs = 8) => {
+    setCooldownLeft(secs)
+    const id = window.setInterval(() => {
+      setCooldownLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(id)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+  }
 
   const validateEmail = (email: string) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -33,7 +48,7 @@ export default function CouponForm() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, hp }),
       })
 
       const data = await response.json()
@@ -48,6 +63,7 @@ export default function CouponForm() {
       setError('Network error. Please try again.')
     } finally {
       setIsSubmitting(false)
+      startCooldown(8)
     }
   }
 
@@ -64,12 +80,12 @@ export default function CouponForm() {
             <h3 className="text-3xl font-bold text-gray-900 mb-4">
               Check Your Email!
             </h3>
-            <p className="text-lg text-gray-600 mb-6">
+              <p className="text-lg text-gray-600 mb-6">
               We've sent your exclusive 15% off coupon code to your inbox. Use it on your first order to start your journey to healthier soil!
             </p>
             <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4 mb-6">
               <p className="text-sm text-green-800 font-semibold">
-                💡 Pro Tip: Add us to your contacts so you never miss our soil health tips and exclusive offers!
+                Pro Tip: Add us to your contacts so you never miss our soil health tips and exclusive offers!
               </p>
             </div>
             <a
@@ -119,6 +135,19 @@ export default function CouponForm() {
           {/* Form Section */}
           <div className="px-8 py-10">
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Honeypot field (hidden) */}
+              <div style={{ position: 'absolute', left: -10000, top: 'auto', width: 1, height: 1, overflow: 'hidden' }} aria-hidden="true">
+                <label htmlFor="company-website">Website</label>
+                <input
+                  type="text"
+                  id="company-website"
+                  name="hp"
+                  value={hp}
+                  onChange={(e) => setHp(e.target.value)}
+                  autoComplete="off"
+                  tabIndex={-1}
+                />
+              </div>
               <div>
                 <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
                   Email Address
@@ -144,7 +173,7 @@ export default function CouponForm() {
 
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || cooldownLeft > 0}
                 className="w-full bg-green-700 hover:bg-green-800 text-white font-bold py-4 px-6 rounded-lg text-lg transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
               >
                 {isSubmitting ? (
@@ -155,6 +184,8 @@ export default function CouponForm() {
                     </svg>
                     Sending...
                   </span>
+                ) : cooldownLeft > 0 ? (
+                  `Please wait ${cooldownLeft}s`
                 ) : (
                   'Get My 15% Off Coupon'
                 )}
