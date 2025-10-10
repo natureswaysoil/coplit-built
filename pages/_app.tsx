@@ -14,7 +14,7 @@ import '../styles/globals.css'
 // Modern CSS for enhanced styling
 import '../styles/modern.css'
 
-// ✅ Vercel Web Analytics
+// Vercel Web Analytics
 import { Analytics } from '@vercel/analytics/next'
 
 // Conversion Optimization Components
@@ -46,7 +46,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <>
-      {/* 🎯 NEW SEO SECTION - ADD THIS */}
+  {/* SEO section */}
       <Head>
         <html lang="en" />
         <title>Nature's Way Soil - Natural Fertilizers & Soil Products | Horse-Safe & Pet-Friendly</title>
