@@ -5,9 +5,7 @@ import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import { products } from '../lib/products';
 import { useCart } from '../lib/cartContext';
-import HeroVideoSection from '../components/HeroVideoSection';
 import EnhancedChatWidget from '../components/EnhancedChatWidget';
-import CouponForm from '../components/CouponForm';
 import PersonalizedRecommendations from '../components/PersonalizedRecommendations';
 import SocialProofBanner from '../components/SocialProofBanner';
 import Footer from '../components/Footer';
@@ -32,8 +30,17 @@ export default function Home() {
       </Head>
 
       <main>
-        {/* Hero Section with Video */}
-        <HeroVideoSection />
+        {/* Simple Hero (video temporarily removed) */}
+        <section style={{padding: 'var(--space-2xl) var(--space-md)'}}>
+          <div style={{maxWidth: 'var(--container-lg)', margin: '0 auto', textAlign: 'center'}}>
+            <h1 style={{fontSize: 'var(--text-4xl)', fontWeight: 800, marginBottom: 'var(--space-md)'}}>
+              Bring Life Back to Your Soil
+            </h1>
+            <p style={{color: 'var(--text-secondary)', maxWidth: 720, margin: '0 auto'}}>
+              Microbe-rich fertilizers, compost, and plant boosters that are safe for kids, pets, and pollinators.
+            </p>
+          </div>
+        </section>
 
         {/* Trust Signals */}
         <TrustSignals />
@@ -164,8 +171,7 @@ export default function Home() {
                 <p style={{fontWeight: 600}}>- Sarah M., Home Gardener</p>
               </div>
 
-      {/* 15% Off Coupon Form */}
-      <CouponForm />
+
 
               <div style={{background: 'white', padding: 'var(--space-lg)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-sm)'}}>
                 <div style={{display: 'flex', marginBottom: 'var(--space-sm)'}}>
