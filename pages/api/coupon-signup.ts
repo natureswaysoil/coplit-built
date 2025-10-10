@@ -29,13 +29,36 @@ export default async function handler(
   }
 
   try {
-    // Create data directory if it doesn't exist
-    const dataDir = path.join(process.cwd(), 'data')
-    if (!fs.existsSync(dataDir)) {
-      fs.mkdirSync(dataDir, { recursive: true })
+    // Determine a writable directory: use /tmp on serverless (Vercel), fallback to project data in local/dev
+    const preferredDirs = [
+      process.env.COUPON_SIGNUPS_DIR || '',
+      '/tmp',
+      path.join(process.cwd(), 'data'),
+    ].filter(Boolean) as string[]
+
+    let dataDir = preferredDirs[0]
+    let filePath = path.join(dataDir, 'coupon-signups.csv')
+
+    const ensureDir = (dir: string) => {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true })
+      }
     }
 
-    const filePath = path.join(dataDir, 'coupon-signups.csv')
+    try {
+      ensureDir(dataDir)
+    } catch (e: any) {
+      // Fallback to next option if not writable
+      for (let i = 1; i < preferredDirs.length; i++) {
+        try {
+          ensureDir(preferredDirs[i])
+          dataDir = preferredDirs[i]
+          filePath = path.join(dataDir, 'coupon-signups.csv')
+          break
+        } catch {}
+      }
+    }
+
     const timestamp = new Date().toISOString()
     const couponCode = 'WELCOME15'
 
