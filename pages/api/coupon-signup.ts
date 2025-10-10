@@ -46,6 +46,13 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
+  // Honeypot: if hidden field is filled, pretend success but do nothing
+  const honeypot = String((req.body as any)?.hp || (req.body as any)?.website || '').trim()
+  if (honeypot) {
+    // Return a generic success to avoid tipping off bots
+    return res.status(200).json({ success: true, message: 'Success! Check your email for your 15% off coupon code.' })
+  }
+
   const rawEmail = String((req.body as any)?.email || '')
   const normalizedEmail = rawEmail.trim().toLowerCase()
 
@@ -89,6 +96,53 @@ export default async function handler(
         } catch {}
       }
     }
+
+  // Simple file-backed rate limiting (per IP and per email)
+  try {
+    const ipHeader = String(req.headers['x-forwarded-for'] || '')
+    const clientIp = ipHeader.split(',')[0].trim() || (req.socket?.remoteAddress || 'unknown')
+
+    const rateFile = path.join(dataDir, 'coupon-rate-limit.json')
+    type RateStore = { ip: Record<string, number[]>; email: Record<string, number[]> }
+    let store: RateStore = { ip: {}, email: {} }
+    if (fs.existsSync(rateFile)) {
+      try {
+        const raw = fs.readFileSync(rateFile, 'utf-8')
+        const parsed = JSON.parse(raw)
+        if (parsed && typeof parsed === 'object') store = { ip: parsed.ip || {}, email: parsed.email || {} }
+      } catch {}
+    }
+
+    const now = Math.floor(Date.now() / 1000)
+    const emailWindow = parseInt(String(process.env.RATE_LIMIT_EMAIL_WINDOW_SEC || ''), 10)
+    const ipWindow = parseInt(String(process.env.RATE_LIMIT_IP_WINDOW_SEC || ''), 10)
+    const emailLimit = parseInt(String(process.env.RATE_LIMIT_EMAIL_MAX || ''), 10)
+    const ipLimit = parseInt(String(process.env.RATE_LIMIT_IP_MAX || ''), 10)
+    const EMAIL_WINDOW = Number.isFinite(emailWindow) && emailWindow > 0 ? emailWindow : 60 * 60 // 1h
+    const IP_WINDOW = Number.isFinite(ipWindow) && ipWindow > 0 ? ipWindow : 60 * 60 // 1h
+    const EMAIL_MAX = Number.isFinite(emailLimit) && emailLimit > 0 ? emailLimit : 5
+    const IP_MAX = Number.isFinite(ipLimit) && ipLimit > 0 ? ipLimit : 20
+
+    // Prune old timestamps
+    const prune = (arr: number[], win: number) => arr.filter((t) => now - t <= win)
+    store.ip[clientIp] = prune(store.ip[clientIp] || [], IP_WINDOW)
+    store.email[normalizedEmail] = prune(store.email[normalizedEmail] || [], EMAIL_WINDOW)
+
+    // Check limits
+    if (store.ip[clientIp].length >= IP_MAX || store.email[normalizedEmail].length >= EMAIL_MAX) {
+      return res.status(429).json({ error: 'Too many requests. Please try again later.' })
+    }
+
+    // Record this attempt and persist
+    store.ip[clientIp].push(now)
+    store.email[normalizedEmail].push(now)
+    try {
+      fs.writeFileSync(rateFile, JSON.stringify(store))
+    } catch {}
+  } catch (rlErr) {
+    // If rate limiting fails, continue without blocking the request
+    console.warn('Rate limit check failed (continuing):', rlErr)
+  }
 
   const timestamp = new Date().toISOString()
   const couponCode = process.env.COUPON_CODE || 'WELCOME15'
