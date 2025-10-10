@@ -12,6 +12,32 @@ type ResponseData = {
   message?: string
 }
 
+// Build the coupon email HTML in one place
+function buildCouponEmailHTML(siteUrl: string, couponCode: string): string {
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;"><div style="background: linear-gradient(135deg, #059669 0%, #047857 100%); padding: 40px 20px; text-align: center; border-radius: 10px 10px 0 0;"><h1 style="color: white; margin: 0; font-size: 32px;">Welcome to Nature's Way Soil!</h1></div><div style="background: #f9fafb; padding: 40px 30px; border-radius: 0 0 10px 10px;"><h2 style="color: #059669; margin-top: 0;">Your Exclusive 15% Off Coupon</h2><p style="font-size: 16px;">Thank you for joining our community of gardeners and soil health enthusiasts!</p><div style="background: white; border: 3px dashed #059669; padding: 30px; text-align: center; margin: 30px 0; border-radius: 10px;"><p style="margin: 0 0 10px 0; font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px;">Your Coupon Code</p><p style="margin: 0; font-size: 36px; font-weight: bold; color: #059669; letter-spacing: 2px;">${couponCode}</p><p style="margin: 20px 0 0 0; font-size: 14px; color: #666;">Use this code at checkout to save 15% on your first order</p></div><div style="text-align: center; margin: 30px 0;"><a href="${siteUrl}/products" style="display: inline-block; background: #059669; color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">Shop Now</a></div><div style="background: #ecfdf5; border-left: 4px solid #059669; padding: 20px; margin: 30px 0; border-radius: 5px;"><h3 style="margin-top: 0; color: #059669; font-size: 18px;">Why Choose Nature's Way Soil?</h3><ul style="margin: 0; padding-left: 20px;"><li style="margin-bottom: 10px;">Science-backed organic formulas</li><li style="margin-bottom: 10px;">Safe for kids, pets, and pollinators</li><li style="margin-bottom: 10px;">Restores beneficial soil microbes</li><li style="margin-bottom: 10px;">Sustainable and environmentally friendly</li></ul></div><p style="font-size: 14px; color: #666; margin-top: 30px;">Questions? Reply to this email or visit our <a href="${siteUrl}/contact" style="color: #059669;">contact page</a>.</p><p style="font-size: 14px; color: #666; margin-top: 20px;">Happy gardening!<br><strong>The Nature's Way Soil Team</strong></p></div><div style="text-align: center; padding: 20px; font-size: 12px; color: #999;"><p>You received this email because you signed up for our 15% off coupon at Nature's Way Soil.</p><p>Nature's Way Soil | Bringing Life Back to Your Soil</p></div></body></html>`
+}
+
+// Send coupon email via Resend (if configured)
+async function sendCouponEmail(to: string, couponCode: string, siteUrl: string) {
+  if (!process.env.RESEND_API_KEY) return
+  const resp = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: process.env.EMAIL_FROM || "Nature's Way Soil <noreply@natureswaysoil.com>",
+      to,
+      subject: "Your 15% Off Coupon Code - Welcome to Nature's Way Soil!",
+      html: buildCouponEmailHTML(siteUrl, couponCode),
+    }),
+  })
+  if (!resp.ok) {
+    console.error('Failed to send email:', await resp.text())
+  }
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
@@ -20,15 +46,16 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const { email } = req.body
+  const rawEmail = String((req.body as any)?.email || '')
+  const normalizedEmail = rawEmail.trim().toLowerCase()
 
   // Validate email
-  if (!email || typeof email !== 'string') {
+  if (!normalizedEmail) {
     return res.status(400).json({ error: 'Email is required' })
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(email)) {
+  if (!emailRegex.test(normalizedEmail)) {
     return res.status(400).json({ error: 'Invalid email format' })
   }
 
@@ -64,7 +91,7 @@ export default async function handler(
     }
 
   const timestamp = new Date().toISOString()
-  const couponCode = 'WELCOME15'
+  const couponCode = process.env.COUPON_CODE || 'WELCOME15'
   // Prefer NEXT_PUBLIC_SITE_URL, fallback to PUBLIC_SITE_URL, then default domain
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.PUBLIC_SITE_URL || 'https://natureswaysoil.com'
 
@@ -76,7 +103,7 @@ export default async function handler(
         const { data: existing, error: selErr } = await supabaseAdmin
           .from('coupon_signups')
           .select('email')
-          .eq('email', email)
+          .eq('email', normalizedEmail)
           .maybeSingle()
 
         if (selErr && selErr.code && selErr.code !== 'PGRST116') {
@@ -93,33 +120,14 @@ export default async function handler(
         // Insert new record
         const { error: insErr } = await supabaseAdmin
           .from('coupon_signups')
-          .insert({ email, coupon_code: couponCode, source: 'coupon-form', created_at: timestamp })
+          .insert({ email: normalizedEmail, coupon_code: couponCode, source: 'coupon-form', created_at: timestamp })
 
         if (insErr) {
           console.error('Supabase insert error:', insErr)
         } else {
           // Proceed to email sending path and return
-          // Optional: Send email using existing email service
           try {
-            if (process.env.RESEND_API_KEY) {
-              const emailResponse = await fetch('https://api.resend.com/emails', {
-                method: 'POST',
-                headers: {
-                  'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  from: process.env.EMAIL_FROM || 'Nature\'s Way Soil <noreply@natureswaysoil.com>',
-                  to: email,
-                  subject: 'Your 15% Off Coupon Code - Welcome to Nature\'s Way Soil!',
-                  html: `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;"><div style="background: linear-gradient(135deg, #059669 0%, #047857 100%); padding: 40px 20px; text-align: center; border-radius: 10px 10px 0 0;"><h1 style="color: white; margin: 0; font-size: 32px;">Welcome to Nature's Way Soil!</h1></div><div style="background: #f9fafb; padding: 40px 30px; border-radius: 0 0 10px 10px;"><h2 style="color: #059669; margin-top: 0;">Your Exclusive 15% Off Coupon</h2><p style="font-size: 16px;">Thank you for joining our community of gardeners and soil health enthusiasts!</p><div style="background: white; border: 3px dashed #059669; padding: 30px; text-align: center; margin: 30px 0; border-radius: 10px;"><p style="margin: 0 0 10px 0; font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px;">Your Coupon Code</p><p style="margin: 0; font-size: 36px; font-weight: bold; color: #059669; letter-spacing: 2px;">${couponCode}</p><p style="margin: 20px 0 0 0; font-size: 14px; color: #666;">Use this code at checkout to save 15% on your first order</p></div><div style="text-align: center; margin: 30px 0;"><a href="${siteUrl}/products" style="display: inline-block; background: #059669; color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">Shop Now</a></div><div style="background: #ecfdf5; border-left: 4px solid #059669; padding: 20px; margin: 30px 0; border-radius: 5px;"><h3 style="margin-top: 0; color: #059669; font-size: 18px;">Why Choose Nature's Way Soil?</h3><ul style="margin: 0; padding-left: 20px;"><li style="margin-bottom: 10px;">Science-backed organic formulas</li><li style="margin-bottom: 10px;">Safe for kids, pets, and pollinators</li><li style="margin-bottom: 10px;">Restores beneficial soil microbes</li><li style="margin-bottom: 10px;">Sustainable and environmentally friendly</li></ul></div><p style="font-size: 14px; color: #666; margin-top: 30px;">Questions? Reply to this email or visit our <a href="${siteUrl}/contact" style="color: #059669;">contact page</a>.</p><p style="font-size: 14px; color: #666; margin-top: 20px;">Happy gardening!<br><strong>The Nature's Way Soil Team</strong></p></div><div style="text-align: center; padding: 20px; font-size: 12px; color: #999;"><p>You received this email because you signed up for our 15% off coupon at Nature's Way Soil.</p><p>Nature's Way Soil | Bringing Life Back to Your Soil</p></div></body></html>`,
-                }),
-              })
-
-              if (!emailResponse.ok) {
-                console.error('Failed to send email:', await emailResponse.text())
-              }
-            }
+            await sendCouponEmail(normalizedEmail, couponCode, siteUrl)
           } catch (emailError) {
             console.error('Error sending email:', emailError)
           }
@@ -144,7 +152,7 @@ export default async function handler(
     }
     
     // Prepare CSV row
-    const sanitizedEmail = sanitizeForCSV(email)
+  const sanitizedEmail = sanitizeForCSV(normalizedEmail)
     const csvRow = `"${sanitizedEmail}","${timestamp}","${couponCode}"\n`
 
     // Ensure file exists with headers
@@ -157,14 +165,18 @@ export default async function handler(
     // Check if email already exists in file (duplicate prevention)
     try {
       const existingData = fs.readFileSync(filePath, 'utf-8')
-  const lines = existingData.split('\n').filter((line: string) => line.trim() !== '')
+      const lines = existingData.split('\n').filter((line: string) => line.trim() !== '')
       let duplicate = false
       for (let i = 1; i < lines.length; i++) {
         const row = lines[i]
         const match = row.match(/^\"([^\"]*)\",\"[^\"]*\",\"[^\"]*\"$/)
-        if (match && match[1] === sanitizedEmail) {
-          duplicate = true
-          break
+        if (match) {
+          const existingEmailField = match[1]
+          const normalizedExisting = existingEmailField.replace(/^'/, '').trim().toLowerCase()
+          if (normalizedExisting === normalizedEmail) {
+            duplicate = true
+            break
+          }
         }
       }
       if (duplicate) {
@@ -187,79 +199,7 @@ export default async function handler(
     
     // Optional: Send email using existing email service
     try {
-      // Check if email service is configured
-      if (process.env.RESEND_API_KEY) {
-        const emailResponse = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            from: process.env.EMAIL_FROM || 'Nature\'s Way Soil <noreply@natureswaysoil.com>',
-            to: email,
-            subject: 'Your 15% Off Coupon Code - Welcome to Nature\'s Way Soil!',
-            html: `
-              <!DOCTYPE html>
-              <html>
-                <head>
-                  <meta charset="utf-8">
-                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                </head>
-                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-                  <div style="background: linear-gradient(135deg, #059669 0%, #047857 100%); padding: 40px 20px; text-align: center; border-radius: 10px 10px 0 0;">
-                    <h1 style="color: white; margin: 0; font-size: 32px;">Welcome to Nature's Way Soil!</h1>
-                  </div>
-                  
-                  <div style="background: #f9fafb; padding: 40px 30px; border-radius: 0 0 10px 10px;">
-                    <h2 style="color: #059669; margin-top: 0;">Your Exclusive 15% Off Coupon</h2>
-                    
-                    <p style="font-size: 16px;">Thank you for joining our community of gardeners and soil health enthusiasts!</p>
-                    
-                    <div style="background: white; border: 3px dashed #059669; padding: 30px; text-align: center; margin: 30px 0; border-radius: 10px;">
-                      <p style="margin: 0 0 10px 0; font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px;">Your Coupon Code</p>
-                      <p style="margin: 0; font-size: 36px; font-weight: bold; color: #059669; letter-spacing: 2px;">${couponCode}</p>
-                      <p style="margin: 20px 0 0 0; font-size: 14px; color: #666;">Use this code at checkout to save 15% on your first order</p>
-                    </div>
-                    
-                    <div style="text-align: center; margin: 30px 0;">
-                      <a href="${siteUrl}/products" style="display: inline-block; background: #059669; color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">Shop Now</a>
-                    </div>
-                    
-                    <div style="background: #ecfdf5; border-left: 4px solid #059669; padding: 20px; margin: 30px 0; border-radius: 5px;">
-                      <h3 style="margin-top: 0; color: #059669; font-size: 18px;">Why Choose Nature's Way Soil?</h3>
-                      <ul style="margin: 0; padding-left: 20px;">
-                        <li style="margin-bottom: 10px;">Science-backed organic formulas</li>
-                        <li style="margin-bottom: 10px;">Safe for kids, pets, and pollinators</li>
-                        <li style="margin-bottom: 10px;">Restores beneficial soil microbes</li>
-                        <li style="margin-bottom: 10px;">Sustainable and environmentally friendly</li>
-                      </ul>
-                    </div>
-                    
-                    <p style="font-size: 14px; color: #666; margin-top: 30px;">
-                      Questions? Reply to this email or visit our <a href="${siteUrl}/contact" style="color: #059669;">contact page</a>.
-                    </p>
-                    
-                    <p style="font-size: 14px; color: #666; margin-top: 20px;">
-                      Happy gardening!<br>
-                      <strong>The Nature's Way Soil Team</strong>
-                    </p>
-                  </div>
-                  
-                  <div style="text-align: center; padding: 20px; font-size: 12px; color: #999;">
-                    <p>You received this email because you signed up for our 15% off coupon at Nature's Way Soil.</p>
-                    <p>Nature's Way Soil | Bringing Life Back to Your Soil</p>
-                  </div>
-                </body>
-              </html>
-            `,
-          }),
-        })
-
-        if (!emailResponse.ok) {
-          console.error('Failed to send email:', await emailResponse.text())
-        }
-      }
+      await sendCouponEmail(normalizedEmail, couponCode, siteUrl)
     } catch (emailError) {
       console.error('Error sending email:', emailError)
       // Don't fail the request if email fails
