@@ -22,7 +22,7 @@ async function extractProductData() {
     const imagePath = path.join(screenshotDir, screenshot);
     
     if (!fs.existsSync(imagePath)) {
-      console.log(`❌ Image not found: ${screenshot}`);
+  console.log(`Image not found: ${screenshot}`);
       continue;
     }
 
@@ -33,7 +33,7 @@ async function extractProductData() {
       const { data: { text } } = await worker.recognize(imagePath);
       await worker.terminate();
       
-      console.log('📝 Extracted text:');
+  console.log('Extracted text:');
       console.log('=' * 50);
       console.log(text);
       console.log('=' * 50);
@@ -78,12 +78,12 @@ async function extractProductData() {
       });
       
     } catch (error) {
-      console.log(`❌ Error processing ${screenshot}:`, error.message);
+  console.log(`Error processing ${screenshot}:`, error.message);
     }
   }
 
   // Output results
-  console.log('\n📊 SUMMARY OF EXTRACTED PRODUCTS:\n');
+  console.log('\nSummary of Extracted Products:\n');
   products.forEach((product, index) => {
     console.log(`${index + 1}. ${product.productName}`);
     console.log(`   Price: ${product.price}`);

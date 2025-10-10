@@ -1,6 +1,6 @@
 # Stripe Key Security Guide
 
-## ✅ SAFE SETUP
+## SAFE SETUP
 
 ### Local Development (.env.local)
 ```bash
@@ -16,14 +16,14 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
 STRIPE_SECRET_KEY=sk_live_...
 ```
 
-## 🔒 Security Best Practices
+## Security Best Practices
 
 1. **Never commit live keys to git**
 2. **Use test keys for all local development**
 3. **Live keys only on secure production servers**
 4. **Regularly rotate your keys**
 
-## 🧪 Testing
+## Testing
 
 With test keys, you can safely test with these cards:
 - Success: `4242 4242 4242 4242`
@@ -39,6 +39,6 @@ With test keys, you can safely test with these cards:
 
 ## Current Setup Status
 
-- ✅ Local: Should use test keys (pk_test_, sk_test_)
-- ✅ Vercel: Has your live keys (pk_live_, sk_live_)
-- ✅ Code: Runtime key loading prevents build-time exposure
+- Local: Should use test keys (publishable and secret)
+- Vercel: Has your live keys (publishable and secret)
+- Code: Runtime key loading prevents build-time exposure

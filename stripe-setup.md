@@ -47,13 +47,15 @@ Use Stripe test card numbers:
 - Any future expiry date and any 3-digit CVC
 
 ## Current Features
-- ✅ Full billing/shipping address collection
-- ✅ NC sales tax calculation by ZIP/city
-- ✅ Runtime Stripe key loading (no build-time env issues)
-- ✅ Onsite checkout with Stripe Elements
-- ✅ Order confirmation and webhooks
+ Full billing/shipping address collection
+ NC sales tax calculation by ZIP/city
+ Runtime Stripe key loading (no build-time env issues)
+ Onsite checkout with Stripe Elements
+ Order confirmation and webhooks
 
 ## Next Steps
 1. Replace the organic gardening solution keys in `.env.local` with your actual Stripe test keys
 2. Set the same keys in Vercel environment variables  
 3. Test checkout locally first, then push to production
+ STRIPE_SECRET_KEY=YOUR_STRIPE_SECRET_KEY
+ STRIPE_WEBHOOK_SECRET=YOUR_STRIPE_WEBHOOK_SECRET

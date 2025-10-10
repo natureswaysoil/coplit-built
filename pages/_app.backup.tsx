@@ -3,7 +3,7 @@ import type { AppProps } from 'next/app'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-// ✅ Import the cart context ONCE and alias the provider to avoid any name collisions
+// Import the cart context ONCE and alias the provider to avoid any name collisions
 import { CartProvider as CartCtxProvider, useCart } from '../lib/cartContext'
 
 // Adjust to your actual CSS file
