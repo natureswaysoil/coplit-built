@@ -103,7 +103,7 @@ COMMIT;`;
     }}>
       <div style={{ maxWidth: 1000, margin: '0 auto' }}>
         <h1 style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          🗄️ Database Setup - Nature's Way Soil
+          Database Setup - Nature's Way Soil
         </h1>
         
         {/* Connection Test */}
@@ -114,7 +114,7 @@ COMMIT;`;
           borderRadius: '12px',
           marginBottom: '2rem'
         }}>
-          <h2 style={{ marginTop: 0 }}>🔌 Step 1: Test Connection</h2>
+          <h2 style={{ marginTop: 0 }}>Step 1: Test Connection</h2>
           <p>First, let's verify your Supabase connection is working:</p>
           
           <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
@@ -175,7 +175,7 @@ COMMIT;`;
           borderRadius: '12px',
           marginBottom: '2rem'
         }}>
-          <h2 style={{ marginTop: 0 }}>⚙️ Step 2: Manual Database Setup</h2>
+          <h2 style={{ marginTop: 0 }}>Step 2: Manual Database Setup</h2>
           
           <div style={{ marginBottom: '2rem' }}>
             <h3>Instructions:</h3>
@@ -184,7 +184,7 @@ COMMIT;`;
                 <a href="https://supabase.com/dashboard/project/gixjfavlefeldoostsij" 
                    target="_blank" 
                    style={{ color: '#22c55e', textDecoration: 'none' }}>
-                  👉 https://supabase.com/dashboard → Your Project
+                  Open Supabase Dashboard → Your Project
                 </a>
               </li>
               <li><strong>Go to the "SQL Editor" tab</strong></li>
@@ -209,7 +209,7 @@ COMMIT;`;
                   fontSize: '14px'
                 }}
               >
-                📋 Copy SQL
+                Copy SQL
               </button>
             </div>
             
@@ -237,18 +237,18 @@ COMMIT;`;
           borderRadius: '12px',
           marginBottom: '2rem'
         }}>
-          <h2 style={{ marginTop: 0 }}>📋 What This Creates</h2>
+          <h2 style={{ marginTop: 0 }}>What This Creates</h2>
           <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))' }}>
             <div style={{ background: 'rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '8px' }}>
-              <h4>👥 customers table</h4>
+              <h4>customers table</h4>
               <p>Stores customer information like name and email</p>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '8px' }}>
-              <h4>📦 orders table</h4>
+              <h4>orders table</h4>
               <p>Stores order details, shipping address, tax calculation</p>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.1)', padding: '1rem', borderRadius: '8px' }}>
-              <h4>🛒 order_items table</h4>
+              <h4>order_items table</h4>
               <p>Stores individual items within each order</p>
             </div>
           </div>
@@ -260,7 +260,7 @@ COMMIT;`;
           padding: '2rem', 
           borderRadius: '12px'
         }}>
-          <h2 style={{ marginTop: 0 }}>🔧 Troubleshooting</h2>
+          <h2 style={{ marginTop: 0 }}>Troubleshooting</h2>
           <div style={{ fontSize: '14px' }}>
             <h4>If connection test fails:</h4>
             <ul>

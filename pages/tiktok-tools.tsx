@@ -32,7 +32,7 @@ export default function TikTokTools() {
     }}>
       <div style={{ maxWidth: 800, margin: '0 auto' }}>
         <h1 style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          🎬 TikTok Marketing Tools
+          TikTok Marketing Tools
         </h1>
         
         <div style={{ 
@@ -42,18 +42,18 @@ export default function TikTokTools() {
           borderRadius: '12px',
           marginBottom: '2rem'
         }}>
-          <h2 style={{ marginTop: 0 }}>📱 TikTok Strategy Tips</h2>
+          <h2 style={{ marginTop: 0 }}>TikTok Strategy Tips</h2>
           <div style={{ display: 'grid', gap: '1rem' }}>
             <div style={{ padding: '1rem', background: '#f8f9fa', borderRadius: '8px' }}>
-              <strong>✅ Bio Link Strategy:</strong><br />
+              <strong>Bio Link Strategy:</strong><br />
               Put your website link in your TikTok bio and tell viewers "Link in bio!"
             </div>
             <div style={{ padding: '1rem', background: '#f8f9fa', borderRadius: '8px' }}>
-              <strong>📱 QR Code Strategy:</strong><br />
+              <strong>QR Code Strategy:</strong><br />
               Display QR codes in your videos for easy scanning
             </div>
             <div style={{ padding: '1rem', background: '#f8f9fa', borderRadius: '8px' }}>
-              <strong>🛍️ Call-to-Action Ideas:</strong><br />
+              <strong>Call-to-Action Ideas:</strong><br />
               "Scan for organic fertilizers!" • "Link in bio for free shipping!" • "Visit for garden tips!"
             </div>
           </div>
@@ -66,7 +66,7 @@ export default function TikTokTools() {
           borderRadius: '12px',
           textAlign: 'center'
         }}>
-          <h2 style={{ marginTop: 0 }}>🔗 QR Code Generator</h2>
+          <h2 style={{ marginTop: 0 }}>QR Code Generator</h2>
           <p>Generate QR codes to display in your TikTok videos!</p>
           
           <div style={{ margin: '2rem 0' }}>
@@ -113,7 +113,7 @@ export default function TikTokTools() {
               marginTop: '1rem'
             }}
           >
-            📥 Download QR Code
+            Download QR Code
           </button>
 
           <div style={{ 
@@ -123,7 +123,7 @@ export default function TikTokTools() {
             borderRadius: '8px',
             fontSize: '14px'
           }}>
-            <strong>💡 How to Use:</strong><br />
+            <strong>How to Use:</strong><br />
             1. Download the QR code<br />
             2. Add it to your TikTok video (corner or end screen)<br />
             3. Say "Scan to shop!" or "QR code for organic fertilizers!"<br />
@@ -138,18 +138,18 @@ export default function TikTokTools() {
           borderRadius: '12px',
           marginTop: '2rem'
         }}>
-          <h3>🎯 TikTok Content Ideas</h3>
+          <h3>TikTok Content Ideas</h3>
           <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))' }}>
             <div style={{ padding: '1rem', background: '#f8f9fa', borderRadius: '8px' }}>
               <strong> Before/After</strong><br />
               Show lawn transformations using your products
             </div>
             <div style={{ padding: '1rem', background: '#f8f9fa', borderRadius: '8px' }}>
-              <strong>🐕 Pet-Safe Tips</strong><br />
+              <strong>Pet-Safe Tips</strong><br />
               Demonstrate your pet-safe fertilizers
             </div>
             <div style={{ padding: '1rem', background: '#f8f9fa', borderRadius: '8px' }}>
-              <strong>🧪 Science Explained</strong><br />
+              <strong>Science Explained</strong><br />
               Show how organic vs synthetic works
             </div>
             <div style={{ padding: '1rem', background: '#f8f9fa', borderRadius: '8px' }}>

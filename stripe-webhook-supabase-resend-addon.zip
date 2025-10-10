@@ -1,0 +1,12 @@
+# Stripe
+STRIPE_SECRET_KEY=sk_test_xxx
+STRIPE_WEBHOOK_SECRET=whsec_xxx
+
+# Supabase (server-side only — do NOT expose to client)
+SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+# Resend
+RESEND_API_KEY=re_xxx
+RESEND_FROM=Nature's Way Soil <no-reply@natureswaysoil.com>
+SUPPORT_TO=support@natureswaysoil.com
