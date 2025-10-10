@@ -11,6 +11,8 @@ import CouponForm from '../components/CouponForm';
 import PersonalizedRecommendations from '../components/PersonalizedRecommendations';
 import SocialProofBanner from '../components/SocialProofBanner';
 import Footer from '../components/Footer';
+import TrustSignals from '../components/TrustSignals';
+import OptimizedCTA from '../components/OptimizedCTA';
 
 export default function Home() {
   const [mounted, setMounted] = useState(false)

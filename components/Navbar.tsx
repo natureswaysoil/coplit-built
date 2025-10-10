@@ -17,12 +17,13 @@ export default function Navbar() {
           <Link href="/" style={{display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', textDecoration: 'none'}}>
             <Image 
               src="/screenshots/logo-with-tagline.png" 
-              alt="Nature's Way Soil Logo" 
+              alt="Nature&apos;s Way Soil Logo" 
               width={50} 
               height={50}
+              priority
               style={{objectFit: 'contain'}}
             />
-            <span style={{color: 'var(--primary)', fontWeight: '800', fontSize: '1.25rem'}}>Nature's Way Soil</span>
+            <span style={{color: 'var(--primary)', fontWeight: '800', fontSize: '1.25rem'}}>Nature&apos;s Way Soil</span>
           </Link>
           <ul className="nav-links">
             <li><Link href="/products">Products</Link></li>
@@ -56,11 +57,3 @@ export default function Navbar() {
   )
 }
 
-<Image 
-  src="/screenshots/logo-with-tagline.png" 
-  alt="Nature's Way Soil Logo" 
-  width={50} 
-  height={50}
-  priority  // ✅ ADD THIS LINE
-  style={{objectFit: 'contain'}}
-/>

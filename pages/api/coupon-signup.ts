@@ -40,12 +40,12 @@ export default async function handler(
     const couponCode = 'WELCOME15'
 
     // Helper to sanitize email for CSV injection
-    function sanitizeForCSV(value: string): string {
+    const sanitizeForCSV = (value: string): string => {
       // If value starts with =, +, -, or @, prefix with a single quote
       if (/^[=+\-@]/.test(value)) {
-        return "'" + value;
+        return "'" + value
       }
-      return value;
+      return value
     }
     
     // Check if file exists to determine if we need headers
@@ -70,7 +70,7 @@ export default async function handler(
         const row = lines[i];
         // Split CSV row, handling quoted fields
         const match = row.match(/^"([^"]*)","[^"]*","[^"]*"$/);
-        if (match && match[1] === email) {
+        if (match && match[1] === sanitizedEmail) {
           duplicate = true;
           break;
         }

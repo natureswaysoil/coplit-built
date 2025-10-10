@@ -5,6 +5,7 @@ import { getPublishableKey } from '../lib/stripeConfig'
 import { useCart } from '../lib/cartContext'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, Stripe } from '@stripe/stripe-js'
+import Image from 'next/image'
 import CheckoutForm_Tax from '../components/CheckoutForm_Tax'
 import { calculateShipping, FREE_SHIPPING_MINIMUM } from '../lib/shippingCalculator'
 

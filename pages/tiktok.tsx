@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Head from 'next/head';
+import type { GetServerSideProps } from 'next'
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -31,9 +32,14 @@ async function getProducts(): Promise<Product[]> {
   return data as Product[];
 }
 
-export default async function TikTokLanding() {
-  const products = await getProducts();
+type TikTokProps = { products: Product[] }
 
+export const getServerSideProps: GetServerSideProps<TikTokProps> = async () => {
+  const products = await getProducts()
+  return { props: { products } }
+}
+
+export default function TikTokLanding({ products }: TikTokProps) {
   return (
     <div>
       <Head>
