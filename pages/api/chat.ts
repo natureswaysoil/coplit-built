@@ -2,20 +2,37 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import OpenAI from 'openai'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-})
+// Initialize OpenAI client only if key is present to avoid build/runtime issues
+const openai = process.env.OPENAI_API_KEY
+  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  : null
+
+export const config = {
+  api: {
+    bodyParser: { sizeLimit: '1mb' },
+  },
+}
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  if (req.method === 'GET') {
+    return res.status(200).json({ ok: true, route: 'chat', method: 'GET' })
+  }
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
   try {
     const { message, sessionId, history } = req.body
+
+    if (!openai) {
+      return res.status(503).json({
+        error: 'Chat temporarily unavailable',
+        details: 'Missing OPENAI_API_KEY on the server',
+      })
+    }
 
     // Build context from history
     const messages: any[] = [
