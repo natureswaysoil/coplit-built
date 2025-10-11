@@ -1,0 +1,4 @@
+id,customer_id,total,tax,shipping_cost,shipping_state,shipping_county,shipping_zip,shipping_city,shipping_address1,shipping_address2,shipping_phone,stripe_payment_intent_id,status,created_at
+660e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440000,129.98,6.50,8.99,NC,Wake,27601,Raleigh,123 Main St,,919-555-0123,pi_test123,completed,2024-01-01T11:00:00Z
+660e8400-e29b-41d4-a716-446655440001,550e8400-e29b-41d4-a716-446655440001,79.99,4.00,0.00,NC,Mecklenburg,28202,Charlotte,456 Oak Ave,Apt 2B,704-555-0456,pi_test456,completed,2024-01-02T11:00:00Z
+660e8400-e29b-41d4-a716-446655440002,550e8400-e29b-41d4-a716-446655440002,45.98,2.30,8.99,NC,Durham,27701,Durham,789 Pine St,,919-555-0789,pi_test789,pending,2024-01-03T11:00:00Z

@@ -1,0 +1,4 @@
+id,name,email,created_at
+550e8400-e29b-41d4-a716-446655440000,John Smith,john@example.com,2024-01-01T10:00:00Z
+550e8400-e29b-41d4-a716-446655440001,Jane Doe,jane@example.com,2024-01-02T10:00:00Z
+550e8400-e29b-41d4-a716-446655440002,Mike Johnson,mike@example.com,2024-01-03T10:00:00Z

@@ -1,97 +1,73 @@
+// pages/checkout.tsx
 import { useEffect, useMemo, useState } from 'react'
 import { Elements, PaymentElement, LinkAuthenticationElement, useStripe, useElements } from '../lib/stripe-mock'
 import { loadStripe } from '@stripe/stripe-js'
 import { useCart } from '../lib/cartContext'
-import { NC_COUNTIES, NC_CITY_TO_COUNTY, NC_ZIP_TO_COUNTY } from '../lib/nc_data'
+import { Elements } from '@stripe/react-stripe-js'
+import { loadStripe, Stripe } from '@stripe/stripe-js'
+import CheckoutForm_Tax from '../components/CheckoutForm_Tax'
+import { calculateShipping, FREE_SHIPPING_MINIMUM } from '../lib/shippingCalculator'
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string)
+type CheckoutProps = { stripePk?: string | null }
 
-function PaymentForm({
-  email, setEmail, clientSecret, finalizeOrder,
-}: {
-  email: string
-  setEmail: (v: string) => void
-  clientSecret: string
-  finalizeOrder: (piId?: string) => Promise<void>
-}) {
-  const stripe = useStripe()
-  const elements = useElements()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!stripe || !elements) return
-    setLoading(true)
-    setError(null)
-
-    const { error, paymentIntent } = await stripe.confirmPayment({
-      elements,
-      redirect: 'if_required',                       // stay on your site unless required
-      confirmParams: { return_url: window.location.origin + '/success' }, // fallback
-    })
-
-    if (error) {
-      setError(error.message || 'Payment failed')
-      setLoading(false)
-      return
-    }
-
-    if (paymentIntent?.status === 'succeeded') {
-      try {
-        await finalizeOrder(paymentIntent.id)
-        window.location.href = '/success'
-      } catch (e: any) {
-        setError('Payment succeeded, but we could not finalize your order automatically. We’ll email you shortly.')
-      }
-      setLoading(false)
-      return
-    }
-
-    setLoading(false)
-  }
-
-  return (
-    <form onSubmit={onSubmit} style={{ display: 'grid', gap: 12, maxWidth: 420, marginTop: 16 }}>
-      <LinkAuthenticationElement
-        options={{ defaultValues: { email } }}
-        onChange={(e) => e?.value?.email && setEmail(e.value.email)}
-      />
-      <PaymentElement options={{ layout: 'tabs' }} />
-      <button disabled={!stripe || !clientSecret || loading} style={{ padding: '10px 16px', fontWeight: 700 }}>
-        {loading ? 'Processing…' : 'Pay with Link / Card'}
-      </button>
-      {error && <p style={{ color: 'crimson' }}>{error}</p>}
-    </form>
-  )
-}
-
-export default function Checkout() {
-  const { items, clearCart } = useCart()
-
-  // Customer + shipping
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
+export default function CheckoutPage({ stripePk }: CheckoutProps) {
+  const { items, subtotal } = useCart()
+  const [mounted, setMounted] = useState(false)
+  const [zip, setZip] = useState('')
+  const [city, setCity] = useState('')
+  const [stateCode, setStateCode] = useState('NC')
   const [address1, setAddress1] = useState('')
   const [address2, setAddress2] = useState('')
-  const [city, setCity] = useState('')
-  const [state, setState] = useState<'NC' | 'Other'>('NC')
-  const [zip, setZip] = useState('')
-  const [county, setCounty] = useState('')
+  const [phone, setPhone] = useState('')
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [promoCode, setPromoCode] = useState('')
+  const [promoApplied, setPromoApplied] = useState(false)
+  const [promoError, setPromoError] = useState<string | null>(null)
+  const [validatingPromo, setValidatingPromo] = useState(false)
+  const [clientSecret, setClientSecret] = useState<string | null>(null)
+  const [intentId, setIntentId] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [stripeInitError, setStripeInitError] = useState<string | null>(null)
+  const [breakdown, setBreakdown] = useState<{subtotal: number; tax: number; shipping: number; discount?: number; total: number} | null>(null)
+  const [stripe, setStripe] = useState<Stripe | null>(null)
+  const [stripeRetry, setStripeRetry] = useState(0)
 
-  // Billing
-  const [billingSame, setBillingSame] = useState(true)
-  const [bName, setBName] = useState('')
-  const [bAddress1, setBAddress1] = useState('')
-  const [bAddress2, setBAddress2] = useState('')
-  const [bCity, setBCity] = useState('')
-  const [bState, setBState] = useState<'NC' | 'Other'>('NC')
-  const [bZip, setBZip] = useState('')
-  const [bPhone, setBPhone] = useState('')
-
-  const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
+
+  // Initialize Stripe using server-provided pk when available (avoids API caching)
+  useEffect(() => {
+    if (!mounted) return
+    let cancelled = false
+    ;(async () => {
+      try {
+    setStripeInitError(null)
+    const key = stripePk || (await (await fetch('/api/config/stripe-pk')).json()).publishableKey
+    if (!key) throw new Error('Stripe publishable key missing')
+    const s = await loadStripe(key)
+        if (!cancelled) setStripe(s)
+      } catch (e: any) {
+    if (!cancelled) setStripeInitError(e?.message || 'Stripe failed to initialize')
+      }
+    })()
+    return () => { cancelled = true }
+  }, [mounted, stripePk, stripeRetry])
+
+  const disabled = useMemo(() => {
+    return !mounted || items.length === 0 || subtotal <= 0 || !name.trim() || !email.trim() || !address1.trim() || !city.trim() || !stateCode.trim() || !zip.trim()
+  }, [mounted, items.length, subtotal, name, email, address1, city, stateCode, zip])
+
+  // Calculate shipping rates
+  const shippingRates = useMemo(() => {
+    if (!mounted || items.length === 0) return { standard: 0 };
+    const shippingItems = items.map(item => ({
+      sku: item.sku,
+      size: item.size || '32 oz', // default size
+      qty: item.qty
+    }));
+    return calculateShipping(shippingItems, subtotal);
+  }, [mounted, items, subtotal]);
 
   // Totals
   const subtotal = mounted ? items.reduce((s, it) => s + it.price * it.qty, 0) : 0
@@ -124,21 +100,41 @@ export default function Checkout() {
   const [creatingPI, setCreatingPI] = useState(false)
   const [serverTotals, setServerTotals] = useState<{ subtotal: number; tax: number; total: number } | null>(null)
 
-  async function beginPayment() {
-    if (!items.length) return alert('Your cart is empty.')
-    if (!email) return alert('Please enter your email.')
-    if (total < 0.5) return alert('Total must be at least $0.50.')
+  async function ensurePaymentIntent() {
+    if (disabled) return
 
-    // if using separate billing, validate basic fields
-    if (!billingSame) {
-      if (!bName || !bAddress1 || !bCity || !bZip) {
-        return alert('Please complete your billing address.')
-      }
+    // Additional validation for required fields
+    if (!name.trim()) {
+      setError('Name is required')
+      return
+    }
+    if (!email.trim()) {
+      setError('Email is required')
+      return
+    }
+    if (!address1.trim()) {
+      setError('Address is required')
+      return
+    }
+    if (!city.trim()) {
+      setError('City is required')
+      return
+    }
+    if (!stateCode.trim()) {
+      setError('State is required')
+      return
+    }
+    if (!zip.trim()) {
+      setError('ZIP code is required')
+      return
     }
 
-    setCreatingPI(true)
+    // Stripe will be initialized separately; don't block on env here
+    setLoading(true)
+    setError(null)
+    setPromoError(null)
     try {
-      const r = await fetch('/api/create-payment-intent', {
+      const resp = await fetch('/api/create-payment-intent-with-tax', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -154,9 +150,9 @@ export default function Checkout() {
       setClientSecret(j.clientSecret)
       setServerTotals({ subtotal: j.subtotal, tax: j.tax, total: j.total })
     } catch (e: any) {
-      alert(e.message || 'Could not start payment')
+      setError(e?.message || 'Failed to prepare checkout')
     } finally {
-      setCreatingPI(false)
+      setLoading(false)
     }
   }
 
@@ -211,33 +207,153 @@ export default function Checkout() {
   }
 
   return (
-    <main style={{ maxWidth: 900, margin: '0 auto', padding: '2rem' }}>
-      <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem' }}>Checkout</h1>
+    <main style={{ maxWidth: 900, margin: '2rem auto', fontFamily: 'system-ui', padding: '0 1rem' }}>
+      <h1>Checkout</h1>
 
-      {!mounted ? (
-        <p suppressHydrationWarning>Loading…</p>
-      ) : !items.length ? (
-        <p>Your cart is empty. <a href="/products" style={{ color: '#174F2E', fontWeight: 'bold' }}>Browse products</a></p>
-      ) : (
-        <>
-          {/* Shipping */}
-          <section style={{ display: 'grid', gap: 12, marginBottom: 16 }}>
-            <div>
-              <label>Name</label>
-              <input value={name} onChange={(e) => setName(e.target.value)} required style={{ width: '100%', padding: 8 }} />
+      {/* Stripe initialization banner */}
+      {stripeInitError && (
+        <div style={{
+          background: '#fff3cd',
+          color: '#664d03',
+          border: '1px solid #ffecb5',
+          borderRadius: 6,
+          padding: '12px',
+          marginTop: 12
+        }}>
+          <div style={{ fontWeight: 600, marginBottom: 6 }}>Payment form unavailable</div>
+          <div style={{ fontSize: 14 }}>
+            Stripe couldn’t initialize: {stripeInitError}. Try again, or review diagnostics.
+            {' '}<a href="/api/config/stripe-pk" target="_blank" rel="noopener noreferrer" style={{ color: '#0c63e4', textDecoration: 'none' }}>View publishable key</a>
+            {' '}|{' '}
+            <a href="/api/config/diagnostics" target="_blank" rel="noopener noreferrer" style={{ color: '#0c63e4', textDecoration: 'none' }}>Diagnostics</a>
+          </div>
+          <button onClick={() => setStripeRetry(v => v + 1)} style={{ marginTop: 8, padding: '6px 10px', background: '#0d6efd', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}>
+            Retry loading Stripe
+          </button>
+        </div>
+      )}
+
+      {/* Cart items */}
+      <section style={{ display: 'grid', gap: 12, marginTop: 16 }}>
+        {mounted && items.length === 0 && <p>Your cart is empty.</p>}
+        {items.map((it) => (
+          <div key={it.sku} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #eee', padding: '8px 0' }}>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+              <Image 
+  src={it.image} 
+  alt={it.title} 
+  width={48} 
+  height={48} 
+  style={{ objectFit: 'cover', borderRadius: 4 }}
+  unoptimized
+/>
+              <div>
+                <div style={{ fontWeight: 600 }}>{it.title}</div>
+                <div style={{ fontSize: 12, color: '#555' }}>SKU: {it.sku}{it.size ? ` • ${it.size}` : ''}</div>
+              </div>
             </div>
-            <div>
-              <label>Email</label>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ width: '100%', padding: 8 }} />
+            <div style={{ textAlign: 'right' }}>
+              <div>Qty: {it.qty}</div>
+              <div>${(it.price * it.qty).toFixed(2)}</div>
             </div>
-            <div>
-              <label>Phone</label>
-              <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required style={{ width: '100%', padding: 8 }} placeholder="(555) 555-5555" />
+          </div>
+        ))}
+      </section>
+
+      {/* Promo Code Section */}
+      <section style={{ marginTop: 16, padding: 16, background: '#f8f9fa', borderRadius: 8 }}>
+        <h3 style={{ margin: '0 0 12px 0', fontSize: 16 }}>Have a Promo Code?</h3>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+          <input
+            type="text"
+            value={promoCode}
+            onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+            placeholder="Enter code (e.g., WELCOME15)"
+            style={{ 
+              flex: 1, 
+              padding: '8px 12px', 
+              border: promoError ? '2px solid #ef4444' : '1px solid #ccc',
+              borderRadius: 4,
+              fontSize: 14
+            }}
+          />
+          <button
+            onClick={ensurePaymentIntent}
+            disabled={!promoCode.trim() || disabled || loading}
+            style={{
+              padding: '8px 16px',
+              background: promoApplied ? '#22c55e' : '#0d6efd',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 4,
+              cursor: disabled || loading ? 'not-allowed' : 'pointer',
+              opacity: disabled || loading ? 0.6 : 1,
+              fontSize: 14,
+              fontWeight: 600
+            }}
+          >
+            {promoApplied ? '✓ Applied' : 'Apply'}
+          </button>
+        </div>
+        {promoApplied && (
+          <p style={{ margin: '8px 0 0 0', fontSize: 14, color: '#22c55e', fontWeight: 600 }}>
+            ✓ Promo code applied successfully!
+          </p>
+        )}
+        {promoError && (
+          <p style={{ margin: '8px 0 0 0', fontSize: 14, color: '#ef4444' }}>
+            {promoError}
+          </p>
+        )}
+      </section>
+
+      {/* Summary */}
+      <section style={{ marginTop: 16, display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+        <div style={{ minWidth: 260 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span>Subtotal</span>
+            <strong>${breakdown ? (breakdown.subtotal / 100).toFixed(2) : subtotal.toFixed(2)}</strong>
+          </div>
+          {breakdown && (
+            <>
+              {breakdown.discount && breakdown.discount > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, color: '#22c55e' }}>
+                  <span>Discount</span>
+                  <strong>-${(breakdown.discount / 100).toFixed(2)}</strong>
+                </div>
+              )}
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, alignItems: 'center', gap: 8 }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  Sales Tax {typeof (breakdown as any).taxRatePercent === 'number' && (breakdown as any).taxRatePercent > 0 ? <span style={{ color: '#555', fontSize: 12 }}>({(breakdown as any).taxRatePercent.toFixed(2)}%)</span> : null}
+                  <span
+                    title={
+                      (breakdown as any).taxRatePercent ? `Effective tax rate applied to taxable items${(breakdown as any).taxRatePercent ? `: ${(breakdown as any).taxRatePercent.toFixed(4)}%` : ''}. Rates derived from NC base + county data. Shipping may be taxable depending on configuration.` : 'Sales tax applied to taxable items.'
+                    }
+                    style={{ cursor: 'help', background: '#eef2ff', color: '#3730a3', borderRadius: '50%', width: 16, height: 16, fontSize: 11, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+                  >i</span>
+                </span>
+                <strong>${(breakdown.tax / 100).toFixed(2)}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
+                <span>Shipping</span>
+                <strong>${((breakdown.shipping || 0) / 100).toFixed(2)}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
+                <span>Total</span>
+                <strong>${(((breakdown.subtotal + breakdown.tax + (breakdown.shipping || 0) - (breakdown.discount || 0)) / 100)).toFixed(2)}</strong>
+              </div>
+            </>
+          )}
+          {!breakdown && shippingCost > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
+              <span>Est. Shipping</span>
+              <strong>${shippingCost.toFixed(2)}</strong>
             </div>
-            <div>
-              <label>Shipping Address</label>
-              <input value={address1} onChange={(e) => setAddress1(e.target.value)} required style={{ width: '100%', padding: 8, marginBottom: 6 }} placeholder="Street Address" />
-              <input value={address2} onChange={(e) => setAddress2(e.target.value)} style={{ width: '100%', padding: 8 }} placeholder="Apt, Suite (optional)" />
+          )}
+          {subtotal >= FREE_SHIPPING_MINIMUM && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, color: '#22c55e' }}>
+              <span>Free Shipping!</span>
+              <strong>$0.00</strong>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 120px 120px 160px', gap: 12 }}>
               <div>

@@ -1,0 +1,4 @@
+id,name,email,created_at
+gen_random_uuid(),John Smith,john@example.com,now()
+gen_random_uuid(),Jane Doe,jane@example.com,now()
+gen_random_uuid(),Mike Johnson,mike@example.com,now()

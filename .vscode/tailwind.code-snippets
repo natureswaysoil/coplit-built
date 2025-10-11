@@ -1,0 +1,199 @@
+{
+  "TW Button (brand primary)": {
+    "prefix": ["tw-btn", "tw-button"],
+    "body": [
+      "<button className=\"rounded-md px-4 py-2 font-semibold text-white bg-brand-700 hover:bg-brand-800 ${1}\">${0:Button}</button>"
+    ],
+    "description": "Brand-styled primary button"
+  },
+  "TW Card": {
+    "prefix": ["tw-card"],
+    "body": [
+      "<div className=\"rounded-xl border border-green-100 bg-white shadow-sm p-5\">",
+      "  ${0}",
+      "</div>"
+    ],
+    "description": "Rounded card with light border and shadow"
+  },
+  "TW Section Container": {
+    "prefix": ["tw-section", "tw-container"],
+    "body": [
+      "<section className=\"max-w-6xl mx-auto px-6 py-8\">",
+      "  ${0}",
+      "</section>"
+    ],
+    "description": "Responsive centered section container"
+  },
+  "TW Form Input": {
+    "prefix": ["tw-input"],
+    "body": [
+      "<input type=\"${1:text}\" className=\"w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-700/30\" placeholder=\"${2:Placeholder}\" />"
+    ],
+    "description": "Accessible text input styled with Tailwind"
+  },
+  "TW Select": {
+    "prefix": ["tw-select"],
+    "body": [
+      "<select className=\"w-full rounded-md border border-gray-300 px-3 py-2\">",
+      "  ${0}",
+      "</select>"
+    ],
+    "description": "Select element styled with Tailwind"
+  },
+  "TW Badge": {
+    "prefix": ["tw-badge"],
+    "body": [
+      "<span className=\"inline-flex items-center gap-1 rounded-md bg-brand-700 px-2 py-0.5 text-xs font-semibold text-white\">${0:Badge}</span>"
+    ],
+    "description": "Small brand badge"
+  },
+  "TW Product Card (link)": {
+    "prefix": ["tw-product-card"],
+    "body": [
+      "<Link href=\"/products/${1:slug}\" className=\"block border rounded-2xl shadow-md hover:shadow-lg transition p-4 bg-white\">",
+      "  <img src=\"${2:/path/to/image}\" alt=\"${3:Title}\" className=\"w-full h-56 object-cover rounded-lg mb-4\" />",
+      "  <h2 className=\"text-xl font-semibold text-green-900 mb-2\">${3:Title}</h2>",
+      "  <p className=\"text-gray-600 text-sm mb-3\">${4:Short description}</p>",
+      "  <p className=\"text-lg font-bold text-green-700\">${5:$19.99}</p>",
+      "</Link>"
+    ],
+    "description": "Card linking to a product with image, title, blurb, and price"
+  },
+  "TW Nav Link": {
+    "prefix": ["tw-navlink"],
+    "body": [
+      "<Link href=\"${1:/path}\" className=\"text-green-900 hover:text-brand-700\">${2:Link}</Link>"
+    ],
+    "description": "Navigation link with hover"
+  },
+  "TW Page Title": {
+    "prefix": ["tw-title", "tw-h1"],
+    "body": [
+      "<h1 className=\"text-3xl font-bold text-brand-700 mb-4\">${0:Page Title}</h1>"
+    ],
+    "description": "Standard page title"
+  },
+  "TW Next Image": {
+    "prefix": ["tw-image", "tw-next-image"],
+    "body": [
+      "<Image src=\"${1:/path}\" alt=\"${2:Alt}\" width={${3:600}} height={${4:400}} className=\"${5:w-full h-auto object-cover rounded-lg}\" />"
+    ],
+    "description": "Next/Image with Tailwind classes"
+  },
+  "TW Alert Box": {
+    "prefix": ["tw-alert"],
+    "body": [
+      "<div className=\"rounded-md border border-green-200 bg-green-50 p-4 text-green-900\">${0:Message}</div>"
+    ],
+    "description": "Subtle success/notice box"
+  },
+  "TW Button (brand outline)": {
+    "prefix": ["tw-btn-outline", "tw-button-outline"],
+    "body": [
+      "<button className=\"rounded-md px-4 py-2 font-semibold border border-brand-700 text-brand-700 hover:bg-brand-50 ${1}\">${0:Button}</button>"
+    ],
+    "description": "Brand-styled outline button"
+  },
+  "TW Button (ghost)": {
+    "prefix": ["tw-btn-ghost", "tw-button-ghost"],
+    "body": [
+      "<button className=\"rounded-md px-4 py-2 font-semibold text-brand-700 hover:bg-brand-50 hover:text-brand-800 ${1}\">${0:Button}</button>"
+    ],
+    "description": "Subtle ghost button"
+  },
+  "TW Product Grid": {
+    "prefix": ["tw-product-grid", "tw-grid"],
+    "body": [
+      "<div className=\"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6\">",
+      "  ${0}",
+      "</div>"
+    ],
+    "description": "Responsive product grid container"
+  },
+  "TW Product List Item": {
+    "prefix": ["tw-product-list", "tw-list-item"],
+    "body": [
+      "<div className=\"flex items-center gap-4 p-4 border rounded-xl bg-white hover:shadow-sm\">",
+      "  <img src=\"${1:/path/to/image}\" alt=\"${2:Title}\" className=\"w-20 h-20 rounded-md object-cover\" />",
+      "  <div className=\"flex-1\">",
+      "    <h3 className=\"text-base font-semibold text-green-900\">${2:Title}</h3>",
+      "    <p className=\"text-sm text-gray-600\">${3:Short description}</p>",
+      "  </div>",
+      "  <div className=\"text-right\">",
+      "    <div className=\"text-lg font-bold text-brand-700\">${4:$19.99}</div>",
+      "  </div>",
+      "</div>"
+    ],
+    "description": "Horizontally oriented product list item"
+  },
+  "TW Hero Section": {
+    "prefix": ["tw-hero"],
+    "body": [
+      "<section className=\"relative overflow-hidden bg-gradient-to-br from-green-50 to-white\">",
+      "  <div className=\"max-w-6xl mx-auto px-6 py-16 text-center\">",
+      "    <h1 className=\"text-4xl md:text-5xl font-bold text-green-900 mb-4\">${1:Grow Better, Naturally}</h1>",
+      "    <p className=\"text-lg text-gray-700 mb-8\">${2:Premium organic inputs & tools for thriving gardens.}</p>",
+      "    <div className=\"flex justify-center gap-3\">",
+      "      <a href=\"${3:/products}\" className=\"rounded-md px-5 py-3 font-semibold text-white bg-brand-700 hover:bg-brand-800\">Shop Now</a>",
+      "      <a href=\"${4:/about}\" className=\"rounded-md px-5 py-3 font-semibold border border-brand-700 text-brand-700 hover:bg-brand-50\">Learn More</a>",
+      "    </div>",
+      "  </div>",
+      "</section>"
+    ],
+    "description": "Marketing hero with heading, subtext, and CTAs"
+  },
+  "TW Footer (simple)": {
+    "prefix": ["tw-footer"],
+    "body": [
+      "<footer className=\"border-t bg-white\">",
+      "  <div className=\"max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 sm:grid-cols-3 gap-8\">",
+      "    <div>",
+      "      <div className=\"text-xl font-bold text-brand-700 mb-2\">${1:Brand}</div>",
+      "      <p className=\"text-sm text-gray-600\">${2:Organic garden essentials.}</p>",
+      "    </div>",
+      "    <div>",
+      "      <div className=\"text-sm font-semibold text-green-900 mb-2\">Links</div>",
+      "      <ul className=\"space-y-1 text-sm\">",
+      "        <li><a href=\"/products\" className=\"text-gray-700 hover:text-brand-700\">Products</a></li>",
+      "        <li><a href=\"/about\" className=\"text-gray-700 hover:text-brand-700\">About</a></li>",
+      "        <li><a href=\"/contact\" className=\"text-gray-700 hover:text-brand-700\">Contact</a></li>",
+      "      </ul>",
+      "    </div>",
+      "    <div>",
+      "      <div className=\"text-sm font-semibold text-green-900 mb-2\">Newsletter</div>",
+      "      <form className=\"flex gap-2\">",
+      "        <input type=\"email\" placeholder=\"you@example.com\" className=\"flex-1 rounded-md border border-gray-300 px-3 py-2\" />",
+      "        <button className=\"rounded-md px-4 py-2 font-semibold text-white bg-brand-700 hover:bg-brand-800\">Subscribe</button>",
+      "      </form>",
+      "    </div>",
+      "  </div>",
+      "</footer>"
+    ],
+    "description": "Simple three-column footer"
+  },
+  "TW CTA Banner": {
+    "prefix": ["tw-cta"],
+    "body": [
+      "<div className=\"rounded-2xl bg-brand-700 text-white p-8 flex flex-col md:flex-row items-center justify-between gap-4\">",
+      "  <div>",
+      "    <h3 className=\"text-2xl font-bold\">${1:Ready to grow?}</h3>",
+      "    <p className=\"opacity-90\">${2:Shop our best-sellers and see the difference.}</p>",
+      "  </div>",
+      "  <a href=\"${3:/products}\" className=\"rounded-md bg-white text-brand-800 font-semibold px-5 py-3 hover:bg-green-50\">Shop Now</a>",
+      "</div>"
+    ],
+    "description": "Bold call-to-action banner"
+  },
+  "TW Skeleton Loader": {
+    "prefix": ["tw-skeleton"],
+    "body": [
+      "<div className=\"animate-pulse\">",
+      "  <div className=\"h-6 bg-gray-200 rounded w-1/3 mb-3\"></div>",
+      "  <div className=\"h-4 bg-gray-200 rounded w-full mb-2\"></div>",
+      "  <div className=\"h-4 bg-gray-200 rounded w-5/6 mb-2\"></div>",
+      "  <div className=\"h-4 bg-gray-200 rounded w-2/3\"></div>",
+      "</div>"
+    ],
+    "description": "Skeleton text loader with pulse animation"
+  }
+}

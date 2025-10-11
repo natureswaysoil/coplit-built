@@ -1,0 +1,5 @@
+id,order_id,product_id,sku,title,size,qty,price,created_at
+gen_random_uuid(),gen_random_uuid(),1,NWS-HAY-1GAL,Horse Safe Hay Fertilizer,1 Gallon,2,39.99,now()
+gen_random_uuid(),gen_random_uuid(),2,NWS-HUMF-KELP-32OZ,Humic & Fulvic Acid with Kelp,32 oz,1,19.99,now()
+gen_random_uuid(),gen_random_uuid(),6,NWS-KELP-1GAL,Liquid Kelp Fertilizer,1 Gallon,2,34.99,now()
+gen_random_uuid(),gen_random_uuid(),3,NWS-BIOCHAR-32OZ,Liquid Biochar with Kelp,32 oz,1,29.99,now()

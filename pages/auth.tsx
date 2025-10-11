@@ -10,7 +10,7 @@ export default function Auth() {
   const [email, setEmail] = useState('');
   const [msg, setMsg] = useState('');
 
-  const handleSignIn = async (e) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     const { error } = await supabase.auth.signInWithOtp({ email });
     setMsg(error ? error.message : 'Check your email for the login link!');
