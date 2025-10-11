@@ -1,0 +1,91 @@
+/* Animation styles for new components */
+
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.5s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-in;
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+/* Chat widget styles */
+.chat-message {
+  animation: fade-in 0.3s ease-in;
+}
+
+/* Email capture success animation */
+.success-checkmark {
+  animation: bounce 0.5s ease-out;
+}
+
+/* Social proof notification */
+.social-proof-notification {
+  animation: slide-in-left 0.5s ease-out;
+}
+
+/* Inventory urgency pulse */
+.inventory-urgent {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Video play button hover */
+.video-play-button {
+  transition: transform 0.3s ease;
+}
+
+.video-play-button:hover {
+  transform: scale(1.1);
+}
+
+/* Loading spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}

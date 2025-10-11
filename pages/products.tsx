@@ -1,4 +1,5 @@
 // pages/products.tsx
+import Image from 'next/image';
 import Head from 'next/head';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
@@ -22,9 +23,9 @@ export default function ProductsPage({ products }: ProductsPageProps) {
       <main className="p-xl">
         <div className="container">
           <div className="text-center mb-xl">
-            <h1>Our Products</h1>
-            <p style={{fontSize: '1.1rem', color: 'var(--neutral-600)', maxWidth: '600px', margin: '0 auto'}}>
-              Shop Nature's Way Soil organic fertilizers, compost, and plant boosters designed to restore soil health naturally.
+            <h1>Professional Soil Solutions</h1>
+            <p style={{fontSize: '1.1rem', color: 'var(--neutral-600)', maxWidth: '700px', margin: '0 auto'}}>
+              Premium organic fertilizers and soil amendments formulated with advanced microbiology to enhance soil health and maximize plant performance.
             </p>
           </div>
 
@@ -34,12 +35,15 @@ export default function ProductsPage({ products }: ProductsPageProps) {
                 href={`/products/${product.slug}`}
                 key={product.id}
                 className="product-card"
-                style={{textDecoration: 'none', color: 'inherit'}}
+                style={{ textDecoration: 'none', color: 'inherit' }}
               >
-                <img
+                <Image
                   src={product.image}
                   alt={product.title}
-                  style={{width: '100%', height: '200px', objectFit: 'contain'}}
+                  width={300}
+                  height={200}
+                  style={{ width: '100%', height: '200px', objectFit: 'contain' }}
+                  unoptimized
                 />
                 <div className="product-card-content">
                   <h3 style={{color: 'var(--neutral-800)', marginBottom: 'var(--space-sm)'}}>
