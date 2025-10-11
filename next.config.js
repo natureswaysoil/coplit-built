@@ -3,10 +3,10 @@ const nextConfig = {
   reactStrictMode: true,
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'm.media-amazon.com',
-      },
+      // Amazon product images
+      { protocol: 'https', hostname: 'm.media-amazon.com' },
+      // Site-hosted images used on static pages
+      { protocol: 'https', hostname: 'natureswaysoil.com' },
     ],
   },
   async rewrites() {

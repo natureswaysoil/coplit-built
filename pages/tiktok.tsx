@@ -2,11 +2,9 @@
 
 import Image from 'next/image';
 import Head from 'next/head';
+import { GetServerSideProps } from 'next';
 import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { products as staticProducts } from '@/lib/products';
 
 type Product = {
   id: number;
@@ -18,21 +16,9 @@ type Product = {
   rating?: number;
 };
 
-async function getProducts(): Promise<Product[]> {
-  const { data, error } = await supabase
-    .from('products')
-  .select('id, title, price, image_url, slug')
-    .eq('is_active', true);
+type TikTokProps = { products: Product[] }
 
-  if (error) {
-    console.error('Error fetching products:', error);
-    return [];
-  }
-  return data as Product[];
-}
-
-export default async function TikTokLanding() {
-  const products = await getProducts();
+export default function TikTokLanding({ products }: TikTokProps) {
 
   return (
     <div>
@@ -81,6 +67,35 @@ export default async function TikTokLanding() {
       </div>
     </div>
   );
+}
+
+export const getServerSideProps: GetServerSideProps<TikTokProps> = async () => {
+  try {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (url && key) {
+      const supabase = createClient(url, key);
+      const { data, error } = await supabase
+        .from('products')
+        .select('id, title, price, image_url, slug')
+        .eq('is_active', true);
+      if (!error && data) {
+        return { props: { products: data as Product[] } };
+      }
+      console.warn('[tiktok] DB fetch failed, falling back to static:', error?.message);
+    }
+  } catch (e: any) {
+    console.warn('[tiktok] error', e?.message || e);
+  }
+  // Fallback to a subset of static products
+  const fallback = staticProducts.slice(0, 6).map(p => ({
+    id: Number(p.id) || Math.floor(Math.random() * 100000),
+    title: p.title,
+    price: (p as any).price || 0,
+    image_url: p.image,
+    slug: p.slug || String(p.id),
+  })) as Product[];
+  return { props: { products: fallback } };
 }
 
 function renderStars(rating: number) {

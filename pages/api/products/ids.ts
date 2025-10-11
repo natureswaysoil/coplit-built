@@ -1,24 +1,19 @@
-import type { NextRequest } from 'next/server'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import { supabase } from '@/lib/supabaseClient'
 
-export const config = { runtime: 'edge' }
-
-export default async function handler(req: NextRequest) {
-  const { searchParams } = new URL(req.url)
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { searchParams } = new URL(req.url || 'http://localhost')
   const includeInactive = searchParams.get('include') === 'inactive'
   let query = supabase.from('products').select('id, updated_at, is_active, slug').order('updated_at', { ascending: false }).limit(500)
   if (!includeInactive) query = query.eq('is_active', true)
   const { data, error } = await query
 
   if (error) {
-    return new Response(JSON.stringify({ ok: false, error: error.message }), { status: 500 })
+    return res.status(500).json({ ok: false, error: error.message })
   }
 
-  return new Response(JSON.stringify({ ok: true, count: data?.length || 0, products: data || [] }), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json',
-      'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=120'
-    }
-  })
+  return res
+    .status(200)
+    .setHeader('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=120')
+    .json({ ok: true, count: data?.length || 0, products: data || [] })
 }
