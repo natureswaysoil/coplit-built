@@ -2,12 +2,9 @@
 
 import Image from 'next/image';
 import Head from 'next/head';
+import { GetServerSideProps } from 'next';
 import { createClient } from '@supabase/supabase-js';
-export const dynamic = 'force-dynamic'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { products as staticProducts } from '@/lib/products';
 
 type Product = {
   id: number;
@@ -19,20 +16,7 @@ type Product = {
   rating?: number;
 };
 
-async function getProducts(): Promise<Product[]> {
-  const { data, error } = await supabase
-    .from('products')
-  .select('id, title, price, image_url, slug')
-    .eq('is_active', true);
-
-  if (error) {
-    console.error('Error fetching products:', error);
-    return [];
-  }
-  return data as Product[];
-}
-
-interface TikTokProps { products: Product[] }
+type TikTokProps = { products: Product[] }
 
 export default function TikTokLanding({ products }: TikTokProps) {
 
@@ -45,12 +29,12 @@ export default function TikTokLanding({ products }: TikTokProps) {
 
       <header style={styles.header}>
         <Image
-          src="/screenshots/logo-with-tagline.png"
+          src="/logo-with-tagline.png"
           alt="Nature's Way Soil Logo"
           width={150}
           height={150}
         />
-        <h1>Welcome TikTok Gardeners! </h1>
+        <h1>Welcome TikTok Gardeners! 🌱</h1>
         <p>Fix your lawn, grow vibrant plants, and protect your pets — all naturally.</p>
       </header>
 
@@ -85,13 +69,33 @@ export default function TikTokLanding({ products }: TikTokProps) {
   );
 }
 
-export async function getServerSideProps() {
+export const getServerSideProps: GetServerSideProps<TikTokProps> = async () => {
   try {
-    const products = await getProducts()
-    return { props: { products } }
-  } catch {
-    return { props: { products: [] } }
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (url && key) {
+      const supabase = createClient(url, key);
+      const { data, error } = await supabase
+        .from('products')
+        .select('id, title, price, image_url, slug')
+        .eq('is_active', true);
+      if (!error && data) {
+        return { props: { products: data as Product[] } };
+      }
+      console.warn('[tiktok] DB fetch failed, falling back to static:', error?.message);
+    }
+  } catch (e: any) {
+    console.warn('[tiktok] error', e?.message || e);
   }
+  // Fallback to a subset of static products
+  const fallback = staticProducts.slice(0, 6).map(p => ({
+    id: Number(p.id) || Math.floor(Math.random() * 100000),
+    title: p.title,
+    price: (p as any).price || 0,
+    image_url: p.image,
+    slug: p.slug || String(p.id),
+  })) as Product[];
+  return { props: { products: fallback } };
 }
 
 function renderStars(rating: number) {

@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getServiceSupabase } from '../../lib/supabase';
+import { supabaseAdmin } from '../../lib/supabaseAdmin';
 import { Resend } from 'resend';
 
 // Lazy initialization of Resend client to ensure it only runs server-side
@@ -40,8 +40,8 @@ export default async function handler(
       return res.status(400).json({ error: 'Valid email is required' });
     }
 
-    // Save to Supabase
-    const supabase = getServiceSupabase();
+  // Save to Supabase (service role on server)
+  const supabase = supabaseAdmin;
     const { data, error } = await supabase
       .from('email_subscribers')
       .insert([{ email, source }])
@@ -74,7 +74,7 @@ export default async function handler(
       await resend.emails.send({
         from: 'Nature\'s Way Soil <hello@natureswaysoil.com>',
         to: email,
-        subject: '🌱 Welcome to Nature\'s Way Soil Family!',
+                subject: 'Welcome to Nature\'s Way Soil Family!',
         html: `
           <!DOCTYPE html>
           <html>
@@ -92,14 +92,14 @@ export default async function handler(
             <body>
               <div class="container">
                 <div class="header">
-                  <h1>🌱 Welcome to Nature's Way!</h1>
+                          <h1>Welcome to Nature's Way!</h1>
                   <p>Your journey to healthier soil starts here</p>
                 </div>
                 <div class="content">
                   <h2>Thank you for joining our community!</h2>
                   <p>We're excited to help you transform your soil and grow healthier plants naturally.</p>
                   
-                  <h3>🌿 Quick Soil Health Tips:</h3>
+                          <h3>Quick Soil Health Tips:</h3>
                   
                   <div class="tip">
                     <strong>1. Feed the Soil, Not Just the Plants</strong>

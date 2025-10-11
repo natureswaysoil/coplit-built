@@ -1,4 +1,3 @@
-cat > pages/api/load-products.ts << 'EOF'
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -10,20 +9,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const response = await fetch(SHEET_URL);
-    
     if (!response.ok) {
-      return res.status(400).json({ 
-        error: 'Failed to fetch sheet. Make sure it is publicly accessible' 
-      });
+      return res.status(400).json({ error: 'Failed to fetch sheet. Make sure it is publicly accessible' });
     }
-
     const csvText = await response.text();
-    
     const rows = csvText.split('\n').map(row => {
       const cells = [];
       let current = '';
       let inQuotes = false;
-      
       for (let char of row) {
         if (char === '"') {
           inQuotes = !inQuotes;
@@ -37,7 +30,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       cells.push(current.trim().replace(/^"|"$/g, ''));
       return cells;
     });
-
     const products = rows.slice(1)
       .filter(row => row.length > 1 && row[0] && row[0].length > 0)
       .map((row, index) => ({
@@ -48,13 +40,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         benefits: row[3] || 'improves soil health',
         targetAudience: row[4] || 'gardeners',
       }));
-
     res.status(200).json({ products });
-  } catch (error) {
-    res.status(500).json({ 
-      error: 'Failed to load products',
-      details: error.message 
-    });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    res.status(500).json({ error: 'Failed to load products', details: message });
   }
 }
-EOF
