@@ -1,195 +1,222 @@
-import Image from 'next/image';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { products } from '../lib/products';
-import { useCart } from '../lib/cartContext';
-import { ocrImageToTokens, scoreTitleAgainstTokens } from '../lib/ocrMatcher';
-
-// products are imported from ../lib/products
+import Head from 'next/head'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import TrustSignals from '../components/TrustSignals'
+import OptimizedCTA from '../components/OptimizedCTA'
+import EnhancedChatWidget from '../components/EnhancedChatWidget'
+import Footer from '../components/Footer'
+import { products } from '../lib/products'
+import { ProductGrid } from '@/components/ProductGrid'
 
 export default function Home() {
-  const { addItem } = useCart();
-  const [selected, setSelected] = useState<Record<string, string>>({});
-  const [items, setItems] = useState(Array.isArray(products) ? products : []);
+  const [mounted, setMounted] = useState(false)
+  const [items] = useState(Array.isArray(products) ? products : [])
 
   useEffect(() => {
-    // OCR functionality disabled - using predefined product data instead
-    setItems(products);
-  }, []);
-
-  /*
-  // Original OCR functionality - disabled to avoid CORS issues with external images
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const tokensCache = new Map<string, string[]>();
-        async function getTokens(url: string) {
-          if (tokensCache.has(url)) return tokensCache.get(url)!;
-          const tokens = await ocrImageToTokens(url);
-          tokensCache.set(url, tokens);
-          return tokens;
-        }
-        const updated = await Promise.all(products.map(async (p) => {
-          try {
-            const tokens = await getTokens(p.image);
-            const selfScore = scoreTitleAgainstTokens(p.title, tokens).score;
-            if (selfScore >= 0.34) return p;
-            let best = { score: selfScore, image: p.image };
-            for (const candidate of products) {
-              const ct = await getTokens(candidate.image);
-              const s = scoreTitleAgainstTokens(p.title, ct).score;
-              if (s > best.score) best = { score: s, image: candidate.image };
-            }
-            if (best.image !== p.image && best.score > selfScore && best.score >= 0.34) {
-              return { ...p, image: best.image };
-            }
-            return p;
-          } catch {
-            return p;
-          }
-        }));
-        if (!cancelled) setItems(updated);
-      } catch {
-        // ignore
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
-  */
+    setMounted(true)
+  }, [])
 
   return (
-    <div style={{ background: '#174F2E', color: 'white', padding: '1rem 0' }}>
-              <p style={{ fontSize: '1.2rem', margin: '1rem 0', color: '#22c55e' }}>
-        FREE SHIPPING ON ORDERS OVER $75
-        </p>
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'space-between', 
-        maxWidth: 1200, 
-        margin: '0 auto', 
-        padding: '1rem',
-        gap: '2rem',
-        flexWrap: 'wrap'
-      }}>
-        <div style={{ 
-          flex: '1 1 400px',
-          minWidth: '300px'
-        }}>
-          <h1 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Nature's Way Soil</h1>
-          <p style={{ fontSize: '1rem', margin: '1rem 0' }}>
-            At Nature’s Way Soil, our mission is simple: to bring life back to the soil, naturally.<br /><br />
-            We’re a family-run farm that saw firsthand the damage years of synthetic fertilizers had done to the land. The soil was tired, lifeless, and unable to sustain the healthy crops and pastures we needed. Instead of following the same path, we set out to restore the earth the way nature intended—through biology, not chemistry.<br /><br />
-            <b>Our Promise</b><br />
-            Safe & Natural – Every product we make is safe for children, pets, and pollinators.<br />
-            Microbe-Rich Formulas – We use beneficial microbes, worm castings, biochar, and natural extracts to restore soil health.<br />
-            Sustainable Farming – From duckweed to compost teas, our ingredients are chosen to recycle nutrients and heal the land.<br />
-            Results You Can See – Greener lawns, healthier pastures, stronger roots, and thriving gardens—without synthetic chemicals.<br /><br />
-            <b>Why We Do It</b><br />
-            Soil isn’t just dirt—it’s a living ecosystem. By nurturing the microbes and natural processes in the ground, we create healthier plants, stronger food systems, and a cleaner environment for future generations.<br /><br />
-            Every bottle and bag of Nature’s Way Soil® carries this commitment: to restore the balance between people, plants, and the planet.
-          </p>
-        </div>
-        <div style={{ 
-          flex: '0 1 300px', 
-          maxWidth: '300px',
-          minWidth: '200px',
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center',
-          padding: '1rem'
-        }}>
-          <Image 
-            src="/screenshots/logo-with-tagline.png" 
-            alt="Nature's Way Soil Logo" 
-            width={300} 
-            height={150} 
-            style={{ 
-              borderRadius: 16, 
-              background: 'white', 
-              objectFit: 'contain', 
-              width: '100%', 
-              height: 'auto',
-              maxHeight: '200px'
-            }} 
-          />
-        </div>
-      </div>
-      <div style={{ background: '#F6FFF7', color: '#174F2E', padding: '2rem 0', borderRadius: '0 0 16px 16px' }}>
-        <h2 style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '2rem', marginBottom: '2rem' }}>Featured Products</h2>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}>
-          {items.length === 0 && (
-            <p style={{ color: '#174F2E' }}>No products available.</p>
-          )}
-          {items.map(p => (
-            <div key={p.id} style={{ background: 'white', borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.07)', padding: '1.5rem', minWidth: 220, maxWidth: 320, textAlign: 'center' }}>
-              <div style={{ position: 'relative', display: 'inline-block' }}>
-                <img 
-                  src={p.image} 
-                  alt={p.title} 
-                  width={180} 
-                  height={180} 
-                  style={{ objectFit: 'contain', borderRadius: 8, backgroundColor: '#f6fff7' }}
-                />
-                {p.keyword && (
-                  <span style={{ position: 'absolute', top: 6, left: 6, background: '#174F2E', color: 'white', fontSize: 12, padding: '2px 6px', borderRadius: 6, letterSpacing: 0.5 }}>
-                    {p.keyword}
-                  </span>
-                )}
-              </div>
-              <h3 style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>{p.title}</h3>
-              <p style={{ fontSize: '1rem', marginBottom: '1rem' }}>{p.details}</p>
-              <div style={{ marginBottom: '0.75rem' }}>
-                <Link href={`/products/${p.id}`} style={{ color: '#174F2E', textDecoration: 'underline' }}>
-                  View Details
+    <>
+      <Head>
+        <title>Nature's Way Soil - Premium Organic Soil Amendments</title>
+        <meta name="description" content="Transform your garden with Nature's Way Soil premium organic amendments. Science-backed formulas for healthier plants and sustainable growing." />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+
+      <main className="min-h-screen bg-white">
+        {/* Hero Section - Professional & Clean */}
+        <section 
+          className="relative w-full overflow-hidden bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: 'url(https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=1920&h=800&fit=crop&q=80)',
+            minHeight: '600px'
+          }}
+        >
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-green-900/90 to-green-800/70"></div>
+
+          {/* Hero Content */}
+          <div className="relative z-10 container mx-auto px-4 py-24 md:py-32 lg:py-40">
+            <div className="max-w-4xl">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+                Transform Your Garden with Premium Soil Amendments
+              </h1>
+              <p className="text-xl md:text-2xl text-green-50 mb-8 max-w-2xl leading-relaxed">
+                Science-backed organic formulas that restore soil health and deliver exceptional plant growth naturally.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link
+                  href="/products"
+                  className="inline-block bg-white hover:bg-green-50 text-green-900 font-bold px-10 py-5 rounded-lg text-lg transition-all shadow-xl hover:shadow-2xl hover:scale-105 text-center"
+                >
+                  Shop Now
+                </Link>
+                <Link
+                  href="#benefits"
+                  className="inline-block bg-transparent hover:bg-white/10 text-white font-bold px-10 py-5 rounded-lg text-lg transition-all border-2 border-white text-center"
+                >
+                  Learn More
                 </Link>
               </div>
-              <div style={{ marginBottom: '0.75rem' }}>
-                <label htmlFor={`home-size-${p.id}`} style={{ display: 'block', fontWeight: 'bold', marginBottom: 6 }}>Choose size</label>
-                <select
-                  id={`home-size-${p.id}`}
-                  value={selected[p.id] || ''}
-                  onChange={(e) => setSelected((s) => ({ ...s, [p.id]: e.target.value }))}
-                  style={{ width: '100%', padding: '0.5rem', borderRadius: 6, border: '1px solid #ccc' }}
-                  disabled={!p.variations || p.variations.length === 0}
-                >
-                  <option value="" disabled>Select a size</option>
-                  {p.variations?.map(v => (
-                    <option key={v.sku} value={v.sku}>{v.size} - ${v.price.toFixed(2)}</option>
-                  ))}
-                </select>
-                {(!p.variations || p.variations.length === 0) && (
-                  <small style={{ display: 'block', marginTop: 6, color: '#666' }}>Currently unavailable</small>
-                )}
-              </div>
-              <button
-                onClick={() => {
-                  if (!p.variations || p.variations.length === 0) return;
-                  const sku = selected[p.id] || p.variations[0]?.sku;
-                  const variant = p.variations.find(v => v.sku === sku) || p.variations[0]!;
-                  addItem({
-                    id: p.id,
-                    title: p.title,
-                    image: p.image,
-                    sku: variant.sku,
-                    size: variant.size,
-                    price: variant.price,
-                    qty: 1,
-                  });
-                }}
-                disabled={!p.variations || p.variations.length === 0}
-                style={{ background: '#174F2E', color: 'white', border: 'none', borderRadius: 6, padding: '0.5rem 1.2rem', fontWeight: 'bold', cursor: (!p.variations || p.variations.length === 0) ? 'not-allowed' : 'pointer', opacity: (!p.variations || p.variations.length === 0) ? 0.6 : 1, marginTop: '0.5rem' }}
-              >
-                {(!p.variations || p.variations.length === 0) ? 'Unavailable' : 'Add to Cart'}
-              </button>
             </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+          </div>
+        </section>
+
+        {/* Trust Signals */}
+        <TrustSignals />
+
+        {/* Benefits Section */}
+        <section id="benefits" className="py-20 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                Why Choose Nature's Way Soil?
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Professional-grade soil amendments trusted by gardeners and landscapers nationwide
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {/* Benefit 1 */}
+              <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow border-t-4 border-green-600">
+                <h3 className="text-2xl font-bold text-green-700 mb-4">Science-Backed Formulas</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Developed using the latest soil science research, combining beneficial microbes, organic matter, and natural nutrients for optimal results.
+                </p>
+              </div>
+
+              {/* Benefit 2 */}
+              <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow border-t-4 border-green-600">
+                <h3 className="text-2xl font-bold text-green-700 mb-4">Safe & Natural</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Every ingredient is carefully selected to be safe for children, pets, pollinators, and the environment. Grow with confidence.
+                </p>
+              </div>
+
+              {/* Benefit 3 */}
+              <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow border-t-4 border-green-600">
+                <h3 className="text-2xl font-bold text-green-700 mb-4">Proven Results</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Join thousands of satisfied customers who have transformed their soil and seen remarkable improvements in plant health and yields.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Featured Products Section */}
+        <section id="featured" className="py-20 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                Featured Products
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Discover our range of premium organic soil amendments and fertilizers designed to restore soil health naturally
+              </p>
+            </div>
+            <ProductGrid products={items as any} />
+          </div>
+        </section>
+
+        {/* Testimonials Section */}
+        <section className="py-20 bg-gradient-to-b from-green-50 to-white">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                What Our Customers Say
+              </h2>
+              <p className="text-xl text-gray-600">
+                Real results from real gardeners
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {/* Testimonial 1 */}
+              <div className="bg-white p-8 rounded-xl shadow-lg">
+                <div className="flex mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-6 leading-relaxed italic">
+                  "My tomatoes have never been healthier! The difference in soil quality is remarkable. I've been gardening for 20 years and this is the best product I've used."
+                </p>
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                    <span className="text-green-700 font-bold text-lg">SM</span>
+                  </div>
+                  <div>
+                    <p className="font-bold text-gray-900">Sarah M.</p>
+                    <p className="text-gray-600 text-sm">Home Gardener</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Testimonial 2 */}
+              <div className="bg-white p-8 rounded-xl shadow-lg">
+                <div className="flex mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-6 leading-relaxed italic">
+                  "As a professional landscaper, I trust Nature's Way Soil for all my projects. Consistent quality every time, and my clients love the results."
+                </p>
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                    <span className="text-green-700 font-bold text-lg">MR</span>
+                  </div>
+                  <div>
+                    <p className="font-bold text-gray-900">Mike R.</p>
+                    <p className="text-gray-600 text-sm">Professional Landscaper</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Testimonial 3 */}
+              <div className="bg-white p-8 rounded-xl shadow-lg">
+                <div className="flex mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-6 leading-relaxed italic">
+                  "Finally, an organic solution that actually works! My vegetable garden is thriving and producing more than ever before."
+                </p>
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                    <span className="text-green-700 font-bold text-lg">JL</span>
+                  </div>
+                  <div>
+                    <p className="font-bold text-gray-900">Jennifer L.</p>
+                    <p className="text-gray-600 text-sm">Organic Farmer</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <OptimizedCTA />
+
+        {/* Chat Widget */}
+        {mounted && <EnhancedChatWidget />}
+      </main>
+
+      {/* Footer */}
+      <Footer />
+    </>
+  )
 }
-
-// ...removed duplicate default exports...
-

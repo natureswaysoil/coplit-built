@@ -54,6 +54,6 @@ Use Stripe test card numbers:
 - ✅ Order confirmation and webhooks
 
 ## Next Steps
-1. Replace the placeholder keys in `.env.local` with your actual Stripe test keys
+1. Replace the organic gardening solution keys in `.env.local` with your actual Stripe test keys
 2. Set the same keys in Vercel environment variables  
 3. Test checkout locally first, then push to production

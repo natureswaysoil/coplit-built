@@ -45,14 +45,19 @@ export function resolveEnv(nameList: string[]): { name: string; value: string } 
 
 function isPlaceholderKey(key: string): boolean {
   const placeholders = [
+    // Common placeholder patterns developers might leave in .env
     'your_actual_publishable_key_here',
     'your_actual_secret_key_here',
     'your_actual_webhook_secret_here',
     'pk_test_your_actual',
     'sk_test_your_actual',
-    'whsec_your_actual'
+    'whsec_your_actual',
+    // Extremely generic placeholders
+    'YOUR_PUBLISHABLE_KEY',
+    'YOUR_SECRET_KEY',
+    'YOUR_WEBHOOK_SECRET'
   ];
-  return placeholders.some(placeholder => key.includes(placeholder));
+  return placeholders.some(p => key.includes(p));
 }
 
 export function getPublishableKey(): { key: string; source: string } {

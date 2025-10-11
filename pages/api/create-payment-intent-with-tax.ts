@@ -118,10 +118,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
   const subtotal = lines.reduce((sum, line) => sum + (line.amount * line.quantity), 0);
-    const tax = calc.tax_amount_exclusive;
-    const total = calc.amount_total;
+  const tax = calc.tax_amount_exclusive;
+  const total = calc.amount_total;
+  const effectiveRate = subtotal > 0 ? (tax / subtotal) : 0;
     const shippingAmount = shipping?.amount ? Math.round(shipping.amount) : 0;
 
+    // IMPORTANT: Do NOT set shipping here with secret key.
+    // Shipping information will be set by the frontend during payment confirmation
+    // using the publishable key via stripe.confirmPayment(). This prevents the
+    // Stripe error: "shipping information was last set with a secret key and 
+    // therefore cannot be changed with a publishable key."
     const pi = await stripe.paymentIntents.create({
       amount: total,
       currency: "usd",
@@ -163,7 +169,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         discount: discountCents || 0,
         tax: tax || 0,
         shipping: shippingAmount || 0,
-        total: total || 0
+        total: total || 0,
+        taxRatePercent: Number((effectiveRate * 100).toFixed(4))
       }
     });
   } catch (err: any) {

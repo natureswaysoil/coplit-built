@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nature's Way Soil - Premium Organic Products</title>
+    <meta name="description" content="Shop premium organic soil products, fertilizers, and lawn care solutions from Nature's Way Soil. Professional-grade products for natural gardening success.">
+    <style>
+        /* Modern CSS Framework Integration */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --color-primary: #22c55e;
+            --color-secondary: #16a34a;
+            --color-accent: #84cc16;
+            --color-neutral-50: #f9fafb;
+            --color-neutral-100: #f3f4f6;
+            --color-neutral-200: #e5e7eb;
+            --color-neutral-300: #d1d5db;
+            --color-neutral-400: #9ca3af;
+            --color-neutral-500: #6b7280;
+            --color-neutral-600: #4b5563;
+            --color-neutral-700: #374151;
+            --color-neutral-800: #1f2937;
+            --color-neutral-900: #111827;
+            --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 0.5rem;
+            --radius-lg: 1rem;
+            --transition-fast: 150ms ease-in-out;
+            --transition-normal: 250ms ease-in-out;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: var(--font-family-primary);
+            line-height: 1.6;
+            color: var(--color-neutral-800);
+            background-color: var(--color-neutral-50);
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+        
+        /* Modern Navigation */
+        .nav {
+            background: white;
+            box-shadow: var(--shadow-card);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1rem 0;
+        }
+        
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-neutral-900);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: var(--color-neutral-700);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            transition: var(--transition-fast);
+        }
+        
+        .nav-link:hover {
+            color: var(--color-primary);
+            background-color: var(--color-neutral-100);
+        }
+        
+        /* Modern Hero */
+        .hero {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            color: white;
+            text-align: center;
+            padding: 4rem 0;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        /* Category Filter */
+        .category-filter {
+            padding: 2rem 0;
+            background: white;
+            border-bottom: 1px solid var(--color-neutral-200);
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--color-neutral-200);
+            background: white;
+            color: var(--color-neutral-700);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            font-weight: 500;
+        }
+        
+        .filter-btn:hover,
+        .filter-btn.active {
+            border-color: var(--color-primary);
+            background: var(--color-primary);
+            color: white;
+        }
+        
+        /* Product Grid */
+        .products-section {
+            padding: 3rem 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 3rem;
+            color: var(--color-neutral-900);
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        /* Modern Product Cards */
+        .product-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+            transition: var(--transition-normal);
+            position: relative;
+            border: 1px solid var(--color-neutral-200);
+        }
+        
+        .product-card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-4px);
+        }
+        
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+        }
+        
+        .product-card:hover::before {
+            opacity: 1;
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .product-image::before {
+            content: '🌱';
+            font-size: 3rem;
+            opacity: 0.3;
+            position: absolute;
+        }
+        
+        .product-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--color-accent);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            z-index: 2;
+        }
+        
+        .product-content {
+            padding: 1.5rem;
+        }
+        
+        .product-category {
+            color: var(--color-primary);
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+        
+        .product-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--color-neutral-900);
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .product-features {
+            margin-bottom: 1rem;
+        }
+        
+        .feature-tag {
+            display: inline-block;
+            background: var(--color-neutral-100);
+            color: var(--color-neutral-700);
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius);
+            font-size: 0.75rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .product-price {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 1rem;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            text-decoration: none;
+            font-size: 1rem;
+            width: 100%;
+        }
+        
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--color-secondary);
+            transform: translateY(-1px);
+        }
+        
+        /* Stats Section */
+        .stats-section {
+            background: var(--color-neutral-100);
+            padding: 3rem 0;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+        
+        .stat-item h3 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-item p {
+            color: var(--color-neutral-600);
+            font-weight: 500;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container { padding: 0 1rem; }
+            .hero h1 { font-size: 2rem; }
+            .nav-links { display: none; }
+            .filter-buttons { justify-content: flex-start; overflow-x: auto; }
+            .products-grid { grid-template-columns: 1fr; }
+        }
+        
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--color-neutral-200);
+            border-top: 4px solid var(--color-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <!-- Modern Navigation -->
+    <nav class="nav">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    🌱 Nature's Way Soil
+                </div>
+                <div class="nav-links">
+                    <a href="#products" class="nav-link">Products</a>
+                    <a href="#about" class="nav-link">About</a>
+                    <a href="#contact" class="nav-link">Contact</a>
+                    <a href="#cart" class="btn btn-primary">Cart (0)</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Modern Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Premium Organic Soil Solutions</h1>
+            <p>Professional-grade fertilizers, soil amendments, and lawn care products for natural gardening success</p>
+        </div>
+    </section>
+
+    <!-- Category Filter -->
+    <section class="category-filter">
+        <div class="container">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-category="all">All Products</button>
+                <button class="filter-btn" data-category="Fertilizers">Fertilizers</button>
+                <button class="filter-btn" data-category="Soil & Growing Media">Soil & Growing Media</button>
+                <button class="filter-btn" data-category="Lawn Care">Lawn Care</button>
+                <button class="filter-btn" data-category="Soil Amendments">Soil Amendments</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products-section">
+        <div class="container">
+            <h2 class="section-title">Our Premium Product Collection</h2>
+            
+            <!-- Loading State -->
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+            </div>
+            
+            <!-- Products Grid -->
+            <div id="products-grid" class="products-grid hidden">
+                <!-- Products will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h3 id="product-count">23</h3>
+                    <p>Premium Products</p>
+                </div>
+                <div class="stat-item">
+                    <h3>100%</h3>
+                    <p>Organic Certified</p>
+                </div>
+                <div class="stat-item">
+                    <h3>5★</h3>
+                    <p>Customer Rating</p>
+                </div>
+                <div class="stat-item">
+                    <h3>Fast</h3>
+                    <p>Free Shipping</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Product data (loaded from your CSV)
+        const products = [
+        {
+                "asin": "B0D9HT7ND8",
+                "title": "Organic Hydroponic Fertilizer Concentrate",
+                "full_title": "Nature's Way Soil Organic Hydroponic Fertilizer Concentrate \u2013 Made Fresh Weekly-32 oz \u2013 Makes 512 Gallons of Nutrient Solution \u2013 Organic Plant Food for Hydroponic Systems, Aquaponics",
+                "price": 19.99,
+                "category": "Fertilizers",
+                "features": [
+                        "Organic",
+                        "Concentrate"
+                ],
+                "product_type": "hydroponic",
+                "active": true,
+                "description": "Concentrated hydroponic fertilizer that provides complete nutrition for soilless growing systems."
+        },
+        {
+                "asin": "B0DXP97C6F",
+                "title": "Liquid Bone Meal Fertilizer",
+                "full_title": "Nature's Way Soil Liquid Bone Meal Fertilizer \u2013 32 Ounce/1 Gallon Organic Phosphorus & Calcium for Healthy Roots, Flowers & Fruits \u2013 Fast-Absorbing Liquid Plant Food for Vegetables, Flowers, Trees",
+                "price": 19.99,
+                "category": "Fertilizers",
+                "features": [
+                        "Organic",
+                        "Liquid",
+                        "Fast-Absorbing",
+                        "1 Gallon"
+                ],
+                "product_type": "bone_meal",
+                "active": true,
+                "description": "Premium organic fertilizer designed to nourish your plants naturally and promote healthy growth."
+        },
+        {
+                "asin": "B0FFZPLCG7",
+                "title": "Nature\u2019s Way Soil\u00ae Liquid Kelp Fertilizer",
+                "full_title": "Nature\u2019s Way Soil\u00ae Liquid Kelp Fertilizer \u2013 Organic Seaweed Plant Food for Lawn, Garden, Flowers & Vegetables | Cold-Processed | Natural Growth Booster & Soil Revitalizer (32 Ounce)",
+                "price": 19.99,
+                "category": "Fertilizers",
+                "features": [
+                        "Organic",
+                        "Liquid",
+                        "Liquid Formula"
+                ],
+                "product_type": "seaweed_fertilizer",
+                "active": true,
+                "description": "Natural seaweed extract that provides trace minerals and growth hormones for enhanced plant vigor."
+        },
+        {
+                "asin": "B0FGWSKGCY",
+                "title": "Seaweed & Humic Acid Lawn Treatment",
+                "full_title": "Nature's Way Soil\u00ae Seaweed & Humic Acid Lawn Treatment \u2013 32 oz Concentrate | Liquid Soil Revitalizer with 4.5% Humic + 4.5% Cold-Processed Kelp | Organic Garden & Grass Fertilizer Additive",
+                "price": 19.99,
+                "category": "Fertilizers",
+                "features": [
+                        "Organic",
+                        "Concentrate",
+                        "Liquid",
+                        "Liquid Formula"
+                ],
+                "product_type": "seaweed_fertilizer",
+                "active": true,
+                "description": "Natural seaweed extract that provides trace minerals and growth hormones for enhanced plant vigor."
+        },
+        {
+                "asin": "B0822RH5L3",
+                "title": "Organic Liquid Fertilizer for Garden and House Plants/100% Ogranic/USDA Certifie...",
+                "full_title": "Nature's Way Soil Organic Liquid Fertilizer for Garden and House Plants/100% Ogranic/USDA Certified Biobased Product/with B-1 Vitamin, Aloe Vera Juice to Improve Transplants/Made Fresh Weekly/",
+                "price": 20.99,
+                "category": "Fertilizers",
+                "features": [
+                        "Organic",
+                        "Liquid",
+                        "USDA Certified",
+                        "Aloe Vera"
+                ],
+                "product_type": "general",
+                "active": true,
+                "description": "Premium organic fertilizer designed to nourish your plants naturally and promote healthy growth."
+        },
+        {
+                "asin": "B0D6886G54",
+                "title": "Organic Tomato Liquid Fertilizer",
+                "full_title": "Nature's Way Soil Organic Tomato Liquid Fertilizer \u2013 Made Fresh Weekly- Concentrate/Includes Vitamin B-1 and Aloe Vera for Faster Root Establishment, Healthier Transplants/Stops Blossom End Rot,",
+                "price": 29.99,
+                "category": "Fertilizers",
+                "features": [
+                        "Organic",
+                        "Concentrate",
+                        "Liquid",
+                        "B-1 Vitamin"
+                ],
+                "product_type": "tomato_fertilizer",
+                "active": true,
+                "description": "Specialized fertilizer formulated specifically for tomatoes, preventing blossom end rot and promoting healthy fruit development."
+        },
+        {
+                "asin": "B0F8R45FJ2",
+                "title": "Nature\u2019s Way Soil\u00ae Liquid Kelp Fertilizer",
+                "full_title": "Nature\u2019s Way Soil\u00ae Liquid Kelp Fertilizer \u2013 1 Gallon/Makes 1890 Gallons | Organic Seaweed Plant Food for Lawn, Garden, Flowers & Vegetables | Cold-Processed | Natural Growth Booster & Soil Revitalizer",
+                "price": 34.99,
+                "category": "Fertilizers",
+                "features": [
+                        "Organic",
+                        "Liquid",
+                        "1 Gallon"
+                ],
+                "product_type": "seaweed_fertilizer",
+                "active": true,
+                "description": "Natural seaweed extract that provides trace minerals and growth hormones for enhanced plant vigor."
+        },
+        {
+                "asin": "B0DJ1MF2BP",
+                "title": "Hay and Pasture Liquid Fertilizer",
+                "full_title": "Nature's Way Soil Hay and Pasture Liquid Fertilizer \u2013 Organic, Non-Toxic, Safe for Horses, Livestock \u2013 Promotes Healthy Growth, Nutrient-Rich Forage, and Enhanced Pasture Quality (1 Gallon)",
+                "price": 39.99,
+                "category": "Fertilizers",
+                "features": [
+                        "Organic",
+                        "Liquid",
+                        "1 Gallon"
+                ],
+                "product_type": "general",
+                "active": true,
+                "description": "Premium organic fertilizer designed to nourish your plants naturally and promote healthy growth."
+        },
+        {
+                "asin": "B0F9W6R4K9",
+                "title": "Liquid Bone Meal Fertilizer",
+                "full_title": "Nature's Way Soil Liquid Bone Meal Fertilizer \u2013 Organic Phosphorus & Calcium for Healthy Roots, Flowers & Fruits \u2013 Fast-Absorbing Liquid Plant Food for Vegetables, Flowers, Trees, and Shrubs 1 Gallon",
+                "price": 39.99,
+                "category": "Fertilizers",
+                "features": [
+                        "Organic",
+                        "Liquid",
+                        "Fast-Absorbing",
+                        "1 Gallon"
+                ],
+                "product_type": "bone_meal",
+                "active": true,
+                "description": "Premium organic fertilizer designed to nourish your plants naturally and promote healthy growth."
+        },
+        {
+                "asin": "B0F9B4Q5Z8",
+                "title": "Nature\u2019s Way Soil\u00ae Liquid Kelp Fertilizer",
+                "full_title": "Nature\u2019s Way Soil\u00ae Liquid Kelp Fertilizer \u20132.5 Gallon/Organic Seaweed Plant Food for Lawn, Garden, Flowers & Vegetables/Concentrate | Cold-Processed | Natural Growth Booster & Soil Revitalizer",
+                "price": 64.99,
+                "category": "Fertilizers",
+                "features": [
+                        "Organic",
+                        "Concentrate",
+                        "Liquid",
+                        "2.5 Gallon"
+                ],
+                "product_type": "seaweed_fertilizer",
+                "active": true,
+                "description": "Natural seaweed extract that provides trace minerals and growth hormones for enhanced plant vigor."
+        },
+        {
+                "asin": "B0DFV4YZ61",
+                "title": "Nature\u2019s Way Soil Hay, Pasture & Lawn Fertilizer",
+                "full_title": "Nature\u2019s Way Soil Hay, Pasture & Lawn Fertilizer \u2013 1 & 2.5 Gallon Organic Liquid Soil Conditioner for Grass, Turf & Forage | Pet-Safe | Microbial Nitrogen Blend | 2.5 Gallons",
+                "price": 99.99,
+                "category": "Fertilizers",
+                "features": [
+                        "Organic",
+                        "Liquid",
+                        "Pet-Safe",
+                        "2.5 Gallon"
+                ],
+                "product_type": "lawn_care",
+                "active": true,
+                "description": "Premium organic fertilizer designed to nourish your plants naturally and promote healthy growth."
+        },
+        {
+                "asin": "B0FFZRM6BD",
+                "title": "Nature\u2019s Way Soil\u00ae Liquid Humic & Fulvic Acid",
+                "full_title": "Nature\u2019s Way Soil\u00ae Liquid Humic & Fulvic Acid \u2013 32 oz Soil Conditioner with Organic Kelp \u2013 Boosts Root Growth, Water Retention & Microbial Activity \u2013 Natural Lawn & Garden Supplement \u2013 Pet-Safe",
+                "price": 19.99,
+                "category": "Soil & Growing Media",
+                "features": [
+                        "Organic",
+                        "Liquid",
+                        "Pet-Safe",
+                        "Liquid Formula"
+                ],
+                "product_type": "seaweed_fertilizer",
+                "active": true,
+                "description": "Natural seaweed extract that provides trace minerals and growth hormones for enhanced plant vigor."
+        },
+        {
+                "asin": "B0D52CQNGN",
+                "title": "Generic Horlticural Activated Charcoal for Plants, 4 Quarts, Indoor and Outdoor,...",
+                "full_title": "Generic Horlticural Activated Charcoal for Plants, 4 Quarts, Indoor and Outdoor, Charcoal for Terrariums, Conditioning for Bonsai Soil and Catus Soil, Black, NWS-4q-ABC",
+                "price": 29.99,
+                "category": "Soil & Growing Media",
+                "features": [
+                        "Quart Size"
+                ],
+                "product_type": "charcoal",
+                "active": true,
+                "description": "High-quality growing medium crafted for optimal plant health and root development."
+        },
+        {
+                "asin": "B0D69LNC5T",
+                "title": "Booster and Loosener",
+                "full_title": "Nature's Way Soil Booster and Loosener \u2013 Organic Formula to Enhance Soil Health, Improve Aeration, and Promote Root Growth \u2013 Ideal for Gardens, Lawns, and Potted Plants",
+                "price": 29.99,
+                "category": "Soil & Growing Media",
+                "features": [
+                        "Organic"
+                ],
+                "product_type": "lawn_care",
+                "active": true,
+                "description": "High-quality growing medium crafted for optimal plant health and root development."
+        },
+        {
+                "asin": "B0D7T3TLQP",
+                "title": "Nature\u2019s Way Soil\u00ae Orchid & African Violet Potting Mix",
+                "full_title": "Nature\u2019s Way Soil\u00ae Orchid & African Violet Potting Mix \u2013 Premium Coco Coir, Worm Castings, Activated Biochar & Perlite | Lightweight, Nutrient-Rich Indoor Plant Blend",
+                "price": 29.99,
+                "category": "Soil & Growing Media",
+                "features": [
+                        "Worm Castings",
+                        "BioChar",
+                        "Coco Coir"
+                ],
+                "product_type": "orchid_care",
+                "active": true,
+                "description": "Carefully balanced formula designed for orchids and African violets, providing the specific nutrients these delicate plants need."
+        },
+        {
+                "asin": "B0DC9CSMWS",
+                "title": "Nature\u2019s Way Soil Dog Urine Neutralizer & Lawn Revitalizer",
+                "full_title": "Nature\u2019s Way Soil Dog Urine Neutralizer & Lawn Revitalizer \u2013 32 oz/ 1 Gallon | Now with Enzymes/Pet-Safe Grass Repair Spray for Yellow Spots | Odor Eliminator & Soil Reviver for Healthy Green Lawns",
+                "price": 29.99,
+                "category": "Soil & Growing Media",
+                "features": [
+                        "Pet-Safe",
+                        "1 Gallon"
+                ],
+                "product_type": "lawn_care",
+                "active": true,
+                "description": "High-quality growing medium crafted for optimal plant health and root development."
+        },
+        {
+                "asin": "B0DDCPZY3C",
+                "title": "Enhanced Living Compost",
+                "full_title": "Nature's Way Soil Enhanced Living Compost \u2013 with Fermented Duckweed Extract, 20% Worm Castings, 20% Activated BioChar, 60% Weed-Free Compost \u2013 Organic Garden Soil Amendment for Root & Plant Growth",
+                "price": 29.99,
+                "category": "Soil & Growing Media",
+                "features": [
+                        "Organic",
+                        "Worm Castings",
+                        "BioChar"
+                ],
+                "product_type": "compost",
+                "active": true,
+                "description": "High-quality growing medium crafted for optimal plant health and root development."
+        },
+        {
+                "asin": "B0F4NQNTSW",
+                "title": "Nature\u2019s Way Soil Spray Pattern Indicator",
+                "full_title": "Nature\u2019s Way Soil Spray Pattern Indicator",
+                "price": 29.99,
+                "category": "Soil & Growing Media",
+                "features": [],
+                "product_type": "general",
+                "active": true,
+                "description": "High-quality growing medium crafted for optimal plant health and root development."
+        },
+        {
+                "asin": "B0F9V4HQNK",
+                "title": "Liquid Humic & Fulvic Acid with Organic Kelp, Concentrate, Natural Soil Conditio...",
+                "full_title": "Nature's Way Soil Liquid Humic & Fulvic Acid with Organic Kelp, Concentrate, Natural Soil Conditioner, Plant Growth Stimulator, 1 Gallon",
+                "price": 39.99,
+                "category": "Soil & Growing Media",
+                "features": [
+                        "Organic",
+                        "Concentrate",
+                        "Liquid",
+                        "1 Gallon"
+                ],
+                "product_type": "seaweed_fertilizer",
+                "active": true,
+                "description": "Natural seaweed extract that provides trace minerals and growth hormones for enhanced plant vigor."
+        },
+        {
+                "asin": "B0FMQNT193",
+                "title": "\" Pet",
+                "full_title": "Nature's Way Soil\" Pet-Safe Kennel Cleaner & Deodorizer \u2013 Bio-Enzymatic, Non-Toxic, Odor Eliminator for Dog Kennels, Cages, Floors & Bedding \u2013 Professional Strength, Eco-Friendly, 1 Gallon",
+                "price": 54.99,
+                "category": "Soil & Growing Media",
+                "features": [
+                        "Pet-Safe",
+                        "1 Gallon"
+                ],
+                "product_type": "general",
+                "active": true,
+                "description": "High-quality growing medium crafted for optimal plant health and root development."
+        },
+        {
+                "asin": "B0FG38YYJ5",
+                "title": "Nature\u2019s Way Soil Dog Urine Neutral & Lawn",
+                "full_title": "Nature\u2019s Way Soil Dog Urine Neutral & Lawn \u2013 1 Gallon | Pet-Safe Grass Repair Spray for Yellow Spots | Odor Eliminator & Soil Reviver for Healthy Green Lawns (1 Gallon)",
+                "price": 59.99,
+                "category": "Soil & Growing Media",
+                "features": [
+                        "Pet-Safe",
+                        "1 Gallon"
+                ],
+                "product_type": "lawn_care",
+                "active": true,
+                "description": "High-quality growing medium crafted for optimal plant health and root development."
+        },
+        {
+                "asin": "B0F9V3K9L7",
+                "title": "Liquid Humic & Fulvic Acid with Organic Kelp, Concentrate,Natural Soil Condition...",
+                "full_title": "Nature's Way Soil Liquid Humic & Fulvic Acid with Organic Kelp, Concentrate,Natural Soil Conditioner, Plant Growth Stimulator, 2.5 Gallon (2.5 Gallon)",
+                "price": 69.99,
+                "category": "Soil & Growing Media",
+                "features": [
+                        "Organic",
+                        "Concentrate",
+                        "Liquid",
+                        "2.5 Gallon"
+                ],
+                "product_type": "seaweed_fertilizer",
+                "active": true,
+                "description": "Natural seaweed extract that provides trace minerals and growth hormones for enhanced plant vigor."
+        },
+        {
+                "asin": "B0FF98QKY7",
+                "title": "Nature\u2019s Way Soil\u00ae Liquid Biochar with Kelp, Humic & Fulvic Acid",
+                "full_title": "Nature\u2019s Way Soil\u00ae Liquid Biochar with Kelp, Humic & Fulvic Acid \u2013 Organic Soil Conditioner for Plants, Gardens & Lawns \u2013 Boost Microbes & Nutrient Retention \u2013 1 Gallon",
+                "price": 89.99,
+                "category": "Soil & Growing Media",
+                "features": [
+                        "Organic",
+                        "Liquid",
+                        "BioChar",
+                        "1 Gallon"
+                ],
+                "product_type": "seaweed_fertilizer",
+                "active": true,
+                "description": "Natural seaweed extract that provides trace minerals and growth hormones for enhanced plant vigor."
+        }
+];
+            {
+                "asin": "B0D9HT7ND8",
+                "title": "Nature's Way Soil Organic Hydroponic Fertilizer Concentrate",
+                "price": 19.99,
+                "category": "Fertilizers",
+                "features": ["Organic", "Concentrate", "Makes 512 Gallons"]
+            },
+            {
+                "asin": "B0F9W7B3NL",
+                "title": "Nature's Way Soil Liquid Bone Meal Fertilizer",
+                "price": 19.99,
+                "category": "Fertilizers",
+                "features": ["Phosphorus & Calcium", "Fast-Absorbing", "32 oz"]
+            },
+            {
+                "asin": "B0F97893PD",
+                "title": "Nature's Way Soil® Liquid Kelp Fertilizer",
+                "price": 34.99,
+                "category": "Fertilizers",
+                "features": ["Seaweed Extract", "Cold-Processed", "1 Gallon"]
+            },
+            {
+                "asin": "B0822RH5L3",
+                "title": "Nature's Way Soil Organic Liquid Fertilizer for Garden and House Plants",
+                "price": 20.99,
+                "category": "Fertilizers",
+                "features": ["USDA Certified", "B-1 Vitamin", "Aloe Vera"]
+            },
+            {
+                "asin": "B0D6886G54",
+                "title": "Nature's Way Soil Organic Tomato Liquid Fertilizer",
+                "price": 29.99,
+                "category": "Fertilizers",
+                "features": ["Tomato Specific", "Stops Blossom End Rot", "Fresh Weekly"]
+            },
+            {
+                "asin": "B0D7T3TLQP",
+                "title": "Nature's Way Soil® Orchid & African Violet Potting Mix",
+                "price": 29.99,
+                "category": "Soil & Growing Media",
+                "features": ["Coco Coir", "Worm Castings", "Lightweight"]
+            },
+            {
+                "asin": "B0DDCPYLG1",
+                "title": "Nature's Way Soil Enhanced Living Compost",
+                "price": 29.99,
+                "category": "Soil & Growing Media",
+                "features": ["20% Worm Castings", "20% BioChar", "Fermented Extract"]
+            },
+            {
+                "asin": "B0D52CQNGN",
+                "title": "Generic Horticultural Activated Charcoal for Plants",
+                "price": 29.99,
+                "category": "Soil Amendments",
+                "features": ["4 Quarts", "Terrariums", "Bonsai Soil"]
+            },
+            {
+                "asin": "B0D69LNC5T",
+                "title": "Nature's Way Soil Booster and Loosener",
+                "price": 29.99,
+                "category": "Soil Amendments",
+                "features": ["Organic Formula", "Improve Aeration", "Root Growth"]
+            },
+            {
+                "asin": "B0FG38PQQX",
+                "title": "Nature's Way Soil Dog Urine Neutralizer & Lawn Revitalizer",
+                "price": 29.99,
+                "category": "Lawn Care",
+                "features": ["Pet-Safe", "Enzyme Formula", "32 oz"]
+            },
+            {
+                "asin": "B0DJ1JNQW4",
+                "title": "Nature's Way Soil Hay, Pasture & Lawn Fertilizer",
+                "price": 99.99,
+                "category": "Lawn Care",
+                "features": ["2.5 Gallons", "Pet-Safe", "Microbial Nitrogen"]
+            },
+            {
+                "asin": "B0F97893PD",
+                "title": "Nature's Way Soil® Liquid Kelp Fertilizer – 2.5 Gallon",
+                "price": 64.99,
+                "category": "Fertilizers",
+                "features": ["Bulk Size", "Cold-Processed", "Natural Booster"]
+            }
+        ];
+
+        let currentFilter = 'all';
+
+        // DOM Elements
+        const productsGrid = document.getElementById('products-grid');
+        const loading = document.getElementById('loading');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const productCount = document.getElementById('product-count');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                loading.classList.add('hidden');
+                productsGrid.classList.remove('hidden');
+                renderProducts();
+            }, 1000);
+        });
+
+        // Filter functionality
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                filterButtons.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.category;
+                renderProducts();
+            });
+        });
+
+        // Render products
+        function renderProducts() {
+            const filteredProducts = currentFilter === 'all' 
+                ? products 
+                : products.filter(p => p.category === currentFilter);
+
+            productCount.textContent = filteredProducts.length;
+
+            productsGrid.innerHTML = filteredProducts.map(product => `
+                <div class="product-card" data-category="${product.category}">
+                    <div class="product-image">
+                        ${getCategoryIcon(product.category)}
+                        <div class="product-badge">${getBadgeText(product)}</div>
+                    </div>
+                    <div class="product-content">
+                        <div class="product-category">${product.category}</div>
+                        <h3 class="product-title">${product.title}</h3>
+                        <div class="product-features">
+                            ${product.features.map(feature => `<span class="feature-tag">${feature}</span>`).join('')}
+                        </div>
+                        <div class="product-price">$${product.price.toFixed(2)}</div>
+                        <button class="btn btn-primary" onclick="addToCart('${product.asin}')">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Helper functions
+        function getCategoryIcon(category) {
+            const icons = {
+                'Fertilizers': '🌿 Fertilizer',
+                'Soil & Growing Media': '🪴 Soil Mix',
+                'Lawn Care': '🌱 Lawn Care',
+                'Soil Amendments': '⚡ Amendment'
+            };
+            return icons[category] || '🌱 Product';
+        }
+
+        function getBadgeText(product) {
+            if (product.price >= 50) return 'Premium';
+            if (product.features.includes('Organic')) return 'Organic';
+            if (product.features.includes('Concentrate')) return 'Concentrate';
+            return 'Popular';
+        }
+
+        function addToCart(asin) {
+            // Add to cart functionality
+            alert(`Added product ${asin} to cart! (This would integrate with your e-commerce system)`);
+        }
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

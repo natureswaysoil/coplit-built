@@ -1,3 +1,4 @@
+
 // pages/success.tsx
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
@@ -38,7 +39,7 @@ export default function Success() {
               })
             }
           } catch (e) {
-            // non-fatal; we’ll still show the thank-you
+            // non-fatal; we'll still show the thank-you
             console.warn('Could not fetch session details:', e)
           }
         }
@@ -94,7 +95,7 @@ export default function Success() {
 
   return (
     <main style={{ padding: 24, maxWidth: 720, margin: '0 auto' }}>
-      <h1>Thank you! 🎉</h1>
+      <h1>Thank you!</h1>
       <p>Your payment was successful and your order is confirmed.</p>
 
       {summary && (

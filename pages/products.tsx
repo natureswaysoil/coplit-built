@@ -1,93 +1,83 @@
+// pages/products.tsx
 import Image from 'next/image';
+import Head from 'next/head';
 import Link from 'next/link';
-import { useState } from 'react';
-import { useCart } from '../lib/cartContext';
-import { products } from '../lib/products';
-import { useEffect } from 'react';
-import { ocrImageToTokens, scoreTitleAgainstTokens } from '../lib/ocrMatcher';
+import { supabase } from '@/lib/supabaseClient';
+import { Product } from '@/types/Product';
+import { normalizeProducts, logProductAnomalies, NormalizedProduct } from '@/lib/productNormalizer'
+import { products as staticProducts } from '@/lib/products'
 
-export default function Products() {
-  const { addItem } = useCart();
-  const [selected, setSelected] = useState<Record<string, string>>({});
-  const [items, setItems] = useState(Array.isArray(products) ? products : []);
+interface ProductsPageProps { products: NormalizedProduct[] }
 
-  // OCR functionality disabled - using predefined product data instead
-  useEffect(() => {
-    setItems(products);
-  }, []);
-
+export default function ProductsPage({ products }: ProductsPageProps) {
   return (
-    <main style={{ maxWidth: 1200, margin: '0 auto', padding: '2rem' }}>
-      <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem' }}>Products</h1>
-      <input placeholder="Search products..." style={{ marginBottom: 16, width: '100%' }} />
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', justifyContent: 'center' }}>
-        {items.length === 0 && (
-          <p style={{ color: '#555' }}>No products available.</p>
-        )}
-        {items.map(p => (
-          <div key={p.id} style={{ background: 'white', borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.07)', padding: '1.5rem', minWidth: 220, maxWidth: 320, textAlign: 'center' }}>
-            <div style={{ position: 'relative', display: 'inline-block' }}>
-              <img 
-                src={p.image} 
-                alt={p.title} 
-                width={180} 
-                height={180} 
-                style={{ objectFit: 'contain', borderRadius: 8, backgroundColor: '#f6fff7' }}
-              />
-              {p.keyword && (
-                <span style={{ position: 'absolute', top: 6, left: 6, background: '#174F2E', color: 'white', fontSize: 12, padding: '2px 6px', borderRadius: 6, letterSpacing: 0.5 }}>
-                  {p.keyword}
-                </span>
-              )}
-            </div>
-            <h3 style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>{p.title}</h3>
-            <p style={{ fontSize: '1rem', marginBottom: '1rem' }}>{p.details}</p>
-            <div style={{ marginBottom: '0.75rem' }}>
-              <Link href={`/products/${p.id}`} style={{ color: '#174F2E', textDecoration: 'underline' }}>
-                View Details
-              </Link>
-            </div>
-            <div style={{ marginBottom: '0.75rem' }}>
-              <label htmlFor={`size-${p.id}`} style={{ display: 'block', fontWeight: 'bold', marginBottom: 6 }}>Choose size</label>
-              <select
-                id={`size-${p.id}`}
-                value={selected[p.id] || ''}
-                onChange={(e) => setSelected((s) => ({ ...s, [p.id]: e.target.value }))}
-                style={{ width: '100%', padding: '0.5rem', borderRadius: 6, border: '1px solid #ccc' }}
-                disabled={!p.variations || p.variations.length === 0}
-              >
-                <option value="" disabled>Select a size</option>
-                {p.variations?.map(v => (
-                  <option key={v.sku} value={v.sku}>{v.size} - ${v.price.toFixed(2)}</option>
-                ))}
-              </select>
-              {(!p.variations || p.variations.length === 0) && (
-                <small style={{ display: 'block', marginTop: 6, color: '#777' }}>Currently unavailable</small>
-              )}
-            </div>
-            <button
-              onClick={() => {
-                if (!p.variations || p.variations.length === 0) return;
-                const sku = selected[p.id] || p.variations[0]?.sku;
-                const variant = p.variations.find(v => v.sku === sku) || p.variations[0]!;
-                addItem({
-                  id: p.id,
-                  title: p.title,
-                  image: p.image,
-                  sku: variant.sku,
-                  size: variant.size,
-                  price: variant.price,
-                  qty: 1,
-                });
-              }}
-              disabled={!p.variations || p.variations.length === 0}
-              style={{ background: '#174F2E', color: 'white', border: 'none', borderRadius: 6, padding: '0.6rem 1.2rem', fontWeight: 'bold', cursor: (!p.variations || p.variations.length === 0) ? 'not-allowed' : 'pointer', opacity: (!p.variations || p.variations.length === 0) ? 0.6 : 1 }}
-            >
-              {(!p.variations || p.variations.length === 0) ? 'Unavailable' : 'Add to Cart'}
-            </button>
+    <>
+      <Head>
+        <title>Our Products | Nature’s Way Soil</title>
+        <meta
+          name="description"
+          content="Shop Nature’s Way Soil organic fertilizers, compost, and plant boosters."
+        />
+      </Head>
+
+      <main className="p-xl">
+        <div className="container">
+          <div className="text-center mb-xl">
+            <h1>Professional Soil Solutions</h1>
+            <p style={{fontSize: '1.1rem', color: 'var(--neutral-600)', maxWidth: '700px', margin: '0 auto'}}>
+              Premium organic fertilizers and soil amendments formulated with advanced microbiology to enhance soil health and maximize plant performance.
+            </p>
           </div>
-        ))}
-      </div>
-    </main>
+
+          <div className="grid grid-3">
+            {products.map((product) => (
+              <Link
+                href={`/products/${product.slug}`}
+                key={product.id}
+                className="product-card"
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                <Image
+                  src={product.image}
+                  alt={product.title}
+                  width={300}
+                  height={200}
+                  style={{ width: '100%', height: '200px', objectFit: 'contain' }}
+                  unoptimized
+                />
+                <div className="product-card-content">
+                  <h3 style={{color: 'var(--neutral-800)', marginBottom: 'var(--space-sm)'}}>
+                    {product.title}
+                  </h3>
+                  <p style={{color: 'var(--neutral-600)', fontSize: '0.9rem', marginBottom: 'var(--space-md)'}}>
+                    {product.shortDescription}
+                  </p>
+                  <div className="product-price">
+                    {product.price !== undefined
+                      ? `$${product.price}`
+                      : product.variations && product.variations.length > 0
+                        ? `Starting at $${product.variations[0].price}`
+                        : 'Price varies'}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </main>
+    </>
   );
+}
+
+export async function getStaticProps() {
+  let data: any[] | null = null
+  try {
+    const { data: rows, error } = await supabase.from('products').select('*')
+    if (!error) data = rows || null
+  } catch (e) {
+    // swallow error; fallback below
+  }
+  const normalized = normalizeProducts(data, true)
+  logProductAnomalies(normalized)
+  return { props: { products: normalized }, revalidate: 120 }
 }

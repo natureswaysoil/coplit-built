@@ -100,7 +100,10 @@ function calcTotals({
 
   const baseNc = Number(process.env.NEXT_PUBLIC_NC_TAX_RATE ?? 0.0475) || 0
   const countyRate = state === 'NC' ? getCountyRate(county) : 0
-  const tax = Number((subtotal * (state === 'NC' ? baseNc + countyRate : 0)).toFixed(2))
+  const combinedRate = state === 'NC' ? baseNc + countyRate : 0
+  const shippingTaxable = (process.env.NC_TAX_TAXABLE_SHIPPING || '').toLowerCase() === 'true'
+  const taxableBase = shippingTaxable ? subtotal + (shippingCents / 100) : subtotal
+  const tax = Number((taxableBase * combinedRate).toFixed(2))
   const total = Number((subtotal + tax + (shippingCents / 100)).toFixed(2))
 
   const subtotalCents = Math.round(subtotal * 100)
@@ -110,7 +113,7 @@ function calcTotals({
   if (!Number.isFinite(totalCents) || totalCents < 50) {
     throw new Error('Bad total after tax (must be ≥ $0.50)')
   }
-  return { subtotal, tax, total, subtotalCents, taxCents, totalCents, shippingCents }
+  return { subtotal, tax, total, subtotalCents, taxCents, totalCents, shippingCents, combinedRate, shippingTaxable }
 }
 
 function metaFrom(prefix: string, src?: Address): Record<string, string> {
@@ -163,7 +166,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
   const resolvedCounty = resolveCounty(zip, city, countyRaw)
-    const { subtotal, tax, total, totalCents, subtotalCents, taxCents } = calcTotals({
+  const { subtotal, tax, total, totalCents, subtotalCents, taxCents, combinedRate, shippingTaxable } = calcTotals({
       items,
       amountCents,
       state,
@@ -179,6 +182,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       total: total.toFixed(2),
       state,
   county: resolvedCounty || '',
+      tax_rate_percent: (combinedRate * 100).toFixed(4),
+      shipping_taxable: shippingTaxable ? 'true' : 'false'
     }
     const metadata = {
       ...baseMeta,
@@ -205,7 +210,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       clientSecret: resp.client_secret,
       intentId: resp.id,
       totals: { subtotal, tax, total }, // dollars
-      breakdown: { subtotal: subtotalCents, tax: taxCents, shipping: Math.round(shippingCents) }, // cents for UI
+      breakdown: { subtotal: subtotalCents, tax: taxCents, shipping: Math.round(shippingCents), taxRatePercent: Number((combinedRate * 100).toFixed(4)) }, // cents for UI + rate
     })
   } catch (err: any) {
     console.error('PI error:', err)
