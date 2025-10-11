@@ -35,7 +35,14 @@
     "category": "Soil Health",
     "featuredImage": "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&h=400&fit=crop",
     "author": "Nature's Way Team",
-    "featuredPost": false
+    "featuredPost": false,
+    "videos": {
+      "tiktok": null,
+      "instagram": null,
+      "youtube": null
+    },
+    "videoDescription": null,
+    "socialMediaPromoted": false
   },
   {
     "id": "article_20250928_190850",
@@ -47,7 +54,14 @@
     "category": "Soil Health",
     "featuredImage": "https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=800&h=400&fit=crop",
     "author": "Nature's Way Team",
-    "featuredPost": true
+    "featuredPost": true,
+    "videos": {
+      "tiktok": null,
+      "instagram": null,
+      "youtube": null
+    },
+    "videoDescription": null,
+    "socialMediaPromoted": false
   },
   {
     "id": "article_20251001_120000",
@@ -74,61 +88,12 @@
     ],
     "metaDescription": "Expert guide to pruning techniques for healthier plants. Natural gardening tips and organic solutions for healthier plants and soil.",
     "featuredPost": false,
-    "video": {
-      "url": "https://cdn.abacus.ai/videos/a8e8fdb2-8ea1-4d09-9c83-e909d51c78fc.mp4",
-      "title": "Pruning Techniques for Healthier Plants - Nature's Way Soil Promotional Video",
-      "duration": 29,
-      "width": 720,
-      "height": 1280,
-      "platforms": [
-        "tiktok",
-        "instagram",
-        "youtube"
-      ]
-    }
-  },
-  {
-    "id": "article_20251005_new1",
-    "slug": "organic-pest-control-methods",
-    "title": "Natural Pest Control: Organic Methods That Actually Work",
-    "excerpt": "Discover effective organic pest control methods that protect your garden without harmful chemicals. Learn natural solutions for common garden pests.",
-    "content": "# Natural Pest Control: Organic Methods That Actually Work\n\nGarden pests can be frustrating, but you don't need harsh chemicals to protect your plants. At Nature's Way Soil, we believe in working with nature to create balanced ecosystems where beneficial insects keep pest populations in check naturally.\n\n## Understanding Integrated Pest Management\n\nIntegrated Pest Management (IPM) is a holistic approach that combines multiple strategies:\n\n- **Prevention**: Building healthy soil and choosing resistant varieties\n- **Monitoring**: Regular inspection to catch problems early\n- **Cultural controls**: Crop rotation, companion planting, and proper spacing\n- **Biological controls**: Encouraging beneficial insects and using natural predators\n- **Physical barriers**: Row covers, netting, and traps\n- **Organic treatments**: Natural sprays and amendments as a last resort\n\n## Common Garden Pests and Natural Solutions\n\n### Aphids\n\nThese tiny sap-suckers can quickly multiply on tender new growth.\n\n**Natural controls:**\n- Spray with strong water stream to dislodge\n- Apply neem oil or insecticidal soap\n- Attract ladybugs, lacewings, and parasitic wasps\n- Plant companion herbs like dill, fennel, and yarrow\n\n### Tomato Hornworms\n\nLarge green caterpillars that can defoliate tomato plants overnight.\n\n**Natural controls:**\n- Hand-pick and destroy (or relocate)\n- Encourage parasitic wasps that lay eggs on hornworms\n- Plant basil and marigolds as companions\n- Apply Bacillus thuringiensis (Bt) organic spray\n\n### Cabbage Worms\n\nGreen caterpillars that damage brassica crops.\n\n**Natural controls:**\n- Use floating row covers to exclude butterflies\n- Hand-pick caterpillars regularly\n- Apply Bt spray\n- Plant aromatic herbs like thyme and sage nearby\n\n### Slugs and Snails\n\nNocturnal mollusks that leave slime trails and ragged holes in leaves.\n\n**Natural controls:**\n- Set beer traps or copper barriers\n- Encourage ground beetles and birds\n- Apply diatomaceous earth around plants\n- Remove hiding places like boards and debris\n\n### Japanese Beetles\n\nMetallic green beetles that skeletonize leaves.\n\n**Natural controls:**\n- Hand-pick in early morning when sluggish\n- Use pheromone traps away from garden\n- Apply beneficial nematodes to soil for grubs\n- Plant trap crops like roses away from vegetables\n\n## Building a Pest-Resistant Garden\n\n### Healthy Soil = Healthy Plants\n\nPlants growing in nutrient-rich, biologically active soil are naturally more resistant to pests and diseases. They produce stronger cell walls, more defensive compounds, and recover faster from damage.\n\n**Strengthen your soil with:**\n- **[Living Compost](https://natureswaysoil.com/products/living-compost)**: Rich in beneficial microbes that support plant immunity\n- **[Humic Fulvic Acid](https://natureswaysoil.com/products/humic-fulvic)**: Enhances nutrient uptake for stronger, healthier plants\n- **[Kelp Seaweed Extract](https://natureswaysoil.com/products/kelp-seaweed)**: Contains natural growth hormones and stress-reducing compounds\n\n### Attract Beneficial Insects\n\nCreate habitat for pest predators:\n- Plant diverse flowering plants for nectar and pollen\n- Provide water sources\n- Leave some areas undisturbed for overwintering\n- Avoid broad-spectrum pesticides that kill beneficials\n\n### Practice Crop Rotation\n\nRotating plant families prevents pest buildup in soil and reduces disease pressure.\n\n### Use Physical Barriers\n\n- Row covers for young plants\n- Netting for fruit protection\n- Collars around stems to prevent cutworms\n- Mulch to deter soil-dwelling pests\n\n## Organic Pest Control Recipes\n\n### Garlic-Pepper Spray\n\nRepels many soft-bodied insects.\n\n**Ingredients:**\n- 1 bulb garlic, minced\n- 1 tablespoon cayenne pepper\n- 1 quart water\n- Few drops dish soap\n\n**Instructions:**\n1. Steep garlic and pepper in water overnight\n2. Strain and add soap\n3. Spray on affected plants\n4. Reapply after rain\n\n### Neem Oil Spray\n\nEffective against aphids, whiteflies, and fungal diseases.\n\n**Instructions:**\n1. Mix 2 tablespoons neem oil per gallon water\n2. Add 1 teaspoon dish soap as emulsifier\n3. Spray thoroughly, including undersides of leaves\n4. Apply in evening to avoid leaf burn\n\n### Diatomaceous Earth\n\nFossil powder that damages soft-bodied insects.\n\n**Application:**\n- Dust lightly on plants and soil\n- Reapply after rain or watering\n- Use food-grade DE only\n- Wear mask when applying\n\n## Monitoring and Early Detection\n\nRegular garden inspection is your best defense:\n\n- Check plants weekly for signs of damage\n- Look under leaves where pests hide\n- Monitor for beneficial insects too\n- Keep records of pest problems and solutions\n- Act quickly when problems appear\n\n## When to Take Action\n\nNot every pest requires intervention. Consider:\n\n- **Threshold levels**: A few pests won't significantly harm plants\n- **Beneficial presence**: Are predators already controlling the problem?\n- **Plant health**: Healthy plants can tolerate some damage\n- **Timing**: Late-season damage may not warrant treatment\n\n## Conclusion: Prevention is Best\n\nThe most effective pest control starts with prevention:\n\n1. Build healthy, living soil\n2. Choose appropriate varieties for your climate\n3. Provide proper spacing and air circulation\n4. Water and fertilize appropriately\n5. Encourage biodiversity\n6. Monitor regularly\n7. Act quickly when problems arise\n\nBy creating a balanced garden ecosystem with healthy soil as the foundation, you'll find that pest problems become manageable without resorting to harmful chemicals. Your garden will be safer for children, pets, pollinators, and beneficial insects while producing abundant, healthy harvests.\n\n*Ready to build pest-resistant plants through healthy soil? Explore our organic soil amendments at [natureswaysoil.com](https://natureswaysoil.com) and create a thriving garden ecosystem naturally.*\n\n---\n\n**About Nature's Way Soil**: We're a family-run farm dedicated to restoring soil health naturally. Our mission is simple: to bring life back to the soil through biology, not chemistry. Every product we make is safe for children, pets, and pollinators while delivering results you can see in greener lawns, healthier pastures, and thriving gardens.",
-    "publishDate": "2025-10-05T10:00:00.000Z",
-    "category": "Plant Care",
-    "featuredImage": "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=800&h=400&fit=crop",
-    "author": "Nature's Way Soil Team",
-    "tags": [
-      "pest control",
-      "organic gardening",
-      "natural methods",
-      "beneficial insects",
-      "IPM",
-      "garden health",
-      "sustainable gardening"
-    ],
-    "metaDescription": "Learn effective organic pest control methods that protect your garden naturally. Discover natural solutions for common pests without harmful chemicals.",
-    "featuredPost": false
-  },
-  {
-    "id": "article_20251005_new2",
-    "slug": "composting-basics-beginners-guide",
-    "title": "Composting 101: A Beginner's Guide to Black Gold",
-    "excerpt": "Learn the basics of composting and turn your kitchen scraps and yard waste into nutrient-rich soil amendment. Simple steps for successful composting.",
-    "content": "# Composting 101: A Beginner's Guide to Black Gold\n\nCompost is often called \"black gold\" by gardeners, and for good reason. This nutrient-rich material improves soil structure, feeds beneficial microbes, and provides slow-release nutrition for plants. Best of all, you can make it for free from materials you'd otherwise throw away.\n\n## Why Compost?\n\nComposting offers multiple benefits:\n\n- **Reduces waste**: Diverts organic material from landfills\n- **Improves soil**: Adds organic matter and beneficial microbes\n- **Saves money**: Free fertilizer and soil amendment\n- **Retains moisture**: Helps soil hold water\n- **Suppresses disease**: Beneficial microbes outcompete pathogens\n- **Sequesters carbon**: Helps fight climate change\n\n## Understanding the Composting Process\n\nComposting is controlled decomposition. Microorganisms break down organic matter into humus—a stable, nutrient-rich material that improves soil health.\n\n### The Four Essential Elements\n\n1. **Carbon (Browns)**: Dry leaves, straw, paper, cardboard\n2. **Nitrogen (Greens)**: Fresh grass clippings, food scraps, coffee grounds\n3. **Oxygen**: Air circulation through turning or proper structure\n4. **Moisture**: Like a wrung-out sponge—moist but not soggy\n\n### The Ideal Ratio\n\nAim for roughly 30:1 carbon to nitrogen ratio:\n- 3 parts browns to 1 part greens by volume\n- Mix materials as you add them\n- Adjust if pile is too wet (add browns) or too dry (add greens)\n\n## Getting Started: Choosing Your Method\n\n### Bin Composting\n\nContained system using purchased or DIY bins.\n\n**Pros:**\n- Neat appearance\n- Keeps pests out\n- Retains heat and moisture\n- Good for small spaces\n\n**Cons:**\n- Initial cost\n- Limited capacity\n- Can be harder to turn\n\n### Pile Composting\n\nOpen heap on the ground.\n\n**Pros:**\n- Free\n- Unlimited size\n- Easy to turn\n- Good air circulation\n\n**Cons:**\n- Less attractive\n- May attract pests\n- Slower in cold weather\n- Requires more space\n\n### Tumbler Composting\n\nRotating drum on a stand.\n\n**Pros:**\n- Easy to turn\n- Fast composting\n- Pest-proof\n- Clean appearance\n\n**Cons:**\n- Expensive\n- Limited capacity\n- Can be difficult to empty\n\n### Vermicomposting\n\nUsing worms to process food scraps.\n\n**Pros:**\n- Works indoors\n- Produces rich castings\n- Processes food scraps quickly\n- Great for apartments\n\n**Cons:**\n- Requires worm care\n- Limited capacity\n- Can't handle all materials\n- Initial setup cost\n\n## What to Compost\n\n### Green Materials (Nitrogen-Rich)\n\n- Fruit and vegetable scraps\n- Coffee grounds and filters\n- Tea bags\n- Fresh grass clippings\n- Plant trimmings\n- Eggshells\n- Seaweed and kelp\n\n### Brown Materials (Carbon-Rich)\n\n- Dry leaves\n- Straw and hay\n- Shredded paper and cardboard\n- Wood chips and sawdust\n- Corn stalks\n- Pine needles\n\n### What NOT to Compost\n\n- Meat, fish, or bones\n- Dairy products\n- Oils and fats\n- Pet waste\n- Diseased plants\n- Weeds with seeds\n- Treated wood\n- Glossy paper\n\n## Building Your Compost Pile\n\n### Step-by-Step Instructions\n\n1. **Choose location**: Partial shade, good drainage, convenient access\n2. **Start with browns**: 4-6 inch layer of coarse material for drainage\n3. **Add greens**: 2-3 inch layer of nitrogen-rich material\n4. **Alternate layers**: Continue layering browns and greens\n5. **Add water**: Moisten each layer as you build\n6. **Top with browns**: Finish with brown layer to reduce odors\n\n### Maintaining Your Pile\n\n**Turning:**\n- Turn every 1-2 weeks for fast composting\n- Or turn monthly for slower process\n- Move outside material to center\n- Fluff to add oxygen\n\n**Moisture:**\n- Should feel like wrung-out sponge\n- Add water if too dry\n- Add browns if too wet\n- Cover in rainy weather\n\n**Temperature:**\n- Hot composting: 130-150°F\n- Kills weed seeds and pathogens\n- Speeds decomposition\n- Cool composting works too, just slower\n\n## Troubleshooting Common Problems\n\n### Pile Smells Bad\n\n**Cause**: Too wet, not enough air, or too much nitrogen\n\n**Solution**: Add browns, turn pile, ensure drainage\n\n### Pile Not Heating Up\n\n**Cause**: Too small, too dry, or not enough nitrogen\n\n**Solution**: Add greens, water, make pile larger (3x3x3 feet minimum)\n\n### Attracting Pests\n\n**Cause**: Food scraps exposed, meat/dairy added\n\n**Solution**: Bury food scraps, avoid meat/dairy, use bin with lid\n\n### Taking Too Long\n\n**Cause**: Pieces too large, not enough nitrogen, insufficient moisture\n\n**Solution**: Chop materials smaller, add greens, maintain moisture, turn more often\n\n## When Is Compost Ready?\n\nFinished compost:\n- Dark brown, crumbly texture\n- Earthy smell\n- Original materials unrecognizable\n- Cool temperature\n- Usually ready in 2-6 months\n\n### Using Your Compost\n\n**Garden beds:**\n- Mix 2-4 inches into top 6 inches of soil\n- Apply in spring or fall\n\n**Mulch:**\n- Spread 1-2 inches around plants\n- Keep away from stems\n\n**Potting mix:**\n- Mix 1 part compost with 2 parts soil\n- Add perlite for drainage\n\n**Compost tea:**\n- Steep compost in water\n- Use as liquid fertilizer\n- Apply to soil or foliage\n\n## Supercharging Your Compost\n\nAccelerate decomposition and boost nutrient content:\n\n### Add Beneficial Microbes\n\n**[Nature's Way Living Compost](https://natureswaysoil.com/products/living-compost)** contains:\n- Fermented duckweed extract\n- Worm castings\n- Activated biochar\n- Aged compost\n\nAdd to your pile to:\n- Speed decomposition\n- Increase microbial diversity\n- Improve nutrient content\n- Enhance finished compost quality\n\n### Boost with Amendments\n\n- **Rock dust**: Adds minerals\n- **Kelp meal**: Provides trace elements\n- **Biochar**: Improves structure and water retention\n- **Lime**: Adjusts pH if needed\n\n## Advanced Composting Techniques\n\n### Hot Composting\n\nFast method producing finished compost in 4-6 weeks:\n\n1. Build large pile (3x3x3 feet minimum)\n2. Mix materials thoroughly\n3. Maintain proper moisture\n4. Turn every 3-4 days\n5. Monitor temperature (130-150°F)\n\n### Sheet Composting (Lasagna Gardening)\n\nCompost directly in garden beds:\n\n1. Layer cardboard over grass\n2. Add alternating layers of browns and greens\n3. Top with finished compost or soil\n4. Let decompose over winter\n5. Plant in spring\n\n### Trench Composting\n\nBury scraps directly in garden:\n\n1. Dig trench 8-12 inches deep\n2. Add food scraps\n3. Cover with soil\n4. Rotate trench locations\n5. Plant after 4-6 weeks\n\n## Composting Through the Seasons\n\n### Spring\n- Turn winter pile\n- Start new pile with spring cleanup\n- Apply finished compost to beds\n\n### Summer\n- Monitor moisture in hot weather\n- Add grass clippings in thin layers\n- Harvest finished compost\n\n### Fall\n- Stockpile leaves for winter browns\n- Build large pile with fall cleanup\n- Insulate pile for winter activity\n\n### Winter\n- Continue adding scraps\n- Pile may freeze but will resume in spring\n- Plan next year's composting system\n\n## Small-Space Composting Solutions\n\n### Apartment Composting\n\n- Vermicomposting under sink\n- Bokashi fermentation system\n- Small tumbler on balcony\n- Community composting programs\n\n### Urban Composting\n\n- Compact bins\n- Vertical composters\n- Shared neighborhood systems\n- Municipal collection programs\n\n## The Science of Composting\n\nUnderstanding the process helps you succeed:\n\n### Decomposition Stages\n\n1. **Mesophilic phase**: Moderate-temperature microbes start breakdown\n2. **Thermophilic phase**: Heat-loving bacteria dominate, temperatures rise\n3. **Cooling phase**: Temperature drops, fungi and actinomycetes take over\n4. **Curing phase**: Final maturation, humus formation\n\n### Key Microorganisms\n\n- **Bacteria**: Primary decomposers, generate heat\n- **Fungi**: Break down tough materials like lignin\n- **Actinomycetes**: Create earthy smell, final decomposition\n- **Protozoa**: Consume bacteria, release nutrients\n\n## Conclusion: Start Composting Today\n\nComposting is easier than you think. Start simple:\n\n1. Choose a method that fits your space\n2. Collect browns and greens\n3. Layer materials with proper moisture\n4. Turn occasionally\n5. Be patient\n\nYou don't need perfect conditions or expensive equipment. Even a small pile of leaves and kitchen scraps will eventually become compost. As you gain experience, you can refine your technique and expand your operation.\n\nThe rewards are worth it: rich, dark compost that transforms your soil, reduces waste, and creates a thriving garden ecosystem. Start your composting journey today and discover why gardeners call it black gold.\n\n*Want to supercharge your compost and soil health? Explore our organic amendments at [natureswaysoil.com](https://natureswaysoil.com) and take your gardening to the next level.*\n\n---\n\n**About Nature's Way Soil**: We're a family-run farm dedicated to restoring soil health naturally. Our mission is simple: to bring life back to the soil through biology, not chemistry. Every product we make is safe for children, pets, and pollinators while delivering results you can see in greener lawns, healthier pastures, and thriving gardens.",
-    "publishDate": "2025-10-05T14:00:00.000Z",
-    "category": "Soil Health",
-    "featuredImage": "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&h=400&fit=crop",
-    "author": "Nature's Way Soil Team",
-    "tags": [
-      "composting",
-      "organic matter",
-      "soil health",
-      "waste reduction",
-      "sustainable gardening",
-      "DIY",
-      "beginners"
-    ],
-    "metaDescription": "Complete beginner's guide to composting. Learn how to turn kitchen scraps and yard waste into nutrient-rich compost for your garden.",
-    "featuredPost": false
+    "videos": {
+      "tiktok": null,
+      "instagram": null,
+      "youtube": "https://www.youtube.com/embed/Vz_fJK0bPFg"
+    },
+    "videoDescription": "Watch our expert demonstrate these pruning techniques in action! Learn the proper cuts, timing, and tools for healthier plants.",
+    "socialMediaPromoted": true
   }
 ]
