@@ -1,3 +1,4 @@
+cat > pages/video-scripts.tsx << 'EOF'
 import { useState } from 'react';
 
 export default function SimpleScriptGenerator() {
@@ -24,7 +25,7 @@ export default function SimpleScriptGenerator() {
       setProducts(data.products);
       setLoading(false);
     } catch (err) {
-      setError('Failed to load products. Make sure the API route exists at /api/load-products.ts');
+      setError('Failed to load products. Make sure the API route exists.');
       setLoading(false);
     }
   };
@@ -121,7 +122,7 @@ NARRATION: Real soil health builds thriving underground ecosystems.`,
 
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto', padding: 32, fontFamily: 'system-ui' }}>
-      <h1 style={{ marginBottom: 8 }}>Nature's Way Soil - Video Script Generator</h1>
+      <h1 style={{ marginBottom: 8 }}>Nature&apos;s Way Soil - Video Script Generator</h1>
       <p style={{ color: '#666', marginBottom: 32 }}>
         Generate WaveSpeed-ready scripts from your Google Sheet
       </p>
@@ -164,7 +165,7 @@ NARRATION: Real soil health builds thriving underground ecosystems.`,
             marginBottom: 16
           }}
         >
-          {loading ? 'Loading Products...' : `Load Products from Sheet`}
+          {loading ? 'Loading Products...' : 'Load Products from Sheet'}
         </button>
 
         {products.length > 0 && (
@@ -341,7 +342,7 @@ NARRATION: Real soil health builds thriving underground ecosystems.`,
                             🎬 {scene.visuals}
                           </div>
                           <div style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>
-                            📝 "{scene.textOverlay}"
+                            📝 &quot;{scene.textOverlay}&quot;
                           </div>
                           {scene.productShot && (
                             <div style={{ 
@@ -373,10 +374,11 @@ NARRATION: Real soil health builds thriving underground ecosystems.`,
           borderRadius: 8,
           border: '2px dashed #d1d5db'
         }}>
-          <p style={{ fontSize: 20, marginBottom: 8 }}>👆 Click "Load Products" to get started</p>
+          <p style={{ fontSize: 20, marginBottom: 8 }}>👆 Click &quot;Load Products&quot; to get started</p>
           <p style={{ fontSize: 14 }}>This will read your Google Sheet and prepare scripts for WaveSpeed</p>
         </div>
       )}
     </div>
   );
 }
+EOF
