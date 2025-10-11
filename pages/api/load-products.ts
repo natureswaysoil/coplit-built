@@ -1,3 +1,4 @@
+cat > pages/api/load-products.ts << 'EOF'
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -18,7 +19,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const csvText = await response.text();
     
-    // Parse CSV
     const rows = csvText.split('\n').map(row => {
       const cells = [];
       let current = '';
@@ -57,3 +57,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
   }
 }
+EOF
