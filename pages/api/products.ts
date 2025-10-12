@@ -1,12 +1,10 @@
-import type { NextRequest } from 'next/server'
+import type { NextApiRequest, NextApiResponse } from 'next'
 import { supabase } from '@/lib/supabaseClient'
 import { normalizeProducts, NormalizedProduct } from '@/lib/productNormalizer'
 import { products as staticProducts } from '@/lib/products'
 
-export const config = { runtime: 'edge' }
-
-export default async function handler(req: NextRequest) {
-  const { searchParams } = new URL(req.url)
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { searchParams } = new URL(req.url || 'http://localhost')
   const source = searchParams.get('source') // 'db' | 'static' | null
   const search = (searchParams.get('search') || searchParams.get('q') || '').trim()
   const includeInactive = searchParams.get('include') === 'inactive' || searchParams.get('include_inactive') === 'true'
@@ -42,20 +40,12 @@ export default async function handler(req: NextRequest) {
     normalized = normalizeProducts(null, true).slice(0, limit)
   }
 
-  const body = JSON.stringify({
+  return res.status(200).setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300').json({
     ok: true,
     count: normalized.length,
     source: used,
     fallback: used === 'static',
     error: error || null,
     products: normalized
-  })
-
-  return new Response(body, {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json',
-      'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300'
-    }
   })
 }
