@@ -158,5 +158,34 @@
         "youtube"
       ]
     }
+  },
+  {
+    "id": 1760236274,
+    "title": "Understanding Soil pH and How to Adjust It Naturally",
+    "slug": "understanding-soil-ph-and-how-to-adjust-it-naturally",
+    "excerpt": "Learn about soil pH importance and how it can transform your garden.",
+    "content": "# Understanding Soil pH and How to Adjust It Naturally\n\n[Comprehensive article content would be generated here by LLM]\n\nFocus areas: soil pH importance, testing methods, natural amendments, product recommendations",
+    "author": "Nature's Way Soil Team",
+    "date": "2025-10-12",
+    "category": "Gardening Tips",
+    "tags": [
+      "soil pH importance",
+      "testing methods",
+      "natural amendments"
+    ],
+    "featured_image": "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800",
+    "reading_time": "8 min read",
+    "video": {
+      "url": "https://cdn.abacus.ai/videos/understanding-soil-ph-and-how-to-adjust-it-naturally.mp4",
+      "title": "Understanding Soil pH and How to Adjust It Naturally - Nature's Way Soil",
+      "duration": 30,
+      "width": 720,
+      "height": 1280,
+      "platforms": [
+        "tiktok",
+        "instagram",
+        "youtube"
+      ]
+    }
   }
 ]
