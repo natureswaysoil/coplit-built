@@ -30,3 +30,25 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // ... your existing config
+  
+  // Add this for Cloud Run
+  output: 'standalone',
+  
+  // Optional: Enable compression
+  compress: true,
+  
+  // Optional: Optimize images
+  images: {
+    domains: [
+      'm.media-amazon.com',
+      'docs.google.com',
+      // Add other image domains you use
+    ],
+  },
+}
+
+module.exports = nextConfig
