@@ -51,9 +51,6 @@ export default function OptimizedCTA({
               className="inline-block bg-white text-green-900 font-bold px-8 py-4 rounded-lg text-lg hover:bg-green-50 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 w-full sm:w-auto"
             >
               {primaryButtonText}
-              <svg className="inline-block w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
             </Link>
 
             <Link
@@ -65,43 +62,15 @@ export default function OptimizedCTA({
           </div>
 
           {/* Trust Indicators */}
-          <div className="mt-10 flex flex-wrap justify-center items-center gap-6 text-green-100">
-            <div className="flex items-center gap-2">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <span className="text-sm">30-Day Money Back</span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <span className="text-sm">Free Shipping Over $50</span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <span className="text-sm">Expert Support 24/7</span>
-            </div>
+          <div className="mt-10 grid gap-3 text-green-100 text-sm md:grid-cols-3">
+            <p className="font-semibold">30-Day Money Back Guarantee</p>
+            <p className="font-semibold">Free Shipping on Orders Over $50</p>
+            <p className="font-semibold">Expert Support Available 24/7</p>
           </div>
 
-          {/* Customer Count */}
-          <div className="mt-8 text-green-100">
-            <p className="text-sm">
-              Join <span className="font-bold text-white">10,000+</span> happy gardeners
-            </p>
-            <div className="flex justify-center mt-2">
-              {[...Array(5)].map((_, i) => (
-                <svg key={i} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                  <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                </svg>
-              ))}
-              <span className="ml-2 text-sm">4.9/5 Average Rating</span>
-            </div>
-          </div>
+          <p className="mt-8 text-sm text-green-100">
+            Join <span className="font-bold text-white">10,000+</span> happy gardeners — average rating 4.9/5
+          </p>
         </div>
       </div>
     </section>
