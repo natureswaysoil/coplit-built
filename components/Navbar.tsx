@@ -15,11 +15,12 @@ export default function Navbar() {
       <nav className="nav container">
         <div style={{display: 'flex', alignItems: 'center', gap: 'var(--space-lg)'}}>
           <Link href="/" style={{display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', textDecoration: 'none'}}>
-            <Image 
-              src="/screenshots/logo-with-tagline.png" 
-              alt="Nature's Way Soil Logo" 
-              width={50} 
+            <Image
+              src="/screenshots/logo-with-tagline.png"
+              alt="Nature's Way Soil Logo"
+              width={50}
               height={50}
+              priority
               style={{objectFit: 'contain'}}
             />
             <span style={{color: 'var(--primary)', fontWeight: '800', fontSize: '1.25rem'}}>Nature's Way Soil</span>
@@ -55,12 +56,3 @@ export default function Navbar() {
     </header>
   )
 }
-
-<Image 
-  src="/screenshots/logo-with-tagline.png" 
-  alt="Nature's Way Soil Logo" 
-  width={50} 
-  height={50}
-  priority  // ✅ ADD THIS LINE
-  style={{objectFit: 'contain'}}
-/>
