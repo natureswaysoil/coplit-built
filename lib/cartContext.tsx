@@ -1,5 +1,11 @@
-// lib/cartContext.tsx
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 
 export type CartItem = {
   id: string
@@ -22,11 +28,11 @@ type CartContextValue = {
 
 const CartContext = createContext<CartContextValue | undefined>(undefined)
 
-export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([])
+type CartProviderProps = { children: ReactNode };
 
-  // Hydrate from localStorage on client
-  useEffect(() => {
+export function CartProvider({ children }: CartProviderProps) {
+  const [items, setItems] = useState<CartItem[]>(() => {
+    if (typeof window === 'undefined') return [];
     try {
       const raw = typeof window !== 'undefined' ? localStorage.getItem('cart') : null
       if (raw) setItems(JSON.parse(raw))

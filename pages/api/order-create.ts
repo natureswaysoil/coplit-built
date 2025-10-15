@@ -8,11 +8,12 @@ const supabase = createClient(
   { auth: { persistSession: false } }
 )
 
-type Item = { sku: string; qty: number; price: number }
-type Address = {
-  name?: string; email?: string; phone?: string;
-  address1?: string; address2?: string; city?: string; state?: string; zip?: string; county?: string;
-}
+  const supabase = createClient(url, key, { auth: { persistSession: false } })
+
+  const { customerId, subtotal, tax, total, items, shipping } = req.body || {}
+  if (!Array.isArray(items) || typeof total !== 'number') {
+    return res.status(400).json({ error: 'Missing required fields' })
+  }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
@@ -32,14 +33,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { data: order, error: insErr } = await supabase
       .from('orders')
       .insert({
-        status: 'pending',
-        pi_id: intentId || null,
-        email, name,
-        subtotal: Number(subtotal) || 0,
-        tax: Number(tax) || 0,
-        total: Number(total) || 0,
-        billing,
-        shipping,
+        customer_id: customerId || null,
+        total,
+        tax: typeof tax === 'number' ? tax : 0,
+        shipping_state: shipping?.state ?? null,
+        shipping_county: shipping?.county ?? null,
+        shipping_zip: shipping?.zip ?? null,
+        shipping_city: shipping?.city ?? null,
+        shipping_address1: shipping?.address1 ?? null,
+        shipping_address2: shipping?.address2 ?? null,
+        shipping_phone: shipping?.phone ?? null,
       })
       .select('id')
       .single()

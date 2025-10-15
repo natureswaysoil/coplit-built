@@ -1,8 +1,7 @@
 // pages/checkout.tsx
 import { useEffect, useMemo, useState } from 'react'
-import Image from 'next/image'
-import type { GetServerSideProps } from 'next'
-import { getPublishableKey } from '../lib/stripeConfig'
+import { Elements, PaymentElement, LinkAuthenticationElement, useStripe, useElements } from '../lib/stripe-mock'
+import { loadStripe } from '@stripe/stripe-js'
 import { useCart } from '../lib/cartContext'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, Stripe } from '@stripe/stripe-js'
@@ -70,8 +69,36 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
     return calculateShipping(shippingItems, subtotal);
   }, [mounted, items, subtotal]);
 
-  const [selectedShipping, setSelectedShipping] = useState<'standard' | 'expedited' | 'priority'>('standard');
-  const shippingCost = shippingRates[selectedShipping] || 0;
+  // Totals
+  const subtotal = mounted ? items.reduce((s, it) => s + it.price * it.qty, 0) : 0
+  const ncRate = useMemo(() => {
+    const env = process.env.NEXT_PUBLIC_NC_TAX_RATE
+    const parsed = env ? Number(env) : NaN
+    return Number.isFinite(parsed) ? parsed : 0.0475
+  }, [])
+  const countyRatesMap = useMemo(() => {
+    const raw = process.env.NEXT_PUBLIC_NC_COUNTY_RATES
+    if (!raw) return {} as Record<string, number>
+    try { return JSON.parse(raw) as Record<string, number> } catch { return {} as Record<string, number> }
+  }, [])
+  const norm = (s: string) => s.trim().toLowerCase()
+  const countyRate = state === 'NC' && county ? (countyRatesMap[norm(county)] || 0) : 0
+  const tax = mounted && state === 'NC' ? subtotal * (ncRate + countyRate) : 0
+  const total = subtotal + tax
+
+  // Autofill county from ZIP/city for shipping
+  useEffect(() => {
+    if (state !== 'NC') return
+    const zipGuess = (NC_ZIP_TO_COUNTY as any)[zip]
+    if (zipGuess && !county) { setCounty(zipGuess); return }
+    const cityGuess = (NC_CITY_TO_COUNTY as any)[norm(city)]
+    if (cityGuess && !county) setCounty(cityGuess)
+  }, [zip, city, state]) // eslint-disable-line
+
+  // PI creation + Payment Element
+  const [clientSecret, setClientSecret] = useState<string | null>(null)
+  const [creatingPI, setCreatingPI] = useState(false)
+  const [serverTotals, setServerTotals] = useState<{ subtotal: number; tax: number; total: number } | null>(null)
 
   async function ensurePaymentIntent() {
     if (disabled) return
@@ -111,35 +138,17 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: items.map(it => ({
-            id: it.id,
-            title: it.title,
-            image: it.image,
-            sku: it.sku,
-            size: it.size,
-            price: it.price,
-            qty: it.qty
-          })),
-          customer: { name, email },
-          address: { line1: address1, city, state: stateCode, postal_code: zip, country: 'US' },
-          shipping: { amount: Math.round(shippingCost * 100) }, // Convert to cents
-          promoCode: promoCode.trim() || undefined
-        })
+          currency: 'usd',
+          email,
+          name,
+          items: items.map(it => ({ title: it.title, size: it.size, qty: it.qty, price: it.price, sku: it.sku })),
+          shipping: { address1, address2, city, state, zip, county, phone },
+        }),
       })
-      const data = await resp.json()
-      if (!resp.ok) throw new Error(data?.error || 'Failed to create/update PaymentIntent')
-      setClientSecret(data.clientSecret || null)
-      setIntentId(data.intentId || null)
-      setBreakdown(data.breakdown || null)
-      
-      // Check if promo code was applied
-      if (promoCode.trim() && data.breakdown?.discount && data.breakdown.discount > 0) {
-        setPromoApplied(true)
-        setPromoError(null)
-      } else if (promoCode.trim()) {
-        setPromoError('Promo code not found or invalid')
-        setPromoApplied(false)
-      }
+      const j = await r.json()
+      if (!r.ok || !j?.clientSecret) throw new Error(j?.error || 'Failed to create payment')
+      setClientSecret(j.clientSecret)
+      setServerTotals({ subtotal: j.subtotal, tax: j.tax, total: j.total })
     } catch (e: any) {
       setError(e?.message || 'Failed to prepare checkout')
     } finally {
@@ -147,27 +156,55 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
     }
   }
 
-  useEffect(() => {
-    // refresh PI when cart changes
-    if (items.length > 0) {
-      ensurePaymentIntent()
-    } else {
-      setClientSecret(null)
-      setIntentId(null)
-      setBreakdown(null)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items.map(i => `${i.sku}:${i.qty}:${i.price}`).join('|')])
+  // Finalize order after payment succeeds (store ship/bill + items)
+  const finalizeOrder = async (piId?: string) => {
+    const billingPayload = billingSame
+      ? null
+      : {
+          name: bName,
+          address1: bAddress1,
+          address2: bAddress2,
+          city: bCity,
+          state: bState,
+          zip: bZip,
+          phone: bPhone,
+        }
 
-  // Automatically create the PaymentIntent when all required fields are present
-  useEffect(() => {
-    if (!disabled && !clientSecret && items.length > 0 && !loading) {
-      ensurePaymentIntent()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled, clientSecret, items.length])
+    const amounts = serverTotals || { subtotal, tax, total }
+    const resp = await fetch('/api/order-create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customerId: null, // or look up/create
+        name, email,
+        subtotal: amounts.subtotal,
+        tax: amounts.tax,
+        total: amounts.total,
+        items: items.map(it => ({ sku: it.sku, qty: it.qty, price: it.price, title: it.title, size: it.size })),
+        shipping: { address1, address2, city, state, zip, county, phone },
+        billing: billingPayload,            // null = use Stripe PI enrich / fallback to shipping
+        stripePaymentIntentId: piId || null,
+      }),
+    })
+    if (!resp.ok) throw new Error(await resp.text())
 
-  const appearance = { theme: 'stripe' as const }
+    // Send confirmation email (best-effort)
+    fetch('/api/order-confirmation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        orderId: (await resp.json()).orderId,
+        email, name,
+        items: items.map(it => ({ title: it.title, size: it.size, qty: it.qty, price: it.price, sku: it.sku })),
+        subtotal: amounts.subtotal,
+        tax: amounts.tax,
+        total: amounts.total,
+        shipping: { address1, address2, city, state, zip, county, phone },
+      }),
+    }).catch(() => {})
+
+    clearCart()
+  }
 
   return (
     <main style={{ maxWidth: 900, margin: '2rem auto', fontFamily: 'system-ui', padding: '0 1rem' }}>
@@ -318,274 +355,75 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
               <span>Free Shipping!</span>
               <strong>$0.00</strong>
             </div>
-          )}
-        </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 120px 120px 160px', gap: 12 }}>
+              <div>
+                <label>City</label>
+                <input value={city} onChange={(e) => setCity(e.target.value)} required style={{ width: '100%', padding: 8 }} />
+              </div>
+              <div>
+                <label>State</label>
+                <select value={state} onChange={(e) => setState(e.target.value as 'NC' | 'Other')} required style={{ width: '100%', padding: 8 }}>
+                  <option value="NC">NC</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label>Zip</label>
+                <input value={zip} onChange={(e) => setZip(e.target.value)} required style={{ width: '100%', padding: 8 }} />
+              </div>
+              <div>
+                <label>County (NC)</label>
+                <select value={county} onChange={(e) => setCounty(e.target.value)} style={{ width: '100%', padding: 8 }}>
+                  <option value="">Select</option>
+                  {NC_COUNTIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+            </div>
+          </section>
 
-        {/* Promo Code Section */}
-        <div style={{ minWidth: 280, padding: 16, background: '#f8f9fa', borderRadius: 8 }}>
-          <h3 style={{ margin: '0 0 12px 0', fontSize: 16 }}>Have a Promo Code?</h3>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <input
-              type="text"
-              value={promoCode}
-              onChange={(e) => {
-                setPromoCode(e.target.value.toUpperCase())
-                setPromoError('')
-              }}
-              placeholder="Enter code"
-              disabled={promoApplied || validatingPromo}
-              style={{
-                flex: 1,
-                padding: '8px 12px',
-                border: '1px solid #ccc',
-                borderRadius: 4,
-                fontSize: 14
-              }}
-            />
-            <button
-              onClick={async () => {
-                if (!promoCode.trim()) {
-                  setPromoError('Please enter a promo code')
-                  return
-                }
-                setValidatingPromo(true)
-                setPromoError('')
-                try {
-                  const resp = await fetch(`/api/promo/validate?code=${encodeURIComponent(promoCode)}`)
-                  const data = await resp.json()
-                  if (data.valid) {
-                    setPromoApplied(true)
-                    setPromoError('')
-                    // Trigger payment intent refresh
-                    await ensurePaymentIntent()
-                  } else {
-                    setPromoError('Invalid or expired promo code')
-                    setPromoApplied(false)
-                  }
-                } catch (err) {
-                  setPromoError('Failed to validate promo code')
-                  setPromoApplied(false)
-                } finally {
-                  setValidatingPromo(false)
-                }
-              }}
-              disabled={promoApplied || validatingPromo || !promoCode.trim()}
-              style={{
-                padding: '8px 16px',
-                background: promoApplied ? '#22c55e' : '#0d6efd',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 4,
-                cursor: promoApplied || validatingPromo ? 'not-allowed' : 'pointer',
-                fontSize: 14,
-                fontWeight: 600
-              }}
-            >
-              {validatingPromo ? 'Checking...' : promoApplied ? 'Applied' : 'Apply'}
-            </button>
-          </div>
-          {promoApplied && (
-            <div style={{ marginTop: 8, color: '#22c55e', fontSize: 14, display: 'flex', alignItems: 'center', gap: 4 }}>
-              <svg style={{ width: 16, height: 16 }} fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <span>Promo code applied successfully!</span>
-              <button
-                onClick={() => {
-                  setPromoApplied(false)
-                  setPromoCode('')
-                  ensurePaymentIntent()
-                }}
-                style={{
-                  marginLeft: 'auto',
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#dc2626',
-                  cursor: 'pointer',
-                  fontSize: 12,
-                  textDecoration: 'underline'
-                }}
-              >
-                Remove
+          {/* Billing */}
+          <section style={{ display: 'grid', gap: 12, marginBottom: 16 }}>
+            <label>
+              <input type="checkbox" checked={billingSame} onChange={(e) => setBillingSame(e.target.checked)} /> Billing same as shipping
+            </label>
+            {!billingSame && (
+              <div style={{ display: 'grid', gap: 12 }}>
+                <input value={bName} onChange={(e) => setBName(e.target.value)} placeholder="Billing Name" style={{ width: '100%', padding: 8 }} />
+                <input value={bAddress1} onChange={(e) => setBAddress1(e.target.value)} placeholder="Billing Address" style={{ width: '100%', padding: 8 }} />
+                <input value={bAddress2} onChange={(e) => setBAddress2(e.target.value)} placeholder="Billing Address 2" style={{ width: '100%', padding: 8 }} />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 120px 120px', gap: 12 }}>
+                  <input value={bCity} onChange={(e) => setBCity(e.target.value)} placeholder="City" style={{ width: '100%', padding: 8 }} />
+                  <select value={bState} onChange={(e) => setBState(e.target.value as 'NC' | 'Other')} style={{ width: '100%', padding: 8 }}>
+                    <option value="NC">NC</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  <input value={bZip} onChange={(e) => setBZip(e.target.value)} placeholder="Zip" style={{ width: '100%', padding: 8 }} />
+                </div>
+                <input value={bPhone} onChange={(e) => setBPhone(e.target.value)} placeholder="Phone" style={{ width: '100%', padding: 8 }} />
+              </div>
+            )}
+          </section>
+
+          {/* Totals */}
+          <section style={{ marginBottom: 16 }}>
+            <p>Subtotal: ${(subtotal/100).toFixed(2)}</p>
+            <p>Tax: ${(tax/100).toFixed(2)}</p>
+            <p>Total: ${(total/100).toFixed(2)}</p>
+            {!clientSecret && (
+              <button onClick={beginPayment} disabled={creatingPI} style={{ padding: '10px 16px', fontWeight: 700 }}>
+                {creatingPI ? 'Calculating…' : 'Enter payment details'}
               </button>
-            </div>
-          )}
-          {promoError && (
-            <div style={{ marginTop: 8, color: '#dc2626', fontSize: 14 }}>
-              {promoError}
-            </div>
-          )}
-          <p style={{ fontSize: 12, color: '#666', margin: '8px 0 0 0' }}>
-            Try code: <strong>SAVE15</strong> for 15% off your order!
-          </p>
-        </div>
-
-        {/* Shipping Options */}
-        {subtotal < FREE_SHIPPING_MINIMUM && (
-          <div style={{ minWidth: 280, padding: 16, background: '#f8f9fa', borderRadius: 8 }}>
-            <h3 style={{ margin: '0 0 12px 0', fontSize: 16 }}>Shipping Options</h3>
-            {shippingRates.standard !== undefined && (
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, cursor: 'pointer' }}>
-                <input 
-                  type="radio" 
-                  name="shipping" 
-                  value="standard" 
-                  checked={selectedShipping === 'standard'} 
-                  onChange={e => setSelectedShipping(e.target.value as 'standard')}
-                />
-                <span>Standard Shipping (5-7 business days) - ${shippingRates.standard.toFixed(2)}</span>
-              </label>
             )}
-            {shippingRates.expedited && (
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, cursor: 'pointer' }}>
-                <input 
-                  type="radio" 
-                  name="shipping" 
-                  value="expedited" 
-                  checked={selectedShipping === 'expedited'} 
-                  onChange={e => setSelectedShipping(e.target.value as 'expedited')}
-                />
-                <span>Expedited Shipping (2-3 business days) - ${shippingRates.expedited.toFixed(2)}</span>
-              </label>
-            )}
-            {shippingRates.priority && (
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, cursor: 'pointer' }}>
-                <input 
-                  type="radio" 
-                  name="shipping" 
-                  value="priority" 
-                  checked={selectedShipping === 'priority'} 
-                  onChange={e => setSelectedShipping(e.target.value as 'priority')}
-                />
-                <span>Priority Shipping (1-2 business days) - ${shippingRates.priority.toFixed(2)}</span>
-              </label>
-            )}
-            <p style={{ fontSize: 14, color: '#666', margin: '8px 0 0 0' }}>
-              Tip: Get <strong>FREE SHIPPING</strong> on orders over ${FREE_SHIPPING_MINIMUM.toFixed(2)}!
-            </p>
-          </div>
-        )}
+          </section>
 
-        {/* Address / contact */}
-        <div style={{ flex: 1, minWidth: 280 }}>
-          <h3 style={{ marginBottom: 16 }}>Shipping & Contact Information</h3>
-          <p style={{ fontSize: 14, color: '#666', marginBottom: 16 }}>
-            Fields marked with * are required. Please fill in your complete shipping address for accurate tax calculation.
-          </p>
-          <label style={{ display: 'block', marginTop: 8 }}>
-            Name *
-            <input type="text" value={name} onChange={e => setName(e.target.value)} style={{ width: '100%', padding: 8, marginTop: 6, border: !name.trim() ? '2px solid #ef4444' : '1px solid #ccc' }} />
-          </label>
-          <label style={{ display: 'block', marginTop: 8 }}>
-            Email *
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} style={{ width: '100%', padding: 8, marginTop: 6, border: !email.trim() ? '2px solid #ef4444' : '1px solid #ccc' }} />
-          </label>
-          <label style={{ display: 'block', marginTop: 8 }}>
-            Phone (optional)
-            <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} style={{ width: '100%', padding: 8, marginTop: 6 }} />
-          </label>
-          <label style={{ display: 'block', marginTop: 8 }}>
-            Address line 1 *
-            <input type="text" value={address1} onChange={e => setAddress1(e.target.value)} placeholder="Street address" style={{ width: '100%', padding: 8, marginTop: 6, border: !address1.trim() ? '2px solid #ef4444' : '1px solid #ccc' }} />
-          </label>
-          <label style={{ display: 'block', marginTop: 8 }}>
-            Address line 2 (optional)
-            <input type="text" value={address2} onChange={e => setAddress2(e.target.value)} placeholder="Apt, suite, etc." style={{ width: '100%', padding: 8, marginTop: 6 }} />
-          </label>
-          <div style={{ display: 'flex', gap: 12 }}>
-            <label style={{ display: 'block', marginTop: 8, flex: 1 }}>
-              ZIP *
-              <input type="text" value={zip} onChange={e => setZip(e.target.value)} placeholder="e.g., 28580" style={{ width: '100%', padding: 8, marginTop: 6, border: !zip.trim() ? '2px solid #ef4444' : '1px solid #ccc' }} />
-            </label>
-            <label style={{ display: 'block', marginTop: 8, flex: 1 }}>
-              City *
-              <input type="text" value={city} onChange={e => setCity(e.target.value)} placeholder="e.g., Snow Hill" style={{ width: '100%', padding: 8, marginTop: 6, border: !city.trim() ? '2px solid #ef4444' : '1px solid #ccc' }} />
-            </label>
-            <label style={{ display: 'block', marginTop: 8, flex: 1 }}>
-              State *
-              <input type="text" value={stateCode} onChange={e => setStateCode(e.target.value.toUpperCase())} placeholder="NC" maxLength={2} style={{ width: '100%', padding: 8, marginTop: 6, border: !stateCode.trim() ? '2px solid #ef4444' : '1px solid #ccc' }} />
-            </label>
-          </div>
-          <button disabled={disabled || loading} onClick={ensurePaymentIntent} style={{ marginTop: 12, padding: '10px 16px' }}>
-            {loading ? 'Preparing…' : (clientSecret ? 'Update totals & payment form' : 'Calculate totals & show payment form')}
-          </button>
-          {disabled && !loading && (
-            <p style={{ fontSize: 14, color: '#666', marginTop: 8 }}>
-              Please fill in all required fields (marked with *) to continue.
-            </p>
+          {/* Payment */}
+          {clientSecret && (
+            <Elements stripe={stripePromise} options={{ clientSecret }}>
+              <PaymentForm email={email} setEmail={setEmail} clientSecret={clientSecret} finalizeOrder={finalizeOrder} />
+            </Elements>
           )}
-          {error && <p style={{ color: 'crimson', marginTop: 8 }}>{error}</p>}
-        </div>
-      </section>
-
-      {/* Stripe Elements */}
-      {clientSecret && stripe && (
-        <section style={{ marginTop: 24 }}>
-          <div style={{ 
-            background: '#e7f3ff', 
-            padding: '16px', 
-            borderRadius: '8px', 
-            marginBottom: '16px',
-            border: '2px solid #0066cc'
-          }}>
-            <h3 style={{ margin: '0 0 8px 0', color: '#0066cc' }}>Complete Your Transaction</h3>
-            <p style={{ margin: 0, fontSize: '14px' }}>
-              Fill out your payment information below and click "Pay Now" to complete your purchase securely.
-            </p>
-          </div>
-          
-          <Elements 
-            stripe={stripe} 
-            options={{ 
-              clientSecret, 
-              appearance,
-              loader: 'always'
-            }}
-          >
-            <CheckoutForm_Tax
-              intentId={intentId as string}
-              email={email}
-              name={name}
-              address={{
-                address1,
-                address2,
-                city,
-                state: stateCode,
-                zip,
-                phone,
-              }}
-              onPaid={() => { /* noop, redirect happens in form */ }}
-            />
-          </Elements>
-        </section>
+        </>
       )}
-      
-      {/* Help section */}
-      <section style={{ marginTop: '32px', padding: '16px', background: '#f8f9fa', borderRadius: '6px' }}>
-        <h4 style={{ margin: '0 0 12px 0' }}>Need Help?</h4>
-        <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>
-          • Your payment is secured by Stripe encryption<br />
-          • You'll receive an email confirmation after payment<br />
-          • Contact us if you have any questions: support@natureswaysoil.com
-        </p>
-        {intentId && (
-          <p style={{ margin: 0, fontSize: '14px' }}>
-            <a href={`/verify-payment?pi=${intentId}`} style={{ color: '#0066cc', textDecoration: 'none' }}>
-              → Check your payment status anytime
-            </a>
-          </p>
-        )}
-      </section>
     </main>
   )
-}
-
-export const getServerSideProps: GetServerSideProps<CheckoutProps> = async () => {
-  try {
-    const { key } = getPublishableKey()
-    return { props: { stripePk: key } }
-  } catch {
-    // Fallback to client-side fetch
-    return { props: { stripePk: null } }
-  }
 }

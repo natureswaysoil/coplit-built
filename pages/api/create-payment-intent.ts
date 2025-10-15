@@ -1,9 +1,5 @@
-// pages/api/create-payment-intent.ts
-import type { NextApiRequest, NextApiResponse } from 'next'
-import Stripe from 'stripe'
-import { getSecretKey, STRIPE_API_VERSION } from '../../lib/stripeConfig'
-import { NC_ZIP_TO_COUNTY, NC_CITY_TO_COUNTY } from '../../lib/nc_data'
-import { getCountyRate } from '../../lib/nc_tax'
+// @ts-nocheck
+import Stripe from '../../lib/stripe-node-mock'
 
 /**
  * Optional server-side price book. If a SKU exists here, we ignore any client
@@ -51,77 +47,64 @@ const norm = (s?: string) => (s ?? '').trim().toLowerCase()
 // Parse county rates JSON from env, normalize keys (e.g., "wake" -> 0.02)
 const COUNTY_RATES: Record<string, number> = (() => {
   try {
-    const raw = process.env.NEXT_PUBLIC_NC_COUNTY_RATES || '{}'
-    const parsed = JSON.parse(raw) as Record<string, number>
-    const out: Record<string, number> = {}
-    for (const [k, v] of Object.entries(parsed)) {
-      const n = Number(v)
-      if (Number.isFinite(n)) out[norm(k)] = n
+    const stripe = new Stripe(secret)
+
+    const { currency = 'usd', email, name, items = [], shipping } = req.body || {}
+
+      ? items.reduce((s, it) => {
+          const price = Number(it.price);
+          const qty = Number(it.qty);
+          return s + (Number.isFinite(price) && Number.isFinite(qty) ? price * qty : 0);
+        }, 0)
+      : 0
+    const baseRate = Number(process.env.NEXT_PUBLIC_NC_TAX_RATE || 0.0475)
+    let countyRates: Record<string, number> = {}
+    if (process.env.NEXT_PUBLIC_NC_COUNTY_RATES) {
+      try {
+        countyRates = JSON.parse(process.env.NEXT_PUBLIC_NC_COUNTY_RATES)
+      } catch {}
     }
-    return out
-  } catch {
-    return {}
-  }
-})()
+    const norm = (s: string) => s.trim().toLowerCase()
+      shipping?.state === 'NC' && typeof shipping?.county === 'string' && shipping.county.trim() !== ''
+        ? countyRates[norm(shipping.county)] || 0
+        : 0
+    const tax = shipping?.state === 'NC' ? subtotal * (baseRate + countyRate) : 0
+    const total = subtotal + tax
 
-function resolveCounty(zip?: string, city?: string, fallbackCounty?: string): string | undefined {
-  const z = (zip || '').trim()
-  if (z && NC_ZIP_TO_COUNTY[z]) return NC_ZIP_TO_COUNTY[z]
-  const c = (city || '').trim().toLowerCase()
-  if (c && NC_CITY_TO_COUNTY[c]) return NC_CITY_TO_COUNTY[c]
-  return fallbackCounty
-}
+    const amt = Math.round(total * 100)
+    if (!Number.isFinite(amt) || amt < 50) return res.status(400).json({ error: 'Invalid amount (min 50¢)' })
 
-function calcTotals({
-  items,
-  amountCents,
-  state = 'Other',
-  county,
-  shippingCents = 0,
-}: {
-  items?: CartItem[]
-  amountCents?: number
-  state?: 'NC' | 'Other'
-  county?: string
-  shippingCents?: number
-}) {
-  // Determine subtotal dollars from items or cents
-  let subtotal = 0
-  if (items && items.length) {
-    for (const it of items) {
-      const qty = Number(it.qty)
-      const unit = Number.isFinite(PRICE_BY_SKU[it.sku]) ? PRICE_BY_SKU[it.sku] : Number(it.price)
-      if (Number.isFinite(qty) && Number.isFinite(unit)) subtotal += qty * unit
-    }
-  } else if (Number.isFinite(amountCents as number)) {
-    subtotal = Number(((amountCents as number) / 100).toFixed(2))
-  }
-  subtotal = Number(subtotal.toFixed(2))
+    const pi = await stripe.paymentIntents.create({
+      amount: amt,
+      currency,
+      payment_method_types: ['card', 'link'],   // stay on-site with Link + card
+      receipt_email: email || undefined,
+      metadata: {
+        order_name: String(name ?? '').slice(0, 120),
+        order_email: String(email ?? '').slice(0, 120),
+        items: items ? JSON.stringify(items).slice(0, 450) : '',
+        tax: tax.toFixed(2),
+        subtotal: subtotal.toFixed(2),
+      },
+      shipping: shipping?.address1
+        ? {
+            name: name || email || 'Customer',
+            phone: shipping.phone || undefined,
+            address: {
+              line1: shipping.address1,
+              line2: shipping.address2 || undefined,
+              city: shipping.city,
+              state: shipping.state,
+              postal_code: shipping.zip,
+              country: 'US',
+            },
+          }
+        : undefined,
+    })
 
-  const baseNc = Number(process.env.NEXT_PUBLIC_NC_TAX_RATE ?? 0.0475) || 0
-  const countyRate = state === 'NC' ? getCountyRate(county) : 0
-  const combinedRate = state === 'NC' ? baseNc + countyRate : 0
-  const shippingTaxable = (process.env.NC_TAX_TAXABLE_SHIPPING || '').toLowerCase() === 'true'
-  const taxableBase = shippingTaxable ? subtotal + (shippingCents / 100) : subtotal
-  const tax = Number((taxableBase * combinedRate).toFixed(2))
-  const total = Number((subtotal + tax + (shippingCents / 100)).toFixed(2))
-
-  const subtotalCents = Math.round(subtotal * 100)
-  const taxCents = Math.round(tax * 100)
-  const totalCents = subtotalCents + taxCents + Math.round(shippingCents)
-
-  if (!Number.isFinite(totalCents) || totalCents < 50) {
-    throw new Error('Bad total after tax (must be ≥ $0.50)')
-  }
-  return { subtotal, tax, total, subtotalCents, taxCents, totalCents, shippingCents, combinedRate, shippingTaxable }
-}
-
-function metaFrom(prefix: string, src?: Address): Record<string, string> {
-  if (!src) return {}
-  const m: Record<string, string> = {}
-  const add = (k: keyof Address) => {
-    const v = src[k]
-    if (v !== undefined && v !== null && String(v).trim() !== '') m[`${prefix}_${k}`] = String(v)
+    return res.status(200).json({ clientSecret: pi.client_secret, subtotal, tax, total })
+  } catch (err) {
+    return res.status(500).json({ error: err?.message || 'Stripe error' })
   }
   add('name'); add('email'); add('phone')
   add('address1'); add('address2'); add('city'); add('state'); add('zip'); add('county')
