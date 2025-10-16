@@ -104,9 +104,8 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
       <PaymentElement 
         options={{ 
           layout: "tabs",
-          // Only include supported method identifiers here. Wallets like Apple Pay/Google Pay
-          // are surfaced automatically via Card/Payment Request Button when eligible.
-          // paymentMethodOrder: ["link", "card"]
+          // Prioritize Stripe Link for one-click checkout
+          paymentMethodOrder: ["link", "card"]
         }} 
       />
       
