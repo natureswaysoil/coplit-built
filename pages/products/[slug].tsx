@@ -104,13 +104,13 @@ export default function ProductPage(props: ProductPageProps) {
                 )}
                 
                 {/* Product Image */}
-                <div className="bg-gray-50 rounded-xl p-4 max-w-xs mx-auto">
+                <div className="bg-gray-50 rounded-lg p-2 w-24 h-24 mx-auto flex items-center justify-center">
                   <Image
                     src={product.image}
                     alt={product.title}
-                    width={100}
-                    height={100}
-                    className="w-full h-auto object-contain max-h-32"
+                    width={80}
+                    height={80}
+                    className="object-contain"
                     priority
                   />
                 </div>
