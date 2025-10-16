@@ -6,7 +6,7 @@ export default function MoneyBackGuarantee() {
         <p className="text-green-100 text-sm mt-1">Risk-Free Purchase</p>
       </div>
       
-      <div className="bg-green-800/30 rounded-lg p-4">
+      <div className="bg-green-50 rounded-lg p-4">
         <p className="text-center text-green-50 leading-relaxed">
           Not happy with your results? Get a <strong>full refund within 60 days</strong>. 
           No questions asked. We stand behind the quality of our products 100%.

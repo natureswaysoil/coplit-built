@@ -20,7 +20,7 @@ export default function OptimizedCTA({
   secondaryButtonText = "Learn More",
   secondaryButtonLink = "/blog",
   showUrgency = true,
-  backgroundColor = "bg-gradient-to-r from-green-700 to-green-900"
+  backgroundColor = "bg-gradient-to-r from-green-50 to-green-100"
 }: CTAProps) {
   return (
     <section className={`${backgroundColor} py-16 md:py-20`}>
@@ -34,12 +34,12 @@ export default function OptimizedCTA({
           )}
 
           {/* Main Heading */}
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
             {title}
           </h2>
 
           {/* Subtitle */}
-          <p className="text-lg md:text-xl text-green-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
             {subtitle}
           </p>
 
@@ -54,14 +54,14 @@ export default function OptimizedCTA({
 
             <Link
               href={secondaryButtonLink}
-              className="inline-block bg-transparent border-2 border-white text-white font-semibold px-8 py-4 rounded-lg text-lg hover:bg-white hover:text-green-900 transition-all duration-300 w-full sm:w-auto"
+              className="inline-block bg-transparent border-2 border-green-600 text-green-700 font-semibold px-8 py-4 rounded-lg text-lg hover:bg-green-600 hover:text-white transition-all duration-300 w-full sm:w-auto"
             >
               {secondaryButtonText}
             </Link>
           </div>
 
           {/* Trust Indicators */}
-          <div className="mt-10 flex flex-wrap justify-center items-center gap-6 text-green-100">
+          <div className="mt-10 flex flex-wrap justify-center items-center gap-6 text-gray-700">
             <div className="flex items-center gap-2">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
