@@ -108,9 +108,9 @@ export default function ProductPage(props: ProductPageProps) {
                   <Image
                     src={product.image}
                     alt={product.title}
-                    width={600}
-                    height={600}
-                    className="w-full h-auto object-contain"
+                    width={400}
+                    height={400}
+                    className="w-full h-auto object-contain max-h-96"
                     priority
                   />
                 </div>
@@ -188,13 +188,25 @@ export default function ProductPage(props: ProductPageProps) {
                   />
                 </div>
 
-                {/* Add to Cart Button */}
-                <button
-                  onClick={handleAddToCart}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-5 px-8 rounded-xl text-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
-                >
-                  Add to Cart - ${(currentPrice * quantity).toFixed(2)}
-                </button>
+                {/* Add to Cart & Checkout Buttons */}
+                <div className="space-y-3">
+                  <button
+                    onClick={handleAddToCart}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-5 px-8 rounded-xl text-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+                  >
+                    Add to Cart - ${(currentPrice * quantity).toFixed(2)}
+                  </button>
+                  
+                  <Link
+                    href="/cart"
+                    onClick={() => {
+                      handleAddToCart();
+                    }}
+                    className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-5 px-8 rounded-xl text-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+                  >
+                    Buy Now - Go to Checkout
+                  </Link>
+                </div>
 
                 {/* Description */}
                 <div className="pt-6 border-t-2 border-gray-200">
