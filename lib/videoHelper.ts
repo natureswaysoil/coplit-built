@@ -87,10 +87,10 @@ export function findProductVideo(product: {
   }
 
   // Strategy 4: Fallback - try simple ID match with videoConfig products
-  if (product.id && videoConfig.products[product.id]) {
+  if (product.id && (videoConfig.products as any)[product.id]) {
     return {
-      url: videoConfig.products[product.id].url,
-      name: videoConfig.products[product.id].name,
+      url: (videoConfig.products as any)[product.id].url,
+      name: (videoConfig.products as any)[product.id].name,
       found: true,
       matchType: 'id'
     }
