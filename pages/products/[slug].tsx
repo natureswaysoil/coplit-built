@@ -1,21 +1,15 @@
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Image from 'next/image'
+import Link from 'next/link'
 import { fetchProductWithVariationsBySlug } from '@/lib/productFetch'
 import { products as staticProducts } from '@/lib/products'
 import { NormalizedProduct, normalizeFromStatic } from '@/lib/productNormalizer'
 import { useState, useEffect } from 'react'
-import UsageInstructionsSection from '@/components/UsageInstructions'
 import { useCart } from '@/lib/cartContext'
-import UrgencyBadges from '@/components/UrgencyBadges'
-import MoneyBackGuarantee from '@/components/MoneyBackGuarantee'
-import ProductBundles from '@/components/ProductBundles'
-import EmailCaptureSection from '@/components/EmailCaptureSection'
 import ProductVideoPlayer from '@/components/ProductVideoPlayer'
 import { findProductVideo } from '@/lib/videoHelper'
-import InventoryTracker from '@/components/InventoryTracker'
-import PersonalizedRecommendations from '@/components/PersonalizedRecommendations'
-import EnhancedChatWidget from '@/components/EnhancedChatWidget'
+
 let trackProductView: any = () => Promise.resolve()
 try {
   trackProductView = require('@/lib/supabase_client').trackProductView || trackProductView
@@ -28,13 +22,16 @@ export default function ProductPage(props: ProductPageProps) {
   const { product } = props
   const { addItem } = useCart()
   const [sku, setSku] = useState<string>(() => product?.variations?.[0]?.sku || '')
+  const [quantity, setQuantity] = useState(1)
   const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`)
   const variant = product?.variations?.find(v => v.sku === sku) || product?.variations?.[0]
-  if (router.isFallback || !product) return <div>Loading...</div>
+  const videoInfo = findProductVideo(product)
+  
+  if (router.isFallback || !product) return <div className="min-h-screen flex items-center justify-center"><p className="text-xl">Loading...</p></div>
   
   useEffect(() => {
     if (typeof window !== 'undefined' && product.id) {
-  trackProductView(product.id, sessionId).catch((err: unknown) => {
+      trackProductView(product.id, sessionId).catch((err: unknown) => {
         if (process.env.NODE_ENV === 'development') {
           console.error('Failed to track product view:', err)
         }
@@ -42,210 +39,196 @@ export default function ProductPage(props: ProductPageProps) {
     }
   }, [product.id, sessionId])
 
+  const currentPrice = variant?.price ?? product.price ?? 0
+
+  const handleAddToCart = () => {
+    if (currentPrice === 0) return
+    
+    addItem({
+      id: product.id,
+      title: product.title,
+      price: currentPrice,
+      image: product.image,
+      sku: variant?.sku || product.id,
+      qty: quantity
+    })
+    
+    alert('Added to cart!')
+  }
+
   return (
     <>
       <Head>
-        <title>{product.title}</title>
+        <title>{product.title} | Nature&apos;s Way Soil</title>
         <meta name="description" content={product.shortDescription || product.description} />
         <link rel="canonical" href={`${process.env.PUBLIC_SITE_URL || 'https://natureswaysoil.com'}/products/${product.slug}`} />
         <meta property="og:type" content="product" />
         <meta property="og:title" content={product.title} />
         <meta property="og:description" content={product.shortDescription || product.description} />
         <meta property="og:image" content={product.image} />
-        <meta property="og:url" content={`${process.env.PUBLIC_SITE_URL || 'https://natureswaysoil.com'}/products/${product.slug}`} />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={product.title} />
-        <meta name="twitter:description" content={product.shortDescription || product.description} />
-        <meta name="twitter:image" content={product.image} />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify((() => {
-              const hasVars = product.variations && product.variations.length > 0
-              const prices = hasVars ? product.variations!.map(v => v.price) : (product.price !== undefined ? [product.price] : [])
-              const aggregate = prices.length ? {
-                '@type': 'AggregateOffer',
-                priceCurrency: 'USD',
-                lowPrice: Math.min(...prices),
-                highPrice: Math.max(...prices),
-                offerCount: prices.length,
-                offers: hasVars ? product.variations!.map(v => ({
-                  '@type': 'Offer',
-                  price: v.price,
-                  priceCurrency: 'USD',
-                  sku: v.sku,
-                  availability: 'https://schema.org/InStock'
-                })) : undefined
-              } : undefined
-              return {
-                '@context': 'https://schema.org',
-                '@type': 'Product',
-                name: product.title,
-                image: [product.image],
-                description: product.shortDescription || product.description,
-                sku: product.variations?.[0]?.sku || product.id,
-                brand: { '@type': 'Brand', name: "Nature's Way Soil" },
-                offers: aggregate || (product.price !== undefined ? {
-                  '@type': 'Offer',
-                  priceCurrency: 'USD',
-                  price: product.price,
-                  availability: 'https://schema.org/InStock'
-                } : undefined)
-              }
-            })())
-          }}
-        />
       </Head>
-      <main className="container p-xl">
-        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-xl)', alignItems: 'start'}}>
-          <div>
-            <ProductVideoPlayer 
-              videoUrl={`/videos/products/${product.id}.mp4`}
-              productName={product.title}
-              posterUrl={product.image}
-            />
-            
-            <Image
-              src={product.image}
-              alt={product.title}
-              width={600}
-              height={600}
-              style={{width: '100%', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--neutral-50)', objectFit: 'contain'}}
-            />
-          </div>
-          <div>
-            <h1 style={{color: 'var(--primary)', marginBottom: 'var(--space-lg)'}}>{product.title}</h1>
-            
-            <InventoryTracker productId={product.id} />
-            
-            <p style={{marginBottom: 'var(--space-lg)', lineHeight: '1.6', color: 'var(--neutral-700)'}}>{product.description}</p>
-            {product.variations?.length ? (
-              <div style={{marginBottom: 'var(--space-lg)'}}>
-                <label className="form-label">Size</label>
-                <select
-                  value={sku}
-                  onChange={e => setSku(e.target.value)}
-                  className="form-input"
-                >
-                  {product.variations.map(v => (
-                    <option key={v.sku} value={v.sku}>{v.size} - ${v.price.toFixed(2)}</option>
-                  ))}
-                </select>
-              </div>
-            ) : null}
-            <div style={{fontWeight: 'bold', marginBottom: 'var(--space-lg)', fontSize: '1.5rem', color: 'var(--primary)'}}>
-              {variant ? `$${variant.price.toFixed(2)}` : (product.price !== undefined ? `$${product.price.toFixed(2)}` : '')}
+
+      <main className="min-h-screen bg-white">
+        {/* Breadcrumb */}
+        <div className="bg-gray-50 py-4">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Link href="/" className="hover:text-green-600">Home</Link>
+              <span>/</span>
+              <Link href="/products" className="hover:text-green-600">Products</Link>
+              <span>/</span>
+              <span className="text-gray-900 font-medium">{product.title}</span>
             </div>
-
-            <UrgencyBadges 
-              stockLevel="low"
-              recentPurchases={Math.floor(Math.random() * 20) + 5}
-              showFreeShipping={true}
-            />
-
-            <MoneyBackGuarantee />
-
-            <button
-              onClick={() => {
-                if (!(variant || product.price !== undefined)) return
-                const line = variant ? { sku: variant.sku, size: variant.size, price: variant.price } : { sku: product.id, size: 'Default', price: product.price! }
-                addItem({ id: product.id, title: product.title, image: product.image, qty: 1, ...line })
-              }}
-              className="btn btn-primary"
-            >Add to Cart</button>
           </div>
         </div>
 
-        <div style={{marginTop: 'var(--space-xl)'}}>
-          <ProductBundles 
-            currentProduct={{
-              id: product.id,
-              title: product.title,
-              slug: product.slug || String(product.id),
-              price: variant?.price || product.price || 0,
-              image: product.image,
-              category: (product as any).category || 'soil-health',
-              active: true
-            }}
-            relatedProducts={staticProducts
-              .filter(p => (p as any).category === (product as any).category && p.id !== product.id)
-              .map(p => ({
-                id: p.id,
-                title: (p as any).title,
-                slug: p.slug || String(p.id),
-                price: (p as any).price || 0,
-                image: (p as any).image || '',
-                category: (p as any).category || 'soil-health',
-                active: true
-              }))
-            }
-          />
-        </div>
+        {/* Product Content */}
+        <section className="py-12">
+          <div className="container mx-auto px-4">
+            <div className="grid md:grid-cols-2 gap-12 max-w-7xl mx-auto">
+              
+              {/* Left Column - Images & Video */}
+              <div className="space-y-6">
+                {/* Product Video */}
+                {videoInfo.found && (
+                  <div className="rounded-2xl overflow-hidden shadow-lg">
+                    <ProductVideoPlayer 
+                      videoUrl={videoInfo.url}
+                      productName={product.title}
+                      posterUrl={product.image}
+                    />
+                  </div>
+                )}
+                
+                {/* Product Image */}
+                <div className="bg-gray-50 rounded-2xl p-8">
+                  <Image
+                    src={product.image}
+                    alt={product.title}
+                    width={600}
+                    height={600}
+                    className="w-full h-auto object-contain"
+                    priority
+                  />
+                </div>
+              </div>
 
-        <div style={{marginTop: 'var(--space-xl)'}}>
-          <PersonalizedRecommendations currentProductId={product.id} />
-        </div>
+              {/* Right Column - Product Info */}
+              <div className="space-y-6">
+                <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
+                  {product.title}
+                </h1>
 
-        <div style={{marginTop: 'var(--space-xl)'}}>
-          <EmailCaptureSection />
-        </div>
-        
-        <EnhancedChatWidget />
+                {/* Price */}
+                <div className="text-4xl font-bold text-green-600">
+                  ${currentPrice.toFixed(2)}
+                </div>
 
-        {product.usageInstructions ? (
-          <UsageInstructionsSection instructions={product.usageInstructions} />
-        ) : (
-          <section className="card" style={{marginTop: 'var(--space-xl)', backgroundColor: 'var(--warning-50)', border: '1px solid var(--warning-200)'}}>
-            <h2 style={{color: 'var(--primary)', marginBottom: 'var(--space-md)'}}>How to Use This Product</h2>
-            <p style={{color: 'var(--neutral-800)', marginBottom: 'var(--space-md)'}}>Detailed usage instructions for this product are being added. In the meantime, follow these general best practices:</p>
-            <ul style={{paddingLeft: 'var(--space-lg)', color: 'var(--primary)', lineHeight: '1.6'}}>
-              <li>Shake well before use.</li>
-              <li>If concentrate, dilute with water per the label or 1–2 oz per gallon as a general starting point.</li>
-              <li>Apply in early morning or evening; avoid peak heat.</li>
-              <li>Water lightly after soil applications to aid uptake.</li>
-              <li>Reapply every 2–4 weeks during active growth.</li>
-            </ul>
-            <p className="text-sm text-gray-600 mt-4">Need specific guidance? <a className="underline text-brand-700" href="/contact">Contact us</a> and we'll recommend rates for your plants.</p>
-          </section>
-        )}
+                {/* Short Description */}
+                {product.shortDescription && (
+                  <p className="text-xl text-gray-700 leading-relaxed">
+                    {product.shortDescription}
+                  </p>
+                )}
+
+                {/* Key Benefits */}
+                <div className="bg-green-50 rounded-xl p-6 space-y-3">
+                  <div className="flex items-center gap-2 text-gray-700">
+                    <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                    </svg>
+                    <span>100% Organic & Natural</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-700">
+                    <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                    </svg>
+                    <span>Safe for Kids, Pets & Pollinators</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-700">
+                    <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                    </svg>
+                    <span>30-Day Money-Back Guarantee</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-700">
+                    <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                    </svg>
+                    <span>Free Shipping on Orders Over $50</span>
+                  </div>
+                </div>
+
+                {/* Size Selection */}
+                {product.variations && product.variations.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-bold text-gray-900 mb-3">
+                      Select Size
+                    </label>
+                    <select
+                      value={sku}
+                      onChange={e => setSku(e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none text-lg"
+                    >
+                      {product.variations.map(v => (
+                        <option key={v.sku} value={v.sku}>
+                          {v.size} - ${v.price.toFixed(2)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* Quantity */}
+                <div>
+                  <label className="block text-sm font-bold text-gray-900 mb-3">
+                    Quantity
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={quantity}
+                    onChange={e => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="w-32 px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none text-lg"
+                  />
+                </div>
+
+                {/* Add to Cart Button */}
+                <button
+                  onClick={handleAddToCart}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-5 px-8 rounded-xl text-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+                >
+                  Add to Cart - ${(currentPrice * quantity).toFixed(2)}
+                </button>
+
+                {/* Description */}
+                <div className="pt-6 border-t-2 border-gray-200">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Product Description</h3>
+                  <div className="text-gray-700 leading-relaxed space-y-4">
+                    {product.description}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
     </>
   )
 }
 
 export async function getStaticPaths() {
-  return {
-    paths: staticProducts.map(p => ({ params: { slug: p.slug || String(p.id) } })),
-    fallback: true
-  }
+  const paths = staticProducts.map(p => ({ params: { slug: p.slug } }))
+  return { paths, fallback: true }
 }
 
 export async function getStaticProps({ params }: { params: { slug: string } }) {
   const slug = params.slug
   let product = await fetchProductWithVariationsBySlug(slug)
   if (!product) {
-    const staticMatch = staticProducts.find(p => p.slug === slug || String(p.id) === slug)
-    if (staticMatch) product = normalizeFromStatic(staticMatch)
+    const static_ = staticProducts.find(p => p.slug === slug)
+    if (static_) product = normalizeFromStatic(static_)
   }
   if (!product) return { notFound: true }
-  if (!(product as any).usageInstructions) {
-    const simpleSlug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
-    const staticMatch = staticProducts.find(p =>
-      p.slug === product!.slug ||
-      simpleSlug((p as any).title) === simpleSlug(product!.title) ||
-      ((p as any).keyword && (p as any).keyword === (product as any).keyword)
-    )
-    if (staticMatch && (staticMatch as any).usageInstructions) {
-      ;(product as any).usageInstructions = (staticMatch as any).usageInstructions
-    }
-  }
-  if (product.slug && slug !== product.slug) {
-    return {
-      redirect: {
-        destination: `/products/${product.slug}`,
-        permanent: true
-      }
-    }
-  }
-  return { props: { product }, revalidate: 120 }
+  return { props: { product }, revalidate: 300 }
 }
