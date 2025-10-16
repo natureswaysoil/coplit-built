@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react'
 import { useCart } from '@/lib/cartContext'
 import ProductVideoPlayer from '@/components/ProductVideoPlayer'
 import { findProductVideo } from '@/lib/videoHelper'
+import EnhancedChatWidget from '@/components/EnhancedChatWidget'
 
 let trackProductView: any = () => Promise.resolve()
 try {
@@ -25,19 +26,19 @@ export default function ProductPage(props: ProductPageProps) {
   const [quantity, setQuantity] = useState(1)
   const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`)
   const variant = product?.variations?.find(v => v.sku === sku) || product?.variations?.[0]
-  const videoInfo = findProductVideo(product)
-  
-  if (router.isFallback || !product) return <div className="min-h-screen flex items-center justify-center"><p className="text-xl">Loading...</p></div>
+  const videoInfo = product ? findProductVideo(product) : { found: false, url: '', name: '' }
   
   useEffect(() => {
-    if (typeof window !== 'undefined' && product.id) {
+    if (typeof window !== 'undefined' && product?.id) {
       trackProductView(product.id, sessionId).catch((err: unknown) => {
         if (process.env.NODE_ENV === 'development') {
           console.error('Failed to track product view:', err)
         }
       })
     }
-  }, [product.id, sessionId])
+  }, [product?.id, sessionId])
+  
+  if (router.isFallback || !product) return <div className="min-h-screen flex items-center justify-center"><p className="text-xl">Loading...</p></div>
 
   const currentPrice = variant?.price ?? product.price ?? 0
 
@@ -212,6 +213,9 @@ export default function ProductPage(props: ProductPageProps) {
             </div>
           </div>
         </section>
+
+        {/* Chat Widget */}
+        <EnhancedChatWidget />
       </main>
     </>
   )

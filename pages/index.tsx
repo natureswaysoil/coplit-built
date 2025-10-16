@@ -5,6 +5,7 @@ import { products } from '../lib/products'
 import { ProductGrid } from '@/components/ProductGrid'
 import Footer from '../components/Footer'
 import EmailCouponCapture from '../components/EmailCouponCapture'
+import EnhancedChatWidget from '../components/EnhancedChatWidget'
 
 export default function Home() {
   const [mounted, setMounted] = useState(false)
@@ -89,6 +90,21 @@ export default function Home() {
               Our Products
             </h2>
             <ProductGrid products={items as any} />
+          </div>
+        </section>
+
+        {/* Natural Gardening Help Section */}
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4 max-w-4xl">
+            <div className="bg-white rounded-2xl shadow-lg p-8 border-2 border-green-200">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">
+                🌱 Natural Gardening Questions?
+              </h2>
+              <p className="text-lg text-gray-600 text-center mb-6">
+                Get expert advice on organic soil care, natural fertilizers, and sustainable growing practices
+              </p>
+              <EnhancedChatWidget />
+            </div>
           </div>
         </section>
       </main>
