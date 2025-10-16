@@ -12,14 +12,13 @@ import MoneyBackGuarantee from '@/components/MoneyBackGuarantee'
 import ProductBundles from '@/components/ProductBundles'
 import EmailCaptureSection from '@/components/EmailCaptureSection'
 import ProductVideoPlayer from '@/components/ProductVideoPlayer'
-import { findProductVideo } from '@/lib/videoHelper'
-import { findProductVideo } from '@/lib/videoHelper'
-import { findProductVideo } from '@/lib/videoHelper'
 import InventoryTracker from '@/components/InventoryTracker'
 import PersonalizedRecommendations from '@/components/PersonalizedRecommendations'
 import EnhancedChatWidget from '@/components/EnhancedChatWidget'
 let trackProductView: any = () => Promise.resolve()
 try {
+  // Dynamic require to avoid breaking static export if module has edge-incompatible code
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   trackProductView = require('@/lib/supabase_client').trackProductView || trackProductView
 } catch {}
 
@@ -34,6 +33,7 @@ export default function ProductPage(props: ProductPageProps) {
   const variant = product?.variations?.find(v => v.sku === sku) || product?.variations?.[0]
   if (router.isFallback || !product) return <div>Loading...</div>
   
+  // Track product view
   useEffect(() => {
     if (typeof window !== 'undefined' && product.id) {
   trackProductView(product.id, sessionId).catch((err: unknown) => {
@@ -101,6 +101,7 @@ export default function ProductPage(props: ProductPageProps) {
       <main className="container p-xl">
         <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-xl)', alignItems: 'start'}}>
           <div>
+            {/* Product Video */}
             <ProductVideoPlayer 
               videoUrl={`/videos/products/${product.id}.mp4`}
               productName={product.title}
@@ -118,6 +119,7 @@ export default function ProductPage(props: ProductPageProps) {
           <div>
             <h1 style={{color: 'var(--primary)', marginBottom: 'var(--space-lg)'}}>{product.title}</h1>
             
+            {/* Inventory Tracker */}
             <InventoryTracker productId={product.id} />
             
             <p style={{marginBottom: 'var(--space-lg)', lineHeight: '1.6', color: 'var(--neutral-700)'}}>{product.description}</p>
@@ -138,13 +140,14 @@ export default function ProductPage(props: ProductPageProps) {
             <div style={{fontWeight: 'bold', marginBottom: 'var(--space-lg)', fontSize: '1.5rem', color: 'var(--primary)'}}>
               {variant ? `$${variant.price.toFixed(2)}` : (product.price !== undefined ? `$${product.price.toFixed(2)}` : '')}
             </div>
-
+            {/* Urgency Badges */}
             <UrgencyBadges 
               stockLevel="low"
               recentPurchases={Math.floor(Math.random() * 20) + 5}
               showFreeShipping={true}
             />
 
+            {/* Money-Back Guarantee */}
             <MoneyBackGuarantee />
 
             <button
@@ -158,6 +161,7 @@ export default function ProductPage(props: ProductPageProps) {
           </div>
         </div>
 
+        {/* Product Bundles */}
         <div style={{marginTop: 'var(--space-xl)'}}>
           <ProductBundles 
             currentProduct={{
@@ -184,16 +188,28 @@ export default function ProductPage(props: ProductPageProps) {
           />
         </div>
 
+        {/* Customer Reviews */}
+        <div style={{marginTop: 'var(--space-xl)'}}>
+            productCategory={(product as any).category || 'soil-health'}
+            averageRating={4.8}
+            reviewCount={127}
+          />
+        </div>
+
+        {/* Personalized Recommendations */}
         <div style={{marginTop: 'var(--space-xl)'}}>
           <PersonalizedRecommendations currentProductId={product.id} />
         </div>
 
+        {/* Email Capture Section */}
         <div style={{marginTop: 'var(--space-xl)'}}>
           <EmailCaptureSection />
         </div>
         
+        {/* Enhanced Chat Widget */}
         <EnhancedChatWidget />
 
+        {/* Usage instructions */}
         {product.usageInstructions ? (
           <UsageInstructionsSection instructions={product.usageInstructions} />
         ) : (
@@ -207,7 +223,7 @@ export default function ProductPage(props: ProductPageProps) {
               <li>Water lightly after soil applications to aid uptake.</li>
               <li>Reapply every 2–4 weeks during active growth.</li>
             </ul>
-            <p className="text-sm text-gray-600 mt-4">Need specific guidance? <a className="underline text-brand-700" href="/contact">Contact us</a> and we'll recommend rates for your plants.</p>
+            <p className="text-sm text-gray-600 mt-4">Need specific guidance? <a className="underline text-brand-700" href="/contact">Contact us</a> and we’ll recommend rates for your plants.</p>
           </section>
         )}
       </main>
@@ -216,6 +232,7 @@ export default function ProductPage(props: ProductPageProps) {
 }
 
 export async function getStaticPaths() {
+  // Prebuild static product slugs (prefer slug, fallback to id)
   return {
     paths: staticProducts.map(p => ({ params: { slug: p.slug || String(p.id) } })),
     fallback: true
@@ -226,10 +243,12 @@ export async function getStaticProps({ params }: { params: { slug: string } }) {
   const slug = params.slug
   let product = await fetchProductWithVariationsBySlug(slug)
   if (!product) {
+    // Try static fallback by slug or id
     const staticMatch = staticProducts.find(p => p.slug === slug || String(p.id) === slug)
     if (staticMatch) product = normalizeFromStatic(staticMatch)
   }
   if (!product) return { notFound: true }
+  // Ensure usageInstructions are present if available in static catalog
   if (!(product as any).usageInstructions) {
     const simpleSlug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
     const staticMatch = staticProducts.find(p =>
@@ -241,6 +260,7 @@ export async function getStaticProps({ params }: { params: { slug: string } }) {
       ;(product as any).usageInstructions = (staticMatch as any).usageInstructions
     }
   }
+  // Redirect numeric id path to canonical slug if needed
   if (product.slug && slug !== product.slug) {
     return {
       redirect: {
@@ -251,3 +271,6 @@ export async function getStaticProps({ params }: { params: { slug: string } }) {
   }
   return { props: { product }, revalidate: 120 }
 }
+
+
+

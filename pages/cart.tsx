@@ -3,12 +3,14 @@ import Link from 'next/link'
 import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import { useCart } from '../lib/cartContext'
+import { FREE_SHIPPING_MINIMUM } from '../lib/shippingCalculator'
 
 export default function Cart() {
   const { items, updateQty, removeItem, clearCart } = useCart()
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
   const subtotal = mounted ? items.reduce((sum, it) => sum + it.price * it.qty, 0) : 0
+  const shippingProgress = Math.min((subtotal / FREE_SHIPPING_MINIMUM) * 100, 100)
 
   return (
     <>
@@ -105,6 +107,59 @@ export default function Cart() {
                   </div>
                 ))}
               </div>
+              
+              {/* Free Shipping Progress Bar */}
+              {subtotal < FREE_SHIPPING_MINIMUM ? (
+                <div className="card" style={{
+                  background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+                  border: '2px solid #86efac',
+                  marginBottom: 'var(--space-lg)'
+                }}>
+                  <div style={{marginBottom: 'var(--space-sm)'}}>
+                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-xs)'}}>
+                      <span style={{fontSize: '0.95rem', fontWeight: '600', color: '#166534'}}>
+                        🚚 Progress to FREE Shipping
+                      </span>
+                      <span style={{fontSize: '1.1rem', fontWeight: '700', color: '#15803d'}}>
+                        ${(FREE_SHIPPING_MINIMUM - subtotal).toFixed(2)} away!
+                      </span>
+                    </div>
+                    <div style={{
+                      width: '100%',
+                      height: '12px',
+                      backgroundColor: '#e5e7eb',
+                      borderRadius: '9999px',
+                      overflow: 'hidden',
+                      boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
+                    }}>
+                      <div style={{
+                        width: `${shippingProgress}%`,
+                        height: '100%',
+                        background: 'linear-gradient(90deg, #22c55e 0%, #16a34a 100%)',
+                        borderRadius: '9999px',
+                        transition: 'width 0.5s ease-in-out',
+                        boxShadow: '0 0 10px rgba(34, 197, 94, 0.5)'
+                      }} />
+                    </div>
+                    <p style={{fontSize: '0.8rem', color: '#065f46', marginTop: 'var(--space-xs)', marginBottom: 0}}>
+                      💰 Add ${(FREE_SHIPPING_MINIMUM - subtotal).toFixed(2)} more to save on shipping!
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="card" style={{
+                  background: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)',
+                  border: '2px solid #22c55e',
+                  marginBottom: 'var(--space-lg)'
+                }}>
+                  <div style={{display: 'flex', alignItems: 'center', gap: 'var(--space-sm)'}}>
+                    <span style={{fontSize: '1.5rem'}}>✅</span>
+                    <p style={{fontSize: '1.1rem', fontWeight: '700', color: '#166534', margin: 0}}>
+                      🎉 You qualify for FREE shipping!
+                    </p>
+                  </div>
+                </div>
+              )}
               
               <div className="card" style={{backgroundColor: 'var(--neutral-50)'}}>
                 <div style={{ 
