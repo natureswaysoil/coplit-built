@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { products } from '../lib/products'
 import { ProductGrid } from '@/components/ProductGrid'
 import Footer from '../components/Footer'
-import EmailCouponCapture from '../components/EmailCouponCapture'
+import ExitIntentPopup from '../components/ExitIntentPopup'
 import EnhancedChatWidget from '../components/EnhancedChatWidget'
 
 export default function Home() {
@@ -75,15 +75,7 @@ export default function Home() {
             </p>
           </div>
         </section>
-
-        {/* Email Coupon Section */}
-        <section className="py-16 bg-gray-50">
-          <div className="container mx-auto px-4 max-w-4xl">
-            <EmailCouponCapture />
-          </div>
-        </section>
-
-        {/* Products Section */}
+{/* Products Section */}
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
             <h2 className="text-4xl font-bold text-gray-900 text-center mb-12">
@@ -98,7 +90,7 @@ export default function Home() {
           <div className="container mx-auto px-4 max-w-4xl">
             <div className="bg-white rounded-2xl shadow-lg p-8 border-2 border-green-200">
               <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">
-                🌱 Natural Gardening Questions?
+                Natural Gardening Questions?
               </h2>
               <p className="text-lg text-gray-600 text-center mb-6">
                 Get expert advice on organic soil care, natural fertilizers, and sustainable growing practices
@@ -109,6 +101,7 @@ export default function Home() {
         </section>
       </main>
 
+      <ExitIntentPopup />
       <Footer />
     </>
   )

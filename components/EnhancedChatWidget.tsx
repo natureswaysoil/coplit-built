@@ -13,7 +13,7 @@ export default function EnhancedChatWidget() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: 'Hi! I\'m here to help you find the perfect organic fertilizer for your needs. What are you growing?',
+      content: 'Hi! I am here to help you find the perfect organic fertilizer for your needs. What are you growing?',
       timestamp: new Date()
     }
   ])
