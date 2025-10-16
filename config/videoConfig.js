@@ -58,6 +58,12 @@ export const videoConfig = {
     poster: "/images/hero-poster.jpg",
   },
   products: {
+    // ID-based mappings for products without ASINs
+    "4": {
+      url: "https://d3uryq9bhgb5qr.cloudfront.net/Pictory-API-Self-Service-USD-Monthly/6brpmrpiu3k3kud3b4eb7nc1rs/22ddc732-5c9a-46eb-9f92-ff8a5dafb3c0/VIDEO/organic_hydroponic_fertilizer_concentrate_product_.mp4",
+      name: "Organic Hydroponic Fertilizer Concentrate",
+      amazonUrl: "https://amazon.com/dp/B0D9HT7ND8"
+    },
     // Merge local videos with CloudFront (local videos take precedence for new products)
     ...productVideoMap,
     ...cloudFrontVideos
