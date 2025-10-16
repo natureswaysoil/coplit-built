@@ -25,20 +25,23 @@ export default function Home() {
       <main className="min-h-screen bg-white">
         {/* Video Hero Section */}
         <section className="relative h-screen w-full overflow-hidden">
-          {/* Background Video */}
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute top-0 left-0 w-full h-full object-cover"
-          >
-            <source src="/untitled_project.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
+          {/* YouTube Background Video */}
+          <iframe
+            className="absolute top-0 left-0 w-full h-full pointer-events-none"
+            style={{
+              width: '100vw',
+              height: '100vh',
+              objectFit: 'cover',
+              transform: 'scale(1.5)',
+            }}
+            src="https://www.youtube.com/embed/c2rSWaWTGK4?autoplay=1&mute=1&loop=1&playlist=c2rSWaWTGK4&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1"
+            frameBorder="0"
+            allow="autoplay; fullscreen"
+            allowFullScreen
+          />
           
           {/* Overlay for better text readability */}
-          <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-30"></div>
+          <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-30 pointer-events-none"></div>
           
           {/* Hero Content */}
           <div className="relative z-10 h-full flex items-center justify-center">
