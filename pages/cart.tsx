@@ -4,6 +4,7 @@ import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import { useCart } from '../lib/cartContext'
 import { FREE_SHIPPING_MINIMUM } from '../lib/shippingCalculator'
+import FreeShippingProgress from '../components/FreeShippingProgress'
 
 export default function Cart() {
   const { items, updateQty, removeItem, clearCart } = useCart()
@@ -44,6 +45,9 @@ export default function Cart() {
             </div>
           ) : (
             <>
+              {/* Free Shipping Progress Bar */}
+              <FreeShippingProgress />
+              
               <div style={{ display: 'grid', gap: 'var(--space-lg)', marginBottom: 'var(--space-xl)' }}>
                 {items.map((it) => (
                   <div key={it.sku} className="card" style={{

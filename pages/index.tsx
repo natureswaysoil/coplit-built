@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { products } from '../lib/products'
 import { ProductGrid } from '@/components/ProductGrid'
 import Footer from '../components/Footer'
+import EmailCouponCapture from '../components/EmailCouponCapture'
 
 export default function Home() {
   const [mounted, setMounted] = useState(false)
@@ -16,7 +17,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Nature's Way Soil - Premium Organic Soil Amendments</title>
+        <title>Nature&apos;s Way Soil - Premium Organic Soil Amendments</title>
         <meta name="description" content="Premium organic soil amendments for healthier plants and sustainable growing." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
@@ -62,8 +63,27 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Simple Text Section */}
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4 text-center max-w-4xl">
+            <p className="text-xl text-gray-700 leading-relaxed mb-8">
+              Free shipping on orders over $50
+            </p>
+            <p className="text-lg text-gray-600 leading-relaxed">
+              100% organic • Safe for kids, pets & pollinators • 30-day money-back guarantee
+            </p>
+          </div>
+        </section>
+
+        {/* Email Coupon Section */}
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4 max-w-4xl">
+            <EmailCouponCapture />
+          </div>
+        </section>
+
         {/* Products Section */}
-        <section className="py-20">
+        <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
             <h2 className="text-4xl font-bold text-gray-900 text-center mb-12">
               Our Products

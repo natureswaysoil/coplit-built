@@ -20,6 +20,7 @@ export default function Navbar() {
               alt="Nature's Way Soil Logo" 
               width={50} 
               height={50}
+              priority
               style={{objectFit: 'contain'}}
             />
             <span style={{color: 'var(--primary)', fontWeight: '800', fontSize: '1.25rem'}}>Nature's Way Soil</span>
