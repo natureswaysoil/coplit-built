@@ -91,7 +91,7 @@ export default function ProductPage(props: ProductPageProps) {
             <div className="grid md:grid-cols-2 gap-12 max-w-7xl mx-auto">
               
               {/* Left Column - Images & Video */}
-              <div className="space-y-6">
+              <div className="space-y-8">
                 {/* Product Video */}
                 {videoInfo.found && (
                   <div className="rounded-2xl overflow-hidden shadow-lg">
@@ -103,16 +103,18 @@ export default function ProductPage(props: ProductPageProps) {
                   </div>
                 )}
                 
-                {/* Product Image */}
-                <div className="bg-gray-50 rounded-lg p-2 w-24 h-24 mx-auto flex items-center justify-center">
-                  <Image
-                    src={product.image}
-                    alt={product.title}
-                    width={80}
-                    height={80}
-                    className="object-contain"
-                    priority
-                  />
+                {/* Product Image - Proper Size */}
+                <div className="bg-white rounded-2xl shadow-lg p-8">
+                  <div className="relative w-full max-w-md mx-auto aspect-square">
+                    <Image
+                      src={product.image}
+                      alt={product.title}
+                      fill
+                      className="object-contain"
+                      priority
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
+                  </div>
                 </div>
               </div>
 
