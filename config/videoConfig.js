@@ -59,10 +59,35 @@ export const videoConfig = {
   },
   products: {
     // ID-based mappings for products without ASINs
+    "1": {
+      url: "/videos/products/Parent_B0DJ1MF2BP_video.mp4",
+      name: "Nature's Way Soil Hay and Pasture Liquid Fertilizer",
+      amazonUrl: "https://amazon.com/dp/B0DJ1MF2BP"
+    },
     "4": {
       url: "https://d3uryq9bhgb5qr.cloudfront.net/Pictory-API-Self-Service-USD-Monthly/6brpmrpiu3k3kud3b4eb7nc1rs/22ddc732-5c9a-46eb-9f92-ff8a5dafb3c0/VIDEO/organic_hydroponic_fertilizer_concentrate_product_.mp4",
-      name: "Organic Hydroponic Fertilizer Concentrate",
+      name: "Nature's Way Soil Organic Hydroponic Fertilizer Concentrate",
       amazonUrl: "https://amazon.com/dp/B0D9HT7ND8"
+    },
+    "5": {
+      url: "/videos/products/Parent_B0DDCPZY3C_video.mp4",
+      name: "Nature's Way Soil Enhanced Living Compost",
+      amazonUrl: "https://amazon.com/dp/B0DDCPZY3C"
+    },
+    "7": {
+      url: "https://d3uryq9bhgb5qr.cloudfront.net/Pictory-API-Self-Service-USD-Monthly/6brpmrpiu3k3kud3b4eb7nc1rs/0bdaff8c-5ac2-4c9d-a16a-172d24b79f52/VIDEO/liquid_bone_meal_fertilizer_product_video.mp4",
+      name: "Nature's Way Soil Liquid Bone Meal Fertilizer",
+      amazonUrl: "https://amazon.com/dp/B0DXP97C6F"
+    },
+    "8": {
+      url: "/videos/products/Parent_B0DC9CSMWS_video.mp4",
+      name: "Nature's Way Soil Dog Urine Neutralizer & Lawn Revitalizer",
+      amazonUrl: "https://amazon.com/dp/B0DC9CSMWS"
+    },
+    "9": {
+      url: "/videos/products/Parent_B0D6886G54_video.mp4",
+      name: "Nature's Way Soil Organic Tomato Liquid Fertilizer",
+      amazonUrl: "https://amazon.com/dp/B0D6886G54"
     },
     // Merge local videos with CloudFront (local videos take precedence for new products)
     ...productVideoMap,
