@@ -10,6 +10,8 @@ import { useCart } from '@/lib/cartContext'
 import ProductVideoPlayer from '@/components/ProductVideoPlayer'
 import { findProductVideo } from '@/lib/videoHelper'
 import EnhancedChatWidget from '@/components/EnhancedChatWidget'
+import Footer from '@/components/Footer'
+import ExitIntentPopup from '@/components/ExitIntentPopup'
 
 let trackProductView: any = () => Promise.resolve()
 try {
@@ -217,6 +219,9 @@ export default function ProductPage(props: ProductPageProps) {
         {/* Chat Widget */}
         <EnhancedChatWidget />
       </main>
+
+      <ExitIntentPopup />
+      <Footer />
     </>
   )
 }
