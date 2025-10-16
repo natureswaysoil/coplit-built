@@ -23,21 +23,39 @@ export default function Home() {
       </Head>
 
       <main className="min-h-screen bg-white">
-        {/* Simple Hero */}
-        <section className="py-20 bg-gradient-to-b from-green-50 to-white">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-              Premium Organic Soil Amendments
-            </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Natural solutions for healthier plants and thriving gardens
-            </p>
-            <Link
-              href="/products"
-              className="inline-block bg-green-600 hover:bg-green-700 text-white font-bold px-10 py-4 rounded-lg text-lg transition-all duration-300 shadow-lg hover:shadow-xl"
-            >
-              Shop Products
-            </Link>
+        {/* Video Hero Section */}
+        <section className="relative h-screen w-full overflow-hidden">
+          {/* Background Video */}
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute top-0 left-0 w-full h-full object-cover"
+          >
+            <source src="/untitled_project.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+          
+          {/* Overlay for better text readability */}
+          <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-30"></div>
+          
+          {/* Hero Content */}
+          <div className="relative z-10 h-full flex items-center justify-center">
+            <div className="container mx-auto px-4 text-center">
+              <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 drop-shadow-2xl">
+                Premium Organic Soil Amendments
+              </h1>
+              <p className="text-2xl md:text-3xl text-white mb-10 max-w-3xl mx-auto drop-shadow-lg">
+                Natural solutions for healthier plants and thriving gardens
+              </p>
+              <Link
+                href="/products"
+                className="inline-block bg-green-600 hover:bg-green-700 text-white font-bold px-12 py-5 rounded-lg text-xl transition-all duration-300 shadow-2xl hover:shadow-3xl hover:scale-105"
+              >
+                Shop Products
+              </Link>
+            </div>
           </div>
         </section>
 
