@@ -108,9 +108,9 @@ export default function ProductPage(props: ProductPageProps) {
                   <Image
                     src={product.image}
                     alt={product.title}
-                    width={200}
-                    height={200}
-                    className="w-full h-auto object-contain max-h-48"
+                    width={100}
+                    height={100}
+                    className="w-full h-auto object-contain max-h-32"
                     priority
                   />
                 </div>
