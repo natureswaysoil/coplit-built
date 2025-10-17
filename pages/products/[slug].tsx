@@ -29,7 +29,7 @@ export default function ProductPage({ product }: ProductPageProps) {
       id: `${product.id}-${selectedVariation.sku}`,
       title: `${product.title} - ${selectedVariation.size}`,
       price: selectedVariation.price,
-      quantity: quantity,
+      qty: quantity,
       image: product.image,
       sku: selectedVariation.sku
     });
