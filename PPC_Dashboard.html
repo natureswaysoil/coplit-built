@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon PPC Optimizer Dashboard - Live Data</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        /* Your existing CSS styles here */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>🚀 Amazon PPC Optimizer Dashboard</h1>
+                <p class="company">Nature's Way Soil & Vermicompost LLC</p>
+            </div>
+            <div>
+                <span class="status-badge">ACTIVE</span>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">Total Campaigns</div>
+                <div class="value" id="totalCampaigns">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Active Keywords</div>
+                <div class="value" id="activeKeywords">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Total Spend</div>
+                <div class="value" id="totalSpend">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Total Sales</div>
+                <div class="value" id="totalSales">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Average ACOS</div>
+                <div class="value" id="avgAcos">--</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">📊 Campaign Performance</div>
+            <div id="performanceChart"></div>
+        </div>
+    </div>
+
+    <script>
+        // Function to fetch and update dashboard data
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('http://localhost:8080/api/data');
+                const data = await response.json();
+
+                // Update stats
+                document.getElementById('totalCampaigns').textContent = data.length;
+                document.getElementById('activeKeywords').textContent = data.reduce((sum, item) => sum + item.active_keywords, 0);
+                document.getElementById('totalSpend').textContent = `$${data.reduce((sum, item) => sum + item.total_spend, 0).toFixed(2)}`;
+                document.getElementById('totalSales').textContent = `$${data.reduce((sum, item) => sum + item.total_sales, 0).toFixed(2)}`;
+                document.getElementById('avgAcos').textContent = `${(data.reduce((sum, item) => sum + item.acos, 0) / data.length).toFixed(2)}%`;
+
+                // Plotly chart data
+                const campaignNames = data.map(item => item.campaign_name);
+                const totalSpend = data.map(item => item.total_spend);
+                const totalSales = data.map(item => item.total_sales);
+
+                const chartData = [
+                    {
+                        x: campaignNames,
+                        y: totalSpend,
+                        name: 'Total Spend',
+                        type: 'bar',
+                    },
+                    {
+                        x: campaignNames,
+                        y: totalSales,
+                        name: 'Total Sales',
+                        type: 'bar',
+                    },
+                ];
+
+                const layout = { barmode: 'group' };
+                Plotly.newPlot('performanceChart', chartData, layout);
+            } catch (error) {
+                console.error('Failed to load dashboard data:', error);
+            }
+        }
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', loadDashboardData);
+    </script>
+</body>
+</html>
