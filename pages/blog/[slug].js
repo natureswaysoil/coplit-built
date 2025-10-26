@@ -55,7 +55,25 @@ export default function BlogPost({ post }) {
         <div className="post-header">
           <Link href="/blog" className="back-link">← Back to Blog</Link>
           
-          {post.featuredImage && (
+          {/* Video Player - Priority over featured image */}
+          {post.video && post.video.url && (
+            <div className="video-container">
+              <video 
+                controls
+                poster={post.featuredImage ? `https:${post.featuredImage}` : undefined}
+                className="featured-video"
+              >
+                <source src={post.video.url} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+              {post.video.title && (
+                <p className="video-caption">{post.video.title}</p>
+              )}
+            </div>
+          )}
+          
+          {/* Featured Image - Only show if no video */}
+          {!post.video && post.featuredImage && (
             <img 
               src={`https:${post.featuredImage}`} 
               alt={post.title}
@@ -118,6 +136,23 @@ export default function BlogPost({ post }) {
           object-fit: cover;
           border-radius: 12px;
           margin-bottom: 2rem;
+        }
+        .video-container {
+          width: 100%;
+          margin-bottom: 2rem;
+        }
+        .featured-video {
+          width: 100%;
+          max-height: 600px;
+          border-radius: 12px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .video-caption {
+          text-align: center;
+          color: #666;
+          font-size: 0.9rem;
+          margin-top: 0.5rem;
+          font-style: italic;
         }
         .category {
           background: #4a7c59;

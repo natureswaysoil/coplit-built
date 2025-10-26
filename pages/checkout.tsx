@@ -126,7 +126,15 @@ export default function CheckoutPage({ stripePk }: CheckoutProps) {
           promoCode: promoCode.trim() || undefined
         })
       })
-      const data = await resp.json()
+      
+      // Better error handling for JSON parse issues
+      let data
+      try {
+        data = await resp.json()
+      } catch (jsonError) {
+        throw new Error('Server returned invalid response. Please check your Stripe API keys in Vercel environment variables.')
+      }
+      
       if (!resp.ok) throw new Error(data?.error || 'Failed to create/update PaymentIntent')
       setClientSecret(data.clientSecret || null)
       setIntentId(data.intentId || null)

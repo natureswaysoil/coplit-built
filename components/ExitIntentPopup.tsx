@@ -49,6 +49,12 @@ export default function ExitIntentPopup() {
         throw new Error('Failed to submit email');
       }
 
+      // Store coupon in localStorage for checkout
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('appliedCoupon', 'WELCOME15');
+        localStorage.setItem('couponDiscount', '0.15');
+      }
+
       // Show success message
       setSubmitted(true);
       
@@ -141,7 +147,7 @@ export default function ExitIntentPopup() {
 
             {/* Privacy Note */}
             <p className="text-xs text-gray-500 mt-4 text-center">
-              🔒 No spam. Unsubscribe anytime. Your email is safe with us.
+              No spam. Unsubscribe anytime. Your email is safe with us.
             </p>
           </>
         ) : (
@@ -162,7 +168,7 @@ export default function ExitIntentPopup() {
               Use this code at checkout to save 15% on your first order!
             </p>
             <p className="text-sm text-gray-500">
-              Welcome to the Nature's Way Soil family 🌱
+              Welcome to the Nature&apos;s Way Soil family
             </p>
           </div>
         )}
