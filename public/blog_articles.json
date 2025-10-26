@@ -245,5 +245,34 @@
         "youtube"
       ]
     }
+  },
+  {
+    "id": 1761446208,
+    "title": "Building Healthy Soil: The Foundation of Successful Gardening",
+    "slug": "building-healthy-soil-the-foundation-of-successful-gardening",
+    "excerpt": "Learn about soil structure and how it can transform your garden.",
+    "content": "# Building Healthy Soil: The Foundation of Successful Gardening\n\n[Comprehensive article content would be generated here by LLM]\n\nFocus areas: soil structure, organic matter, microorganisms, soil amendments",
+    "author": "Nature's Way Soil Team",
+    "date": "2025-10-26",
+    "category": "Gardening Tips",
+    "tags": [
+      "soil structure",
+      "organic matter",
+      "microorganisms"
+    ],
+    "featured_image": "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800",
+    "reading_time": "8 min read",
+    "video": {
+      "url": "https://cdn.abacus.ai/videos/building-healthy-soil-the-foundation-of-successful-gardening.mp4",
+      "title": "Building Healthy Soil: The Foundation of Successful Gardening - Nature's Way Soil",
+      "duration": 30,
+      "width": 720,
+      "height": 1280,
+      "platforms": [
+        "tiktok",
+        "instagram",
+        "youtube"
+      ]
+    }
   }
 ]
