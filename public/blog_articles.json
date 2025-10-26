@@ -274,5 +274,34 @@
         "youtube"
       ]
     }
+  },
+  {
+    "id": 1761446224,
+    "title": "Seasonal Gardening Guide: What to Plant When",
+    "slug": "seasonal-gardening-guide-what-to-plant-when",
+    "excerpt": "Learn about planting calendar and how it can transform your garden.",
+    "content": "# Seasonal Gardening Guide: What to Plant When\n\n[Comprehensive article content would be generated here by LLM]\n\nFocus areas: planting calendar, seasonal tasks, soil preparation, product timing",
+    "author": "Nature's Way Soil Team",
+    "date": "2025-10-26",
+    "category": "Gardening Tips",
+    "tags": [
+      "planting calendar",
+      "seasonal tasks",
+      "soil preparation"
+    ],
+    "featured_image": "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800",
+    "reading_time": "8 min read",
+    "video": {
+      "url": "https://cdn.abacus.ai/videos/seasonal-gardening-guide-what-to-plant-when.mp4",
+      "title": "Seasonal Gardening Guide: What to Plant When - Nature's Way Soil",
+      "duration": 30,
+      "width": 720,
+      "height": 1280,
+      "platforms": [
+        "tiktok",
+        "instagram",
+        "youtube"
+      ]
+    }
   }
 ]
