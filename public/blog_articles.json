@@ -216,5 +216,34 @@
         "youtube"
       ]
     }
+  },
+  {
+    "id": 1761446182,
+    "title": "Organic Pest Control: Natural Solutions for a Healthy Garden",
+    "slug": "organic-pest-control-natural-solutions-for-a-healthy-garden",
+    "excerpt": "Learn about organic pest management and how it can transform your garden.",
+    "content": "# Organic Pest Control: Natural Solutions for a Healthy Garden\n\n[Comprehensive article content would be generated here by LLM]\n\nFocus areas: organic pest management, beneficial insects, natural remedies, soil health connection",
+    "author": "Nature's Way Soil Team",
+    "date": "2025-10-26",
+    "category": "Gardening Tips",
+    "tags": [
+      "organic pest management",
+      "beneficial insects",
+      "natural remedies"
+    ],
+    "featured_image": "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800",
+    "reading_time": "8 min read",
+    "video": {
+      "url": "https://cdn.abacus.ai/videos/organic-pest-control-natural-solutions-for-a-healthy-garden.mp4",
+      "title": "Organic Pest Control: Natural Solutions for a Healthy Garden - Nature's Way Soil",
+      "duration": 30,
+      "width": 720,
+      "height": 1280,
+      "platforms": [
+        "tiktok",
+        "instagram",
+        "youtube"
+      ]
+    }
   }
 ]
