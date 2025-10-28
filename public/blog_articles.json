@@ -303,5 +303,34 @@
         "youtube"
       ]
     }
+  },
+  {
+    "id": 1761619333,
+    "title": "Water-Wise Gardening: Conserving Water While Growing Abundantly",
+    "slug": "water-wise-gardening-conserving-water-while-growing-abundantly",
+    "excerpt": "Learn about water conservation and how it can transform your garden.",
+    "content": "# Water-Wise Gardening: Conserving Water While Growing Abundantly\n\n[Comprehensive article content would be generated here by LLM]\n\nFocus areas: water conservation, mulching, soil moisture retention, drought-resistant plants",
+    "author": "Nature's Way Soil Team",
+    "date": "2025-10-28",
+    "category": "Gardening Tips",
+    "tags": [
+      "water conservation",
+      "mulching",
+      "soil moisture retention"
+    ],
+    "featured_image": "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800",
+    "reading_time": "8 min read",
+    "video": {
+      "url": "https://cdn.abacus.ai/videos/water-wise-gardening-conserving-water-while-growing-abundantly.mp4",
+      "title": "Water-Wise Gardening: Conserving Water While Growing Abundantly - Nature's Way Soil",
+      "duration": 30,
+      "width": 720,
+      "height": 1280,
+      "platforms": [
+        "tiktok",
+        "instagram",
+        "youtube"
+      ]
+    }
   }
 ]
