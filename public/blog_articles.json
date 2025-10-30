@@ -332,5 +332,34 @@
         "youtube"
       ]
     }
+  },
+  {
+    "id": 1761792262,
+    "title": "Raised Bed Gardening: Maximizing Space and Soil Quality",
+    "slug": "raised-bed-gardening-maximizing-space-and-soil-quality",
+    "excerpt": "Learn about raised bed benefits and how it can transform your garden.",
+    "content": "# Raised Bed Gardening: Maximizing Space and Soil Quality\n\n[Comprehensive article content would be generated here by LLM]\n\nFocus areas: raised bed benefits, soil mixes, construction tips, intensive planting",
+    "author": "Nature's Way Soil Team",
+    "date": "2025-10-30",
+    "category": "Gardening Tips",
+    "tags": [
+      "raised bed benefits",
+      "soil mixes",
+      "construction tips"
+    ],
+    "featured_image": "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800",
+    "reading_time": "8 min read",
+    "video": {
+      "url": "https://cdn.abacus.ai/videos/raised-bed-gardening-maximizing-space-and-soil-quality.mp4",
+      "title": "Raised Bed Gardening: Maximizing Space and Soil Quality - Nature's Way Soil",
+      "duration": 30,
+      "width": 720,
+      "height": 1280,
+      "platforms": [
+        "tiktok",
+        "instagram",
+        "youtube"
+      ]
+    }
   }
 ]
