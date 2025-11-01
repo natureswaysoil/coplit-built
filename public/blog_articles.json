@@ -361,5 +361,34 @@
         "youtube"
       ]
     }
+  },
+  {
+    "id": 1761965196,
+    "title": "Composting 101: Turn Kitchen Scraps into Garden Gold",
+    "slug": "composting-101-turn-kitchen-scraps-into-garden-gold",
+    "excerpt": "Learn about composting basics and how it can transform your garden.",
+    "content": "# Composting 101: Turn Kitchen Scraps into Garden Gold\n\n[Comprehensive article content would be generated here by LLM]\n\nFocus areas: composting basics, benefits, how-to guide, Nature's Way Living Compost products",
+    "author": "Nature's Way Soil Team",
+    "date": "2025-11-01",
+    "category": "Gardening Tips",
+    "tags": [
+      "composting basics",
+      "benefits",
+      "how-to guide"
+    ],
+    "featured_image": "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800",
+    "reading_time": "8 min read",
+    "video": {
+      "url": "https://cdn.abacus.ai/videos/composting-101-turn-kitchen-scraps-into-garden-gold.mp4",
+      "title": "Composting 101: Turn Kitchen Scraps into Garden Gold - Nature's Way Soil",
+      "duration": 30,
+      "width": 720,
+      "height": 1280,
+      "platforms": [
+        "tiktok",
+        "instagram",
+        "youtube"
+      ]
+    }
   }
 ]
