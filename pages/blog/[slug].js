@@ -49,6 +49,39 @@ export default function BlogPost({ post }) {
         {post.featuredImage && (
           <meta name="twitter:image" content={`https:${post.featuredImage}`} />
         )}
+
+        {/* Canonical URL */}
+        <link rel="canonical" href={`https://natureswaysoil.com/blog/${post.slug}`} />
+
+        {/* JSON-LD Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            "headline": post.title,
+            "description": post.excerpt,
+            "datePublished": post.date,
+            "dateModified": post.date,
+            "author": {
+              "@type": "Organization",
+              "name": "Nature's Way Soil",
+              "url": "https://natureswaysoil.com"
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "Nature's Way Soil",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://natureswaysoil.com/logo-with-tagline.png"
+              }
+            },
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": `https://natureswaysoil.com/blog/${post.slug}`
+            }
+          })}}
+        />
       </Head>
 
       <article className="blog-post">
