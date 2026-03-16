@@ -36,45 +36,39 @@ export default function CheckoutForm_Tax({ intentId, email, name, onPaid, addres
     setSubmitting(true);
     setError(null);
 
-  // IMPORTANT: Shipping information is set here during payment confirmation
-    // using the publishable key. The backend does NOT set shipping when creating
-    // the PaymentIntent to avoid Stripe's security restriction that prevents
-    // updating shipping info set with a secret key using a publishable key.
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-    receipt_email: linkEmail || email,
+        receipt_email: linkEmail || email,
         payment_method_data: {
           billing_details: {
-      name,
-      email: linkEmail || email,
+            name,
+            email: linkEmail || email,
             phone: address?.phone,
-            address: address?.address1 || address?.address2 || address?.city || address?.state || address?.zip ? {
-              line1: address?.address1,
-              line2: address?.address2,
-              city: address?.city,
-              state: address?.state,
-              postal_code: address?.zip,
-              country: 'US',
-            } : undefined,
+            address:
+              address?.address1 ||
+              address?.address2 ||
+              address?.city ||
+              address?.state ||
+              address?.zip
+                ? {
+                    line1: address?.address1,
+                    line2: address?.address2,
+                    city: address?.city,
+                    state: address?.state,
+                    postal_code: address?.zip,
+                    country: 'US',
+                  }
+                : undefined,
           },
         },
-        // Shipping info is set here with publishable key (safe and correct approach)
-        shipping: address?.address1 ? {
-          name,
-          phone: address?.phone,
-          address: {
-            line1: address?.address1,
-            line2: address?.address2,
-            city: address?.city,
-            state: address?.state,
-            postal_code: address?.zip,
-            country: 'US',
-          },
-        } : undefined,
+        // Shipping details are already set on the PaymentIntent server-side.
+        // Providing them again here with the publishable key can trigger Stripe
+        // to reject the update with: "shipping information was last set with a
+        // secret key". Skip sending shipping during confirmation to avoid this.
         return_url: `${window.location.origin}/success?pi=${intentId}`,
       },
-      redirect: "always", // Always redirect for better customer experience
+      redirect: 'always', // Always redirect for better customer experience
     });
 
     setSubmitting(false);

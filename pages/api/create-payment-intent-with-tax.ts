@@ -134,14 +134,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       customer: stripeCustomerId,
       automatic_payment_methods: { enabled: true },
       receipt_email: customer?.email,
-      // shipping: REMOVED - will be set by frontend during confirmPayment
+      // Do not set shipping at creation time. The Payment Element will send
+      // shipping details when confirming on the client. If we pre-populate the
+      // shipping field here (using the secret key) and the client attempts to
+      // confirm with a publishable key, Stripe rejects the update with
+      // "shipping information was last set with a secret key".
       metadata: {
         tax_calculation: calc.id,
         promo_code: promoCode || "",
-        discount_cents: String(discountCents),
-        tax_rate_percent: (effectiveRate * 100).toFixed(4),
-        tax_subtotal_cents: String(subtotal),
-        tax_amount_cents: String(tax)
+        discount_cents: String(discountCents)
       },
     });
 
